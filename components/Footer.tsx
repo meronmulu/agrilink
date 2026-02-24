@@ -3,7 +3,7 @@ import { Facebook, Twitter, Linkedin, Mail, Flower2, } from "lucide-react"
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-50 mt-20 ">
+        <footer className="bg-gray-50 ">
 
             {/* Top Section */}
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto py-20 px-6 text-gray-600 text-sm">
