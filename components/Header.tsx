@@ -1,15 +1,46 @@
-import React from "react";
+'use client'
+
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { CircleUserRound, Flower2, Globe, LogOut, Settings } from "lucide-react";
+import { Flower2, Globe } from "lucide-react";
 import Link from "next/link";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 export default function Header() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkAuth = () => {
+            setIsAuthenticated(localStorage.getItem('isAuthenticated') === 'true');
+        };
+
+        checkAuth();
+        // Listen for storage events in case login happens in another tab
+        window.addEventListener('storage', checkAuth);
+
+        // Custom event for same-tab login updates
+        const handleAuthChange = () => checkAuth();
+        window.addEventListener('authChange', handleAuthChange);
+
+        return () => {
+            window.removeEventListener('storage', checkAuth);
+            window.removeEventListener('authChange', handleAuthChange);
+        };
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('isAuthenticated');
+        setIsAuthenticated(false);
+        // Dispatch custom event so other components (like another header instance if any) update
+        window.dispatchEvent(new Event('authChange'));
+        router.push('/');
+    }
+
     return (
         <header className="w-full fixed h-16  top-0 left-0 z-50 bg-white border-b shadow-sm">
             <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
 
-                <div className="flex items-center space-x-2 cursor-pointer">
+                <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push('/')}>
                     <div className="bg-emerald-500 p-2 rounded-lg">
                         <Flower2 className="text-white w-5 h-5" />
                     </div>
@@ -20,55 +51,30 @@ export default function Header() {
 
                 <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium">
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        Market insight
+                        Market
                     </p>
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        {/* How it works */}
-                        My orders
+                        How it works
                     </p>
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        {/* About Us */}
-                        Message
+                        About Us
                     </p>
 
                     <Button
                         variant="outline"
-                        className="flex items-center gap-2 border-gray-300 hover:border-emerald-500 hover:text-emerald-600"
+                        className="flex items-center justify-center gap-2 border-gray-300 hover:border-emerald-500 hover:text-emerald-600"
                     >
                         <Globe className="w-4 h-4" />
                         EN
                     </Button>
                 </nav>
 
-
-                {/* for not logged in user */}
-
-                {/* <div className="flex items-center">
+                <div className="flex items-center">
                     <Link href="/login">
                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 rounded-lg">
                             Get Started
                         </Button>
                     </Link>
-                </div> */}
-            
-
-               {/* for logged in user */}
-                <div className="">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <CircleUserRound size={32} className="cursor-pointer text-gray-600" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                                <DropdownMenuItem>
-                                    <Settings size={16}/>
-                                    Setting
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <LogOut size={16} />
-                                    Logout
-                                </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
                 </div>
 
 
