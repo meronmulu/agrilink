@@ -6,6 +6,7 @@ import { Lock, Eye, EyeOff, Mail, User } from "lucide-react"
 import { Input } from './ui/input'
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
@@ -14,6 +15,7 @@ export default function Login() {
     password: ''
   })
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -30,6 +32,7 @@ export default function Login() {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500))
       console.log('Login attempt:', formData)
+      router.push('/buyer/marketplace')
     } catch (error) {
       console.error('Login failed:', error)
     } finally {
@@ -40,6 +43,7 @@ export default function Login() {
   const handleGoogleLogin = () => {
     console.log("Continue with Google")
     // later connect to backend OAuth
+    router.push('/buyer/marketplace')
   }
 
   return (
@@ -211,20 +215,20 @@ export default function Login() {
             </button>
 
 
-          {/* Signup */}
-          <p className="text-gray-500 text-center">
-            Don’t have an account?{" "}
-            <Link
-              href="/signup"
-              className="text-emerald-600 hover:text-emerald-700 font-medium"
-            >
-              Sign Up
-            </Link>
-          </p>
+            {/* Signup */}
+            <p className="text-gray-500 text-center">
+              Don’t have an account?{" "}
+              <Link
+                href="/signup"
+                className="text-emerald-600 hover:text-emerald-700 font-medium"
+              >
+                Sign Up
+              </Link>
+            </p>
 
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
     </div >
   )
 }
