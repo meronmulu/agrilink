@@ -1,7 +1,8 @@
 import React from "react";
 import { Button } from "./ui/button";
-import { Flower2, Globe } from "lucide-react";
+import { CircleUserRound, Flower2, Globe, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 export default function Header() {
     return (
@@ -19,13 +20,15 @@ export default function Header() {
 
                 <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium">
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        Market
+                        Market insight
                     </p>
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        How it works
+                        {/* How it works */}
+                        My orders
                     </p>
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        About Us
+                        {/* About Us */}
+                        Message
                     </p>
 
                     <Button
@@ -37,13 +40,41 @@ export default function Header() {
                     </Button>
                 </nav>
 
-                <div className="flex items-center">
+
+                {/* for not logged in user */}
+
+                {/* <div className="flex items-center">
                     <Link href="/login">
                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 rounded-lg">
                             Get Started
                         </Button>
                     </Link>
+                </div> */}
+            
+
+               {/* for logged in user */}
+                <div className="">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <CircleUserRound size={32} className="cursor-pointer text-gray-600" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                                <DropdownMenuItem>
+                                    <Settings size={16}/>
+                                    Setting
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <LogOut size={16} />
+                                    Logout
+                                </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
+
+
+
+
+
             </div>
         </header>
     );

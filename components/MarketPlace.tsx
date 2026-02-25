@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
 import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
 import Image from 'next/image'
 import { Search, Filter } from 'lucide-react'
-import img from '../public/agriGirl.jpg' // placeholder image
-
+import img from '../public/agriGirl.jpg'
+import Link from 'next/link'
 export default function MarketPlace() {
 
   // Dummy products
@@ -68,7 +67,6 @@ export default function MarketPlace() {
 
   return (
     <div className="pt-20 flex flex-col bg-[#fcfdfd] min-h-screen">
-
       {/* Header */}
       <div className="mx-4 md:mx-10 mb-6">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-800">Marketplace</h1>
@@ -92,10 +90,10 @@ export default function MarketPlace() {
         {/* Category Filter */}
         <div className="flex gap-2 flex-wrap">
 
-            <Button className=' border-2 h-10 bg-white hover:bg-white  text-black'>
-                <Filter className="mr-2" size={16} />
-                Catagories
-            </Button>
+          <Button className=' border-2 h-10 bg-white hover:bg-white  text-black'>
+            <Filter className="mr-2" size={16} />
+            Catagories
+          </Button>
         </div>
       </div>
 
@@ -130,12 +128,20 @@ export default function MarketPlace() {
 
               {/* Action Buttons */}
               <div className="mt-4 flex gap-2">
-                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white">
-                  Add to Cart
-                </Button>
-                <Button className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700">
-                  View Details
-                </Button>
+                <Link href="/cart">
+                  <Button className=" bg-emerald-500 hover:bg-emerald-600 text-white">
+                    Add to Cart
+                  </Button>
+                </Link>
+
+
+                <Link href="/productDetail">
+                  <Button className=" bg-white border border-gray-200 hover:bg-gray-50 text-gray-700">
+                    View Details
+                  </Button>
+                </Link>
+
+
               </div>
 
             </CardContent>
