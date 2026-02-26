@@ -3,12 +3,34 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { BarChart3, Store, Bot } from "lucide-react"
 
+const features = [
+  {
+    icon: BarChart3,
+    title: "Real-time Market Intelligence",
+    description:
+      "Showcasing price transparency and data-driven insights. Get accurate daily prices for crops across all major Ethiopian regions.",
+  },
+  {
+    icon: Store,
+    title: "Unified Marketplace",
+    description:
+      "Connecting farmers and buyers directly to reduce post-harvest loss. Eliminate middlemen layers and maximize your profit margins.",
+  },
+  {
+    icon: Bot,
+    title: "AI-Powered Support",
+    description:
+      "Integrated AI Chatbot for expert guidance and agricultural questions available 24/7. Get advice on crop health and trading strategies.",
+  },
+]
+
 export default function FeaturesSection() {
   return (
-    <section className="w-full py-20 bg-gray-50">
+    <section id="features" className="w-full py-20 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6">
 
-        <div className="text-center mb-16 mt-5 ">
+        {/* Header */}
+        <div className="text-center mb-16 mt-5">
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
             Our Core Features
           </h2>
@@ -20,62 +42,37 @@ export default function FeaturesSection() {
 
         {/* Cards */}
         <div className="grid gap-8 md:grid-cols-3">
+          {features.map((feature, index) => {
+            const Icon = feature.icon
 
-          {/* Card 1 */}
-          <Card className="rounded-2xl shadow-sm hover:shadow-md transition">
-            <CardContent className="p-8">
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-green-100 mb-6">
-                <BarChart3 className="text-green-600" size={24} />
-              </div>
+            return (
+              <Card
+                key={index}
+                className="rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-2 transition-all duration-300"
+              >
+                <CardContent className="p-8">
+                  
+                  {/* Icon */}
+                  <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br from-green-100 to-green-200 mb-6">
+                    <Icon className="text-green-600" size={24} />
+                  </div>
 
-              <h3 className="text-lg font-semibold mb-3">
-                Real-time Market Intelligence
-              </h3>
+                  {/* Title */}
+                  <h3 className="text-lg font-semibold mb-3">
+                    {feature.title}
+                  </h3>
 
-              <p className="text-gray-500 text-sm leading-relaxed">
-                Showcasing price transparency and data-driven insights. 
-                Get accurate daily prices for crops across all major Ethiopian regions.
-              </p>
-            </CardContent>
-          </Card>
+                  {/* Description */}
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
 
-          {/* Card 2 */}
-          <Card className="rounded-2xl shadow-sm hover:shadow-md transition">
-            <CardContent className="p-8">
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-green-100 mb-6">
-                <Store className="text-green-600" size={24} />
-              </div>
-
-              <h3 className="text-lg font-semibold mb-3">
-                Unified Marketplace
-              </h3>
-
-              <p className="text-gray-500 text-sm leading-relaxed">
-                Connecting farmers and buyers directly to reduce post-harvest loss.
-                Eliminate middlemen layers and maximize your profit margins.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Card 3 */}
-          <Card className="rounded-2xl shadow-sm hover:shadow-md transition">
-            <CardContent className="p-8">
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-green-100 mb-6">
-                <Bot className="text-green-600" size={24} />
-              </div>
-
-              <h3 className="text-lg font-semibold mb-3">
-                AI-Powered Support
-              </h3>
-
-              <p className="text-gray-500 text-sm leading-relaxed">
-                Integrated AI Chatbot for expert guidance and agricultural questions
-                available 24/7. Get advice on crop health and trading strategies.
-              </p>
-            </CardContent>
-          </Card>
-
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
+
       </div>
     </section>
   )
