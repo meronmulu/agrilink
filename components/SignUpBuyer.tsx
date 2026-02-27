@@ -3,7 +3,9 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from './ui/input'
-import { Lock, Mail, User } from 'lucide-react'
+import { Lock, Mail, Shield, User } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import Link from 'next/link'
 
 export default function SignUpBuyer({ role }: { role: string }) {
   const router = useRouter()
@@ -37,7 +39,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3">
       {/* Name */}
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
@@ -97,6 +99,38 @@ export default function SignUpBuyer({ role }: { role: string }) {
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
         </div>
       </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          Role
+        </label>
+
+        <div className="relative">
+          <Select >
+            <SelectTrigger className="pl-10 h-24 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
+              <SelectValue placeholder="Select user role" />
+            </SelectTrigger>
+
+            <SelectContent className="bg-white">
+              <SelectItem value="ADMIN">Farmer</SelectItem>
+              <SelectItem value="PHARMACIST">Buyer</SelectItem>
+            </SelectContent>
+          </Select>
+
+
+        </div>
+
+        <p className="text-gray-500 text-center text-sm">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-emerald-600 hover:text-emerald-700 font-medium"
+          >
+            Sign In
+          </Link>
+        </p>
+      </div>
+
 
       {/* Submit Button */}
       <button

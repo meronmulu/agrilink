@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { Flower2, Globe } from "lucide-react";
+import { CircleUserRound, Flower2, Globe, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 export default function Header() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -49,7 +51,8 @@ export default function Header() {
                     </h1>
                 </div>
 
-                <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium">
+                {/* for user not login */}
+                {/* <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium mx-auto">
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
                         Market
                     </p>
@@ -67,14 +70,102 @@ export default function Header() {
                         <Globe className="w-4 h-4" />
                         EN
                     </Button>
-                </nav>
+                </nav> */}
 
-                <div className="flex items-center">
+                {/* for user farmer */}
+                {/* <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium mx-auto">
+                    <p className="hover:text-emerald-500 cursor-pointer transition-colors">
+                        Market insight
+                    </p>
+                    <p className="hover:text-emerald-500 cursor-pointer transition-colors">
+                        Orders
+                    </p>
+                    <p className="hover:text-emerald-500 cursor-pointer transition-colors">
+                        Ai assistant
+                    </p>
+                    <p className="hover:text-emerald-500 cursor-pointer transition-colors">
+                        Message
+                     </p>
+
+                    <Button
+                        variant="outline"
+                        className="flex items-center justify-center gap-2 border-gray-300 hover:border-emerald-500 hover:text-emerald-600"
+                    >
+                        <Globe className="w-4 h-4" />
+                        EN
+                    </Button>
+                </nav> */}
+
+
+                {/* for user buyer */}
+                <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium mx-auto">
+                    <p className="hover:text-emerald-500 cursor-pointer transition-colors">
+                        Market insight
+                    </p>
+                   <Link href="/order">
+                    <p className="hover:text-emerald-500 cursor-pointer transition-colors">
+                        Orders
+                    </p>
+                   </Link>         
+
+                    <Link href="/message">
+                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
+                        Message
+                    </p> 
+                    </Link>         
+                    
+
+                    <Button
+                        variant="outline"
+                        className="flex items-center justify-center gap-2 border-gray-300 hover:border-emerald-500 hover:text-emerald-600"
+                    >
+                        <Globe className="w-4 h-4" />
+                        EN
+                    </Button>
+                </nav>
+                <div>
+
+                </div>
+
+                {/* for user not login */}
+                {/* <div className="flex items-center">
                     <Link href="/login">
                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 rounded-lg">
                             Get Started
                         </Button>
                     </Link>
+                </div> */}
+
+                {/* for user login */}
+                <div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <CircleUserRound size={32} className="cursor-pointer text-gray-600" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuItem className="md:hidden">
+                                Market Insight
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="md:hidden">
+                                Orders
+                            </DropdownMenuItem>
+                            <Link href="/message">
+                                <DropdownMenuItem className="md:hidden">
+                                    Message
+                                </DropdownMenuItem>
+                            </Link>
+
+                            <DropdownMenuItem>
+                                {/* <Settings size={16}/> */}
+                                Setting
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-500">
+                                <LogOut size={16} className="text-red-500" />
+                                Logout
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
 
 
