@@ -1,18 +1,22 @@
+'use client'
+
 import React from 'react'
 import { Card, CardContent } from './ui/card'
 import { BarChart3, Bot, Store } from 'lucide-react'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MarketPlacePreview() {
+  const { t } = useLanguage()
   return (
-     <section className="w-full py-20 bg-white">
+    <section className="w-full py-20 bg-white">
       <div className="max-w-6xl mx-auto px-6">
 
         <div className="mb-16 mt-5 ">
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-            Market Place Preview
+            {t('market_preview_title')}
           </h2>
           <p className="mt-4 text-gray-500 max-w-2xl ">
-             Today featured products and services in the marketplace.
+            {t('market_preview_subtitle')}
           </p>
         </div>
 
@@ -27,12 +31,11 @@ export default function MarketPlacePreview() {
               </div>
 
               <h3 className="text-lg font-semibold mb-3">
-                Real-time Market Intelligence
+                {t('coreFeature_title1')}
               </h3>
 
               <p className="text-gray-500 text-sm leading-relaxed">
-                Showcasing price transparency and data-driven insights. 
-                Get accurate daily prices for crops across all major Ethiopian regions.
+                {t('coreFeature_desc1')}
               </p>
             </CardContent>
           </Card>
@@ -45,12 +48,11 @@ export default function MarketPlacePreview() {
               </div>
 
               <h3 className="text-lg font-semibold mb-3">
-                Unified Marketplace
+                {t('coreFeature_title2')}
               </h3>
 
               <p className="text-gray-500 text-sm leading-relaxed">
-                Connecting farmers and buyers directly to reduce post-harvest loss.
-                Eliminate middlemen layers and maximize your profit margins.
+                {t('coreFeature_desc2')}
               </p>
             </CardContent>
           </Card>
@@ -63,12 +65,11 @@ export default function MarketPlacePreview() {
               </div>
 
               <h3 className="text-lg font-semibold mb-3">
-                AI-Powered Support
+                {t('coreFeature_title3')}
               </h3>
 
               <p className="text-gray-500 text-sm leading-relaxed">
-                Integrated AI Chatbot for expert guidance and agricultural questions
-                available 24/7. Get advice on crop health and trading strategies.
+                {t('coreFeature_desc3')}
               </p>
             </CardContent>
           </Card>
@@ -79,12 +80,11 @@ export default function MarketPlacePreview() {
               </div>
 
               <h3 className="text-lg font-semibold mb-3">
-                AI-Powered Support
+                {t('coreFeature_title3')}
               </h3>
 
               <p className="text-gray-500 text-sm leading-relaxed">
-                Integrated AI Chatbot for expert guidance and agricultural questions
-                available 24/7. Get advice on crop health and trading strategies.
+                {t('coreFeature_desc3')}
               </p>
             </CardContent>
           </Card>

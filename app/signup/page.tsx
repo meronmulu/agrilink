@@ -5,10 +5,12 @@ import img from "../../public/Agricultural.jpg"
 import { useState } from "react"
 import SignUpFarmer from "@/components/SignUpFarmer"
 import SignUpBuyer from "@/components/SignUpBuyer"
+import { useLanguage } from '@/context/LanguageContext'
 
 type Role = "FARMER" | "BUYER"
 
 export default function SignupPage() {
+  const { t } = useLanguage()
   // Farmer is selected by default
   const [selectedRole, setSelectedRole] = useState<Role>("FARMER")
 
@@ -26,9 +28,9 @@ export default function SignupPage() {
         />
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 flex flex-col justify-center px-16 text-white">
-          <h1 className="text-4xl font-bold">Welcome 🌾</h1>
+          <h1 className="text-4xl font-bold">{t('signup_welcome')}</h1>
           <p className="mt-4 text-lg text-gray-200 max-w-md">
-            Manage your agricultural system efficiently and securely.
+            {t('signup_subtitle')}
           </p>
         </div>
       </div>
@@ -40,10 +42,10 @@ export default function SignupPage() {
           {/* Header */}
           <div className="text-center mx-auto  lg:text-left mb-6">
             <h2 className="text-3xl font-bold text-gray-900">
-              Create Account
+              {t('signup_header')}
             </h2>
             <p className="text-gray-500 mt-1">
-              Select your role and fill the details to sign up
+              {t('signup_subheader')}
             </p>
           </div>
 
@@ -57,7 +59,7 @@ export default function SignupPage() {
                   : "text-gray-500 hover:text-gray-700"
                 }`}
             >
-              🌾 Farmer
+              🌾 {t('signup_role_farmer').replace('🌾', '').trim()}
             </button>
 
             <button
@@ -68,7 +70,7 @@ export default function SignupPage() {
                   : "text-gray-500 hover:text-gray-700"
                 }`}
             >
-              🛒 Buyer
+              🛒 {t('signup_role_buyer').replace('🛒', '').trim()}
             </button>
           </div>
 
