@@ -4,9 +4,13 @@ import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
 import Image from 'next/image'
 import { Search, Filter } from 'lucide-react'
+import img from '../public/agriGirl.jpg' // placeholder image
+import { useLanguage } from '@/context/LanguageContext'
+
 import img from '../public/agriGirl.jpg'
 import Link from 'next/link'
 export default function MarketPlace() {
+  const { t } = useLanguage()
 
   // Dummy products
   const productsData = [
@@ -69,9 +73,9 @@ export default function MarketPlace() {
     <div className="pt-20 flex flex-col bg-[#fcfdfd] min-h-screen">
       {/* Header */}
       <div className="mx-4 md:mx-10 mb-6">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-800">Marketplace</h1>
+        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-800">{t('market_title')}</h1>
         <p className="text-gray-600">
-          Uncover trends, high-quality products directly from local farmers.
+          {t('market_subtitle')}
         </p>
       </div>
 
@@ -82,7 +86,7 @@ export default function MarketPlace() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder={t('market_search_placeholder')}
             className="pl-10 pr-4 h-10 bg-white w-full rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
           />
         </div>
@@ -92,6 +96,7 @@ export default function MarketPlace() {
 
           <Button className=' border-2 h-10 bg-white hover:bg-white  text-black'>
             <Filter className="mr-2" size={16} />
+            {t('market_categories_btn')}
             Catagories
           </Button>
         </div>
@@ -114,7 +119,7 @@ export default function MarketPlace() {
                   />
                 ) : (
                   <div className="bg-gray-200 w-full h-full flex items-center justify-center">
-                    No Image
+                    {t('market_no_image')}
                   </div>
                 )}
               </div>
@@ -128,6 +133,12 @@ export default function MarketPlace() {
 
               {/* Action Buttons */}
               <div className="mt-4 flex gap-2">
+                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white">
+                  {t('market_add_cart')}
+                </Button>
+                <Button className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700">
+                  {t('market_view_details')}
+                </Button>
                 <Link href="/cart">
                   <Button className=" bg-emerald-500 hover:bg-emerald-600 text-white">
                     Add to Cart

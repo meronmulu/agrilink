@@ -3,11 +3,14 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from './ui/input'
+import { Lock, Mail, User } from 'lucide-react'
+import { useLanguage } from '@/context/LanguageContext'
 import { Lock, Mail, Shield, User } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import Link from 'next/link'
 
 export default function SignUpBuyer({ role }: { role: string }) {
+  const { t } = useLanguage()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -43,7 +46,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
       {/* Name */}
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
-          Full Name
+          {t('signup_name_label')}
         </label>
         <div className="relative group">
           <Input
@@ -53,7 +56,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
             required
             value={formData.name}
             onChange={handleChange}
-            placeholder="John Doe"
+            placeholder={t('signup_name_placeholder')}
             className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
           <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
@@ -63,7 +66,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
       {/* Email */}
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-gray-700">
-          Email Address
+          {t('signup_email_label')}
         </label>
         <div className="relative group">
           <Input
@@ -73,7 +76,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
             required
             value={formData.email}
             onChange={handleChange}
-            placeholder="you@example.com"
+            placeholder={t('signup_email_placeholder')}
             className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
@@ -83,7 +86,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
       {/* Password */}
       <div className="space-y-2">
         <label htmlFor="password" className="text-sm font-medium text-gray-700">
-          Password
+          {t('signup_password_label')}
         </label>
         <div className="relative group">
           <Input
@@ -93,7 +96,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
             required
             value={formData.password}
             onChange={handleChange}
-            placeholder="••••••••"
+            placeholder={t('signup_password_placeholder')}
             className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
@@ -141,7 +144,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          'Create Buyer Account'
+          t('signup_buyer_btn')
         )}
       </button>
     </form>
