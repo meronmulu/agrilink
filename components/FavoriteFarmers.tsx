@@ -44,7 +44,7 @@ export default function FavoriteFarmers() {
                     <div key={farmer.id} className="flex items-center justify-between group cursor-pointer">
                         <div className="flex items-center gap-3">
                             <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0">
-                                <Image src={farmer.image} alt={farmer.name} fill className="object-cover" />
+                                {/* <Image src={farmer.image} alt={farmer.name} fill className="object-cover" /> */}
                                 {/* Online Indicator */}
                                 <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${farmer.online ? 'bg-emerald-500' : 'bg-gray-400'}`}></div>
                             </div>

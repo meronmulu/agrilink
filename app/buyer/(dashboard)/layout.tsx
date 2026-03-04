@@ -16,7 +16,7 @@ export default function BuyerDashboardLayout({
             </div>
 
             {/* Dashboard Body */}
-            <div className="flex flex-1 pt-4 max-w-7xl mx-auto w-full px-2 sm:px-6 lg:px-8">
+            <div className="flex flex-1 pt-4 max-w-7xl h-screen mx-auto w-full sm:px-6 ">
 
                 {/* Sidebar */}
                 <BuyerSidebar />

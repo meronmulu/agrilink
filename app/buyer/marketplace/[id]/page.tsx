@@ -6,7 +6,8 @@ import Footer from '@/components/Footer'
 import ProductGallery from '@/components/ProductGallery'
 import ProductInfo from '@/components/ProductInfo'
 import Link from 'next/link'
-import { ChevronRight, CheckCircle2 } from 'lucide-react'
+import { ChevronRight, CheckCircle2, Star } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 // Dummy product images
 const PRODUCT_IMAGES = [

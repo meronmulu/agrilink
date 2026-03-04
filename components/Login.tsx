@@ -40,7 +40,7 @@ export default function Login() {
       throw new Error(message)
     }
 
-    return res.json() // expected shape: { accessToken?: string, user?: {...} }
+    return res.json() 
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,9 +73,8 @@ export default function Login() {
       await new Promise(resolve => setTimeout(resolve, 1200))
       console.log('Login attempt:', formData)
       router.push('/buyer/marketplace')
-    } catch (err: any) {
+    } catch (err) {
       console.error('Login failed:', err)
-      setError(err?.message || t('login_err_failed'))
     } finally {
       setIsLoading(false)
     }
@@ -96,28 +95,6 @@ export default function Login() {
     }
   };
 
-
-  return (
-    <div className="grid lg:grid-cols-2 min-h-screen">
-      {/* LEFT SIDE */}
-      <div className="relative hidden lg:block">
-        <Image src={img} alt="Agriculture background" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="absolute inset-0 flex flex-col justify-center px-16 text-white">
-          <h1 className="text-4xl font-bold">{t('login_welcome')}</h1>
-          <p className="mt-4 text-lg text-gray-200 max-w-md">{t('login_subtitle')}</p>
-        </div>
-      </div>
-
-      {/* RIGHT SIDE */}
-      <div className="flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-white">
-        <div className="w-full max-w-md">
-          <div className="text-center lg:text-left mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">{t('login_header')}</h2>
-            <p className="text-gray-500 mt-2">{t('login_subheader')}</p>
-  const handleGoogleLogin = () => {
-    router.push('/buyer/marketplace')
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -142,29 +119,6 @@ export default function Login() {
           </div>
         </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-            {/* Email */}
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700 block">{t('login_email_label')}</label>
-              <div className="relative group">
-                <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required disabled={isLoading} placeholder={t('login_email_placeholder')} className="h-12 pl-10 rounded-xl border-gray-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label htmlFor="password" className="text-sm font-medium text-gray-700">{t('login_password_label')}</label>
-                <button type="button" className="text-sm text-emerald-600 hover:text-emerald-700">{t('login_forgot_password')}</button>
-              </div>
-
-              <div className="relative group">
-                <Input id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} required disabled={isLoading} placeholder={t('login_password_placeholder')} className="h-12 pl-10 pr-10 rounded-xl border-gray-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-                <button type="button" onClick={() => setShowPassword(prev => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label={showPassword ? 'Hide password' : 'Show password'}>
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
         {/* RIGHT SIDE */}
         <div className="flex items-center justify-center p-6 lg:p-10 bg-white">
           <div className="w-full max-w-sm">
@@ -212,8 +166,7 @@ export default function Login() {
                   />
                 </div>
               </div>
-
-              {/* Password */}
+            {/* Password */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
                   <label
@@ -262,29 +215,6 @@ export default function Login() {
                 </div>
               </div>
 
-            {error && <div role="alert" className="text-sm text-red-600">{error}</div>}
-
-            {/* Sign In Button */}
-            <button type="submit" disabled={isLoading} className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center">
-              {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : t('login_signin_btn')}
-            </button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 pt-2">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-sm text-gray-400">{t('login_or')}</span>
-              <div className="flex-1 h-px bg-gray-200" />
-            </div>
-
-            {/* Google Button */}
-            <button type="button" onClick={handleGoogleLogin} className="w-full h-12 flex items-center justify-center gap-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all font-medium shadow-sm">
-              <Image src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" className="w-5 h-5" width={20} height={20} />
-              {t('login_google_btn')}
-            </button>
-
-            {/* Signup */}
-            <p className="text-gray-500 text-center">{t('login_no_account')} <Link href="/signup" className="text-emerald-600 hover:text-emerald-700 font-medium">{t('login_signup_link')}</Link></p>
-          </form>
               {/* Sign In Button */}
               <button
                 type="submit"
@@ -345,5 +275,6 @@ export default function Login() {
 
       </div>
     </div>
+    
   )
 }

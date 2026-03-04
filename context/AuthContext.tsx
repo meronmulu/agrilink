@@ -1,6 +1,5 @@
 'use client'
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// @ts-ignore
 import axios from 'axios';
 
 type AuthCtx = { accessToken: string | null; login: (creds:any)=>Promise<void>; logout: ()=>void; };

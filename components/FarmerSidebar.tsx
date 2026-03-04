@@ -10,10 +10,10 @@ export default function FarmerSidebar() {
     const pathname = usePathname()
 
     const navItems = [
-        { name: 'Overview', href: '/farmer/overview', icon: LayoutDashboard },
+        // { name: 'Overview', href: '/farmer/overview', icon: LayoutDashboard },
         { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
         { name: 'Sales', href: '/farmer/sales', icon: DollarSign },
-        { name: 'Messages', href: '/farmer/messages', icon: MessageSquare, badge: 5 },
+        { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
         { name: 'AI Insights', href: '/farmer/insights', icon: BrainCircuit },
         { name: 'Settings', href: '/farmer/settings', icon: Settings },
     ]

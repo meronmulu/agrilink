@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Input } from './ui/input'
 import { Lock, Mail, User } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { Lock, Mail, Shield, User } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import Link from 'next/link'
 
@@ -46,7 +45,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
       {/* Name */}
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
-          {t('signup_name_label')}
+          Full Name
         </label>
         <div className="relative group">
           <Input
@@ -56,7 +55,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
             required
             value={formData.name}
             onChange={handleChange}
-            placeholder={t('signup_name_placeholder')}
+            placeholder="John Doe"
             className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
           <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
@@ -66,7 +65,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
       {/* Email */}
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-gray-700">
-          {t('signup_email_label')}
+          Email Address
         </label>
         <div className="relative group">
           <Input
@@ -76,7 +75,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
             required
             value={formData.email}
             onChange={handleChange}
-            placeholder={t('signup_email_placeholder')}
+            placeholder="you@example.com"
             className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
@@ -86,7 +85,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
       {/* Password */}
       <div className="space-y-2">
         <label htmlFor="password" className="text-sm font-medium text-gray-700">
-          {t('signup_password_label')}
+          Password
         </label>
         <div className="relative group">
           <Input
@@ -96,7 +95,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
             required
             value={formData.password}
             onChange={handleChange}
-            placeholder={t('signup_password_placeholder')}
+            placeholder="••••••••"
             className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
@@ -110,10 +109,9 @@ export default function SignUpBuyer({ role }: { role: string }) {
 
         <div className="relative">
           <Select >
-            <SelectTrigger className="pl-10 h-24 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
+            <SelectTrigger className=" h-24 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
               <SelectValue placeholder="Select user role" />
             </SelectTrigger>
-
             <SelectContent className="bg-white">
               <SelectItem value="ADMIN">Farmer</SelectItem>
               <SelectItem value="PHARMACIST">Buyer</SelectItem>
@@ -144,7 +142,7 @@ export default function SignUpBuyer({ role }: { role: string }) {
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          t('signup_buyer_btn')
+          'Create Buyer Account'
         )}
       </button>
     </form>

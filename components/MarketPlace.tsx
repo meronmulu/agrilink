@@ -4,9 +4,7 @@ import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
 import Image from 'next/image'
 import { Search, Filter } from 'lucide-react'
-import img from '../public/agriGirl.jpg' // placeholder image
 import { useLanguage } from '@/context/LanguageContext'
-
 import img from '../public/agriGirl.jpg'
 import Link from 'next/link'
 export default function MarketPlace() {
@@ -96,8 +94,7 @@ export default function MarketPlace() {
 
           <Button className=' border-2 h-10 bg-white hover:bg-white  text-black'>
             <Filter className="mr-2" size={16} />
-            {t('market_categories_btn')}
-            Catagories
+            Category
           </Button>
         </div>
       </div>
@@ -133,12 +130,8 @@ export default function MarketPlace() {
 
               {/* Action Buttons */}
               <div className="mt-4 flex gap-2">
-                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white">
-                  {t('market_add_cart')}
-                </Button>
-                <Button className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700">
-                  {t('market_view_details')}
-                </Button>
+               
+               
                 <Link href="/cart">
                   <Button className=" bg-emerald-500 hover:bg-emerald-600 text-white">
                     Add to Cart
@@ -146,7 +139,7 @@ export default function MarketPlace() {
                 </Link>
 
 
-                <Link href="/productDetail">
+                <Link href="/buyer/marketplace/[id]" as={`/buyer/marketplace/${product.id}`}>
                   <Button className=" bg-white border border-gray-200 hover:bg-gray-50 text-gray-700">
                     View Details
                   </Button>
