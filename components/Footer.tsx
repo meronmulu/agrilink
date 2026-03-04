@@ -1,7 +1,11 @@
+'use client'
+
 import React from "react"
 import { Facebook, Twitter, Linkedin, Mail, Flower2, } from "lucide-react"
+import { useLanguage } from "@/context/LanguageContext"
 
 export default function Footer() {
+    const { t } = useLanguage()
     return (
         <footer className="bg-gray-50 ">
 
@@ -21,8 +25,7 @@ export default function Footer() {
                     </div>
 
                     <p className="leading-relaxed">
-                        Bridging the information gap for Ethiopian farmers by providing
-                        real-time market data, transparent pricing, and secure transactions.
+                        {t('footer_desc')}
                     </p>
 
                     {/* Social Icons */}
@@ -36,27 +39,27 @@ export default function Footer() {
                 {/* Quick Links */}
                 <div className="md:text-center">
                     <h4 className="font-semibold text-gray-900 mb-4">
-                        Quick Links
+                        {t('footer_links_title')}
                     </h4>
                     <ul className="space-y-3">
-                        <li className="hover:text-green-600 cursor-pointer transition">Home</li>
-                        <li className="hover:text-green-600 cursor-pointer transition">About Us</li>
-                        <li className="hover:text-green-600 cursor-pointer transition">Marketplace</li>
-                        <li className="hover:text-green-600 cursor-pointer transition">Contact</li>
+                        <li className="hover:text-green-600 cursor-pointer transition">{t('footer_link_home')}</li>
+                        <li className="hover:text-green-600 cursor-pointer transition">{t('footer_link_about')}</li>
+                        <li className="hover:text-green-600 cursor-pointer transition">{t('footer_link_market')}</li>
+                        <li className="hover:text-green-600 cursor-pointer transition">{t('footer_link_contact')}</li>
                     </ul>
                 </div>
 
                 {/* Contact */}
                 <div>
                     <h4 className="font-semibold text-gray-900 mb-4">
-                        Contact Us
+                        {t('footer_contact_title')}
                     </h4>
                     <div className="space-y-3">
                         <div className="flex items-center gap-3">
                             <Mail size={16} />
                             <span>support@agrilink.et</span>
                         </div>
-                        <p>Jimma, Ethiopia</p>
+                        <p>{t('footer_location')}</p>
                     </div>
                 </div>
 
@@ -64,7 +67,7 @@ export default function Footer() {
 
             {/* Bottom Section */}
             <div className="text-center text-gray-400 text-xs py-4 border-t">
-                &copy; {new Date().getFullYear()} AgriLink. All rights reserved.
+                &copy; {new Date().getFullYear()} {t('footer_rights')}
             </div>
 
         </footer>
