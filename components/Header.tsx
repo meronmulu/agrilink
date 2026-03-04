@@ -73,10 +73,12 @@ export default function Header() {
                 </nav> */}
 
                 {/* for user farmer */}
-                {/* <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium mx-auto">
-                    <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        Market insight
-                    </p>
+                <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium mx-auto">
+                    <Link href="/MarketInsight">
+                        <p className="hover:text-emerald-500 cursor-pointer transition-colors">
+                            Market insight
+                        </p>
+                    </Link>
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
                         Orders
                     </p>
@@ -85,7 +87,7 @@ export default function Header() {
                     </p>
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
                         Message
-                     </p>
+                    </p>
 
                     <Button
                         variant="outline"
@@ -94,14 +96,16 @@ export default function Header() {
                         <Globe className="w-4 h-4" />
                         EN
                     </Button>
-                </nav> */}
+                </nav>
 
 
                 {/* for user buyer */}
-                <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium mx-auto">
+                {/* <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium mx-auto">
+                   <Link href="/MarketInsight">
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
                         Market insight
                     </p>
+                     </Link>
                    <Link href="/order">
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
                         Orders
@@ -122,10 +126,8 @@ export default function Header() {
                         <Globe className="w-4 h-4" />
                         EN
                     </Button>
-                </nav>
-                <div>
+                </nav> */}
 
-                </div>
 
                 {/* for user not login */}
                 {/* <div className="flex items-center">
@@ -134,7 +136,7 @@ export default function Header() {
                             Get Started
                         </Button>
                     </Link>
-                </div> */}
+                </div>  */}
 
                 {/* for user login */}
                 <div>
@@ -143,10 +145,11 @@ export default function Header() {
                             <CircleUserRound size={32} className="cursor-pointer text-gray-600" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuItem className="md:hidden">
+                            <Link href="/MarketInsight">
+                                <DropdownMenuItem className="md:hidden">
                                 Market Insight
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> 
+                            </Link>
                             <DropdownMenuItem className="md:hidden">
                                 Orders
                             </DropdownMenuItem>

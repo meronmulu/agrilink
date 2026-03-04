@@ -128,7 +128,7 @@ export default function Login() {
                     type="button"
                     className="text-xs text-emerald-600 hover:text-emerald-700"
                   >
-                    Forgot?
+                    Forgot Password?
                   </button>
                 </div>
 
