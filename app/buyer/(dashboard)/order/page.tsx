@@ -121,9 +121,8 @@ export default function OrdersPage() {
 
     return (
         <div className="min-h-screen ">
-            <Header />
 
-            <main className="container mx-auto px-4 py-20 max-w-7xl">
+            <main className="container mx-auto px-4 py-4 max-w-7xl">
                 {/* Header Section */}
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -304,7 +303,6 @@ export default function OrdersPage() {
 
             </main>
 
-            <Footer />
         </div>
     )
 }

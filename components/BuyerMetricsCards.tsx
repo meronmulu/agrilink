@@ -12,16 +12,22 @@ const metrics = {
 
 export default function BuyerMetricsCards() {
     return (
-        <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8">
+        <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8 px-6">
 
             {/* Total Orders */}
-            <Card className="rounded-2xl border-gray-100 shadow-sm border">
-                <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 h-full">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+            <Card className="rounded-2xl border-gray-100 shadow-sm border ">
+                <CardContent className="p-4 sm:p-6  items-start  gap-4 h-full">
+                    <div className='flex flex-row gap-4'>
+                       <div className=" h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
                         <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
                     </div>
                     <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1">Total Orders</p>
+                    </div> 
+                    </div>
+                    
+                    <div>
+                        
                         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 leading-none">{metrics.totalOrders}</h3>
                     </div>
                 </CardContent>

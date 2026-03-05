@@ -2,6 +2,8 @@ import React from "react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import BuyerSidebar from "@/components/BuyerSidebar"
+import Sidebar from "@/components/Sidebar"
+import Link from "next/link"
 
 export default function BuyerDashboardLayout({
     children,
@@ -9,28 +11,24 @@ export default function BuyerDashboardLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50 font-sans">
-            {/* Top Main Navbar */}
-            <div className="shrink-0 h-16 w-full">
-                <Header />
+        <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+            {/* Top Navbar */}
+            <div className="flex items-center h-16 shrink-0 border-b border-gray-200 bg-white">
+                <div className="flex-1">
+                    <Header />
+                </div>
             </div>
-
-            {/* Dashboard Body */}
-            <div className="flex flex-1 pt-4 max-w-7xl h-screen mx-auto w-full sm:px-6 ">
-
+            {/* Main Content Area */}
+            <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar */}
-                <BuyerSidebar />
+                <Sidebar />
 
-                {/* Main Content Area */}
-                <main className="flex-1 pb-16 pl-0 md:pl-6 overflow-hidden">
-                    {children}
+                {/* Page Content Scrollable */}
+                <main className="flex-1 overflow-y-auto ">
+                    <div className="max-w-7xl mx-auto">
+                        {children}
+                    </div>
                 </main>
-
-            </div>
-
-            {/* Bottom Main Footer - Can be hidden on dashboard if preferred, but included for consistency as requested */}
-            <div className="mt-auto">
-                <Footer />
             </div>
         </div>
     )
