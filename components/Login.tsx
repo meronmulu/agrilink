@@ -40,7 +40,7 @@ export default function Login() {
       throw new Error(message)
     }
 
-    return res.json() 
+    return res.json()
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,7 +72,13 @@ export default function Login() {
 
       await new Promise(resolve => setTimeout(resolve, 1200))
       console.log('Login attempt:', formData)
-      router.push('/buyer/marketplace')
+
+      // Simple mock logic: if email contains 'agent', route to agent dashboard
+      if (formData.email.toLowerCase().includes('agent')) {
+        router.push('/agent/dashboard')
+      } else {
+        router.push('/buyer/marketplace')
+      }
     } catch (err) {
       console.error('Login failed:', err)
     } finally {
@@ -112,9 +118,9 @@ export default function Login() {
           />
           <div className="absolute inset-0 bg-black/50" />
           <div className="absolute inset-0 flex flex-col justify-center px-16 text-white">
-            <h1 className="text-4xl font-bold">Welcome 🌾</h1>
+            <h1 className="text-4xl font-bold">{t('login_welcome')}</h1>
             <p className="mt-4 text-lg text-gray-200 max-w-md">
-              Manage your agricultural system efficiently and securely.
+              {t('login_subtitle')}
             </p>
           </div>
         </div>
@@ -126,10 +132,10 @@ export default function Login() {
             {/* Header */}
             <div className="text-center lg:text-left mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                Login
+                {t('login_header')}
               </h2>
               <p className="text-gray-500 mt-1 text-sm">
-                Enter your details to continue
+                {t('login_subheader')}
               </p>
             </div>
 
@@ -142,7 +148,7 @@ export default function Login() {
                   htmlFor="email"
                   className="text-sm font-medium text-gray-700 block"
                 >
-                  Email or Phone
+                  {t('login_email_label')}
                 </label>
 
                 <div className="relative group">
@@ -154,7 +160,7 @@ export default function Login() {
                     onChange={handleChange}
                     required
                     disabled={isLoading}
-                    placeholder="you@example.com"
+                    placeholder={t('login_email_placeholder')}
                     className="h-10 pl-10 rounded-lg border border-gray-200 bg-gray-50
                     focus:bg-white focus:ring-2 focus:ring-emerald-500/20
                     focus:border-emerald-500 transition-all duration-200"
@@ -166,20 +172,20 @@ export default function Login() {
                   />
                 </div>
               </div>
-            {/* Password */}
+              {/* Password */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
                   <label
                     htmlFor="password"
                     className="text-sm font-medium text-gray-700"
                   >
-                    Password
+                    {t('login_password_label')}
                   </label>
                   <button
                     type="button"
                     className="text-xs text-emerald-600 hover:text-emerald-700"
                   >
-                    Forgot Password?
+                    {t('login_forgot_password')}
                   </button>
                 </div>
 
@@ -192,7 +198,7 @@ export default function Login() {
                     onChange={handleChange}
                     required
                     disabled={isLoading}
-                    placeholder="••••••••"
+                    placeholder={t('login_password_placeholder')}
                     className="h-10 pl-10 pr-10 rounded-lg border border-gray-200 bg-gray-50
                     focus:bg-white focus:ring-2 focus:ring-emerald-500/20
                     focus:border-emerald-500 transition-all duration-200"
@@ -230,14 +236,14 @@ export default function Login() {
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white
                   rounded-full animate-spin" />
                 ) : (
-                  'Sign In'
+                  t('login_signin_btn')
                 )}
               </button>
 
               {/* Divider */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400">OR</span>
+                <span className="text-xs text-gray-400">{t('login_or')}</span>
                 <div className="flex-1 h-px bg-gray-200" />
               </div>
 
@@ -255,17 +261,17 @@ export default function Login() {
                   width={18}
                   height={18}
                 />
-                Continue with Google
+                {t('login_google_btn')}
               </button>
 
               {/* Signup */}
               <p className="text-gray-500 text-center text-sm">
-                Don’t have an account?{" "}
+                {t('login_no_account')}{" "}
                 <Link
                   href="/signup"
                   className="text-emerald-600 hover:text-emerald-700 font-medium"
                 >
-                  Sign Up
+                  {t('login_signup_link')}
                 </Link>
               </p>
 
@@ -275,6 +281,6 @@ export default function Login() {
 
       </div>
     </div>
-    
+
   )
 }

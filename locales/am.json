@@ -111,5 +111,18 @@
   "sales_chart_total_year": "አጠቃላይ ዓመት",
   "sales_logistics_title": "የስምሪት እርዳታ ይፈልጋሉ?",
   "sales_logistics_desc": "ምርትዎን በደህና ለማድረስ ከታመኑ አጓጓዦች ጋር ይገናኙ።",
-  "sales_logistics_btn": "ትራንስፖርት ያግኙ"
+  "sales_logistics_btn": "ትራንስፖርት ያግኙ",
+  "signup_email_or_phone_label": "ኢሜል ወይም ስልክ ቁጥር",
+  "signup_phone_placeholder": "+251...",
+  "signup_location_label": "ሰፈራ / ክልል",
+  "signup_location_placeholder": "ጅማ, ኦሮሚያ",
+  "signup_farmer_btn": "የገበሬ አካውንት ይፍጠሩ",
+  "signup_role_label": "ሚና",
+  "signup_select_role": "ሚና ይምረጡ",
+  "signup_already_account": "ቀድሞውኑ አካውንት አለዎት?",
+  "signup_signin_link": "ይግቡ",
+  "nav_market_insight": "የገበያ መረጃ",
+  "nav_orders": "ትዕዛዞች",
+  "nav_message": "መልዕክት",
+  "nav_setting": "ቅንብሮች"
 }

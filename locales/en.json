@@ -111,5 +111,18 @@
   "sales_chart_total_year": "Total Year",
   "sales_logistics_title": "Need Logistics?",
   "sales_logistics_desc": "Connect with trusted transporters to deliver your produce safely.",
-  "sales_logistics_btn": "Find Transport"
+  "sales_logistics_btn": "Find Transport",
+  "signup_email_or_phone_label": "Email or Phone Number",
+  "signup_phone_placeholder": "+251...",
+  "signup_location_label": "Farm Location / Region",
+  "signup_location_placeholder": "Jimma, Oromia",
+  "signup_farmer_btn": "Create Farmer Account",
+  "signup_role_label": "Role",
+  "signup_select_role": "Select user role",
+  "signup_already_account": "Already have an account?",
+  "signup_signin_link": "Sign In",
+  "nav_market_insight": "Market Insight",
+  "nav_orders": "Orders",
+  "nav_message": "Message",
+  "nav_setting": "Setting"
 }

@@ -109,7 +109,20 @@
   "sales_revenue_analytics": "Xiinxala Galii",
   "sales_chart_best_month": "Ji'a Gaarii",
   "sales_chart_total_year": "Bara Guutuu",
-  "sales_logistics_title": "Tajaajila Geejjibaa Barbaadduu?",
-  "sales_logistics_desc": "Oomisha keessan nagaan akka qaqqabuuf geejjibsitoota qulqulluu waliin quunnamaa.",
-  "sales_logistics_btn": "Geejjiba Barbaadi"
+  "sales_logistics_title": "Logistics Barbaadduu?",
+  "sales_logistics_desc": "Oomisha keessan nagaan geessuuf geejjiboota amanamoo waliin wal qunnamaa.",
+  "sales_logistics_btn": "Geejjiba Barbaadi",
+  "signup_email_or_phone_label": "Imeyilii ykn Lakkoofsa Bilbilaa",
+  "signup_phone_placeholder": "+251...",
+  "signup_location_label": "Bakka Qonnaa / Naannoo",
+  "signup_location_placeholder": "Jimmaa, Oromiyaa",
+  "signup_farmer_btn": "Herrega Qonnaan Bulaa Uumi",
+  "signup_role_label": "Gahee",
+  "signup_select_role": "Gahee fayyadamaa filadhu",
+  "signup_already_account": "Duraanuu herrega qabdaa?",
+  "signup_signin_link": "Seeni",
+  "nav_market_insight": "Hubannoo Gabaa",
+  "nav_orders": "Ajajoota",
+  "nav_message": "Ergaa",
+  "nav_setting": "Qindaa'ina"
 }
