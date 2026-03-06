@@ -54,22 +54,22 @@ export default function Header() {
                 {/* for user not login */}
                 <nav className="hidden md:flex items-center gap-6 text-gray-600 font-medium mx-auto">
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        Market
+                        {t('market')}
                     </p>
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        How it works
+                        {t('howItWorks')}
                     </p>
                     <p className="hover:text-emerald-500 cursor-pointer transition-colors">
-                        About Us
+                        {t('aboutUs')}
                     </p>
 
-                   <LanguageDropdown/>
+                    <LanguageDropdown />
                 </nav>
 
-                
 
 
-                
+
+
 
 
                 {/* for user not login */}
@@ -83,7 +83,7 @@ export default function Header() {
 
                 {/* for user login */}
                 <div className="flex gap-2">
-                    <LanguageDropdown/>
+                    <LanguageDropdown />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <CircleUserRound size={32} className="cursor-pointer text-gray-600" />
@@ -91,25 +91,25 @@ export default function Header() {
                         <DropdownMenuContent>
                             <Link href="/MarketInsight">
                                 <DropdownMenuItem className="md:hidden">
-                                Market Insight
-                            </DropdownMenuItem> 
+                                    {t('nav_market_insight')}
+                                </DropdownMenuItem>
                             </Link>
                             <DropdownMenuItem className="md:hidden">
-                                Orders
+                                {t('nav_orders')}
                             </DropdownMenuItem>
                             <Link href="/message">
                                 <DropdownMenuItem className="md:hidden">
-                                    Message
+                                    {t('nav_message')}
                                 </DropdownMenuItem>
                             </Link>
 
                             <DropdownMenuItem>
                                 {/* <Settings size={16}/> */}
-                                Setting
+                                {t('nav_setting')}
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-500">
                                 <LogOut size={16} className="text-red-500" />
-                                Logout
+                                {t('logout')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

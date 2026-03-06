@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
-import { Edit, BarChart2, Tractor, Coffee, History } from 'lucide-react'
+import { Edit, Trash2, BarChart2, Tractor, Coffee, History } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export interface Crop {
@@ -13,10 +13,16 @@ export interface Crop {
     unit: string
     currentStock: number
     maxStock: number
-    image?: string // if missing, show placeholder icon
+    image?: string
 }
 
-export default function CropCard({ crop }: { crop: Crop }) {
+interface CropCardProps {
+    crop: Crop
+    onEdit?: (crop: Crop) => void
+    onDelete?: (id: string) => void
+}
+
+export default function CropCard({ crop, onEdit, onDelete }: CropCardProps) {
     const isOutOfSeason = crop.status === 'Out of Season'
 
     return (
@@ -45,6 +51,17 @@ export default function CropCard({ crop }: { crop: Crop }) {
                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-700 shadow-sm">
                     {crop.category}
                 </div>
+
+                {/* Delete button overlay */}
+                {onDelete && (
+                    <button
+                        onClick={() => onDelete(crop.id)}
+                        className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm p-1.5 rounded-full text-red-400 hover:text-red-600 hover:bg-white transition-colors shadow-sm"
+                        title="Remove listing"
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                )}
             </div>
 
             <CardContent className="p-5">
@@ -87,7 +104,11 @@ export default function CropCard({ crop }: { crop: Crop }) {
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1 h-9 text-gray-600 hover:text-gray-900 border-gray-200 hover:bg-gray-50">
+                    <Button
+                        variant="outline"
+                        className="flex-1 h-9 text-gray-600 hover:text-gray-900 border-gray-200 hover:bg-gray-50"
+                        onClick={() => onEdit?.(crop)}
+                    >
                         <Edit size={16} className="mr-2" />
                         <span className="text-xs font-semibold">Edit Listing</span>
                     </Button>

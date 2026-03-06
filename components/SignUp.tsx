@@ -65,7 +65,7 @@ export default function SignUp() {
       {/* Email */}
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-gray-700">
-          Email Address
+          {t('signup_email_label')}
         </label>
         <div className="relative group">
           <Input
@@ -105,7 +105,7 @@ export default function SignUp() {
       {/* Password */}
       <div className="space-y-2">
         <label htmlFor="password" className="text-sm font-medium text-gray-700">
-          Password
+          {t('signup_password_label')}
         </label>
         <div className="relative group">
           <Input
@@ -158,7 +158,7 @@ export default function SignUp() {
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          'Create Buyer Account'
+          t('signup_buyer_btn')
         )}
       </button>
     </form>

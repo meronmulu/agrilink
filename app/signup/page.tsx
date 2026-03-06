@@ -1,16 +1,19 @@
 'use client'
 
+import React, { useState } from 'react'
 import Image from 'next/image'
 import img from "../../public/Agricultural.jpg"
 import SignUp from '@/components/SignUp'
 
 
 export default function SignupPage() {
+  const { t } = useLanguage()
+  const [role, setRole] = useState<'BUYER' | 'FARMER'>('BUYER')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center p-4">
 
-      <div className="grid lg:grid-cols-2 w-full max-w-6xl bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="grid lg:grid-cols-2 w-full max-w-6xl bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl overflow-hidden mt-16 md:mt-0">
 
         {/* LEFT SIDE */}
         <div className="relative hidden lg:block">
@@ -24,10 +27,10 @@ export default function SignupPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-center px-16 text-white">
             <h1 className="text-5xl font-bold leading-tight">
-              Join Our Platform 
+              {t('signup_welcome')}
             </h1>
             <p className="mt-6 text-lg text-gray-200 max-w-md">
-              Connect farmers and buyers in one powerful agricultural ecosystem.
+              {t('signup_subtitle')}
             </p>
           </div>
         </div>
@@ -39,10 +42,10 @@ export default function SignupPage() {
             {/* Header */}
             <div className="mb-8 text-center lg:text-left">
               <h2 className="text-3xl font-bold text-gray-900">
-                Create Account
+                {t('signup_header')}
               </h2>
               <p className="text-gray-500 mt-2 text-sm">
-                Choose your role and complete the registration
+                {t('signup_subheader')}
               </p>
             </div>
 
@@ -55,7 +58,7 @@ export default function SignupPage() {
 
           </div>
         </div>
-
+      </div>
     </div>
   )
 }
