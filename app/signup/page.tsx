@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import img from "../../public/Agricultural.jpg"
-import SignUpBuyer from "@/components/SignUpBuyer"
+import SignUp from '@/components/SignUp'
 
 
 export default function SignupPage() {
@@ -48,7 +48,7 @@ export default function SignupPage() {
 
            
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                  <SignUpBuyer role="BUYER" />
+                  <SignUp />
                 </div>
             
             </div>

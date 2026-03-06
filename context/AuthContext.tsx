@@ -1,66 +1,75 @@
-'use client'
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+'use client';
 
-type AuthCtx = { accessToken: string | null; login: (creds:any)=>Promise<void>; logout: ()=>void; };
+import { createContext, useContext, useState, useEffect } from 'react';
+import { User } from '../types/auth';
+import * as AuthService from '../services/authService'
+import { useRouter } from 'next/navigation';
 
-const AuthContext = createContext<AuthCtx | undefined>(undefined);
+interface AuthContextType {
+  user: User | null;
+  login: (credentials: { email: string; password: string }) => Promise<boolean>;
+  logout: () => void;
+}
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-  // attempt silent refresh on mount
-  useEffect(() => {
-    let mounted = true;
-    async function tryRefresh() {
-      try {
-        const res = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
-        if (mounted) setAccessToken(res.data.accessToken);
-      } catch { setAccessToken(null); }
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+  
+
+  // login method now takes credentials and calls your login service
+const login = async (credentials: { email: string; password: string }) => {
+  try {
+    const res = await AuthService.login(credentials);
+
+    if (res?.token && res?.user) {
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      setUser(res.user);
+
+      return true;
     }
-    tryRefresh();
-    return () => { mounted = false; };
-  }, []);
 
-  // attach interceptor to refresh on 401
+    return false;
+  } catch {
+    return false;
+  }
+};
+
+
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+   router.push(`/`);
+
+    
+  };
+
+  // On mount, restore user from localStorage if available
   useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      r => r,
-      async err => {
-        const original = err.config;
-        if (err.response?.status === 401 && !original._retry) {
-          original._retry = true;
-          try {
-            const r = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
-            setAccessToken(r.data.accessToken);
-            original.headers['Authorization'] = `Bearer ${r.data.accessToken}`;
-            return axios(original);
-          } catch {
-            setAccessToken(null);
-            return Promise.reject(err);
-          }
-        }
-        return Promise.reject(err);
-      }
-    );
-    return () => axios.interceptors.response.eject(interceptor);
+    const token = localStorage.getItem('token');
+    const userString = localStorage.getItem('user');
+    if (token && userString) {
+      setTimeout(() => {
+        setUser(JSON.parse(userString));
+      }, 0);
+    }
   }, []);
 
-  const login = async (creds:any) => {
-    const res = await axios.post('/api/auth/login', creds, { withCredentials: true });
-    setAccessToken(res.data.accessToken);
-  };
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-  const logout = async () => {
-    await axios.post('/api/auth/logout', {}, { withCredentials: true });
-    setAccessToken(null);
-  };
-
-  return <AuthContext.Provider value={{ accessToken, login, logout }}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

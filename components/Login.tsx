@@ -8,100 +8,69 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
-import { signIn } from 'next-auth/react';
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function Login() {
+
   const { t } = useLanguage()
-  const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({ email: '', password: '' })
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { login } = useAuth()
 
+  const [showPassword, setShowPassword] = useState(false)
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  })
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
 
-  async function submitToServer(data: { email: string; password: string }) {
-    // POST to your auth endpoint; server should set httpOnly refresh cookie and return access token
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // important for httpOnly cookies
-      body: JSON.stringify(data),
-    })
-
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}))
-      const message = body?.message || `Login failed (${res.status})`
-      throw new Error(message)
-    }
-
-    return res.json() 
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
     setError(null)
+
+    if (!formData.email || !formData.password) {
+      setError("Please enter email and password")
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      // Basic client-side validation
-      if (!formData.email || !formData.password) {
-        setError(t('login_err_empty'))
-        return
+
+      const success = await login(formData)
+
+      if (success) {
+        router.push('/buyer/marketplace')
+      } else {
+        setError("Invalid email or password")
       }
 
-      // Try server login
-      try {
-        const payload = await submitToServer(formData)
-        // If your AuthContext.login expects credentials or token, pass it
-        // Here we call login() to update local state and localStorage (AuthContext handles persistence)
-        login(formData)
-        // Optionally store access token in memory via a more advanced AuthContext
-        // e.g. auth.setAccessToken(payload.accessToken)
-      } catch (serverErr) {
-        // If server is not available or returns 4xx/5xx, surface message
-        // For local dev you may want to fallback to client-only login:
-        // login() // <-- uncomment to allow local fallback
-        throw serverErr
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 1200))
-      console.log('Login attempt:', formData)
-      router.push('/buyer/marketplace')
     } catch (err) {
-      console.error('Login failed:', err)
+      console.error("Login failed:", err)
+      setError("Something went wrong. Try again.")
     } finally {
       setIsLoading(false)
     }
   }
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      // Redirects to Google and then back to callback route handled by NextAuth
-      await signIn('google', { callbackUrl: '/buyer/marketplace' });
-      // signIn will redirect; code after this may not run
-    } catch (err) {
-      console.error('Google sign-in error', err);
-      setError(t('login_err_google'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
 
       <div className="grid lg:grid-cols-2 w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
 
-        {/* LEFT SIDE */}
+        {/* LEFT IMAGE */}
         <div className="relative hidden lg:block">
           <Image
             src={img}
@@ -111,6 +80,7 @@ export default function Login() {
             priority
           />
           <div className="absolute inset-0 bg-black/50" />
+
           <div className="absolute inset-0 flex flex-col justify-center px-16 text-white">
             <h1 className="text-4xl font-bold">Welcome 🌾</h1>
             <p className="mt-4 text-lg text-gray-200 max-w-md">
@@ -120,10 +90,10 @@ export default function Login() {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center justify-center p-6 lg:p-10 bg-white">
+        <div className="flex items-center justify-center p-6 lg:p-10">
+
           <div className="w-full max-w-sm">
 
-            {/* Header */}
             <div className="text-center lg:text-left mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
                 Login
@@ -133,132 +103,111 @@ export default function Login() {
               </p>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
 
-              {/* Email */}
+              {/* EMAIL */}
               <div className="space-y-1">
-                <label
-                  htmlFor="email"
-                  className="text-sm font-medium text-gray-700 block"
-                >
-                  Email or Phone
+                <label className="text-sm font-medium text-gray-700">
+                  Email
                 </label>
 
                 <div className="relative group">
+
                   <Input
-                    id="email"
                     name="email"
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    required
-                    disabled={isLoading}
                     placeholder="you@example.com"
+                    disabled={isLoading}
                     className="h-10 pl-10 rounded-lg border border-gray-200 bg-gray-50
                     focus:bg-white focus:ring-2 focus:ring-emerald-500/20
-                    focus:border-emerald-500 transition-all duration-200"
+                    focus:border-emerald-500"
                   />
+
                   <User
-                    className="absolute left-3 top-1/2 -translate-y-1/2
-                    text-gray-400 group-focus-within:text-emerald-500"
                     size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
+
                 </div>
               </div>
-            {/* Password */}
+
+              {/* PASSWORD */}
               <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label
-                    htmlFor="password"
-                    className="text-sm font-medium text-gray-700"
-                  >
+
+                <div className="flex justify-between text-sm">
+
+                  <label className="font-medium text-gray-700">
                     Password
                   </label>
-                  <button
-                    type="button"
-                    className="text-xs text-emerald-600 hover:text-emerald-700"
+
+                  <Link
+                    href="/forgot-password"
+                    className="text-emerald-600 hover:text-emerald-700"
                   >
                     Forgot Password?
-                  </button>
+                  </Link>
+
                 </div>
 
                 <div className="relative group">
+
                   <Input
-                    id="password"
                     name="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
-                    required
-                    disabled={isLoading}
                     placeholder="••••••••"
+                    disabled={isLoading}
                     className="h-10 pl-10 pr-10 rounded-lg border border-gray-200 bg-gray-50
                     focus:bg-white focus:ring-2 focus:ring-emerald-500/20
-                    focus:border-emerald-500 transition-all duration-200"
+                    focus:border-emerald-500"
                   />
 
                   <Lock
-                    className="absolute left-3 top-1/2 -translate-y-1/2
-                    text-gray-400 group-focus-within:text-emerald-500"
                     size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
                   <button
                     type="button"
-                    onClick={() => setShowPassword(prev => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2
-                    text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
+
                 </div>
+
               </div>
 
-              {/* Sign In Button */}
+              {/* ERROR MESSAGE */}
+              {error && (
+                <p className="text-red-500 text-sm">
+                  {error}
+                </p>
+              )}
+
+              {/* LOGIN BUTTON */}
               <button
                 type="submit"
                 disabled={isLoading}
                 className="w-full h-10 rounded-lg bg-gradient-to-r 
-                from-emerald-600 to-teal-600 
+                from-emerald-600 to-teal-600
                 hover:from-emerald-700 hover:to-teal-700
-                text-white text-sm font-semibold shadow-md 
-                transition-all duration-200
+                text-white text-sm font-semibold shadow-md
                 disabled:opacity-50 flex items-center justify-center"
               >
-                {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white
-                  rounded-full animate-spin" />
-                ) : (
-                  'Sign In'
-                )}
+
+                {isLoading
+                  ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>
+                  : "Sign In"
+                }
+
               </button>
 
-              {/* Divider */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400">OR</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-
-              {/* Google Button */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className="w-full h-10 flex items-center justify-center gap-2
-                border border-gray-200 rounded-lg bg-white
-                hover:bg-gray-50 transition-all text-sm font-medium"
-              >
-                <Image
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  alt="Google logo"
-                  width={18}
-                  height={18}
-                />
-                Continue with Google
-              </button>
-
-              {/* Signup */}
+              {/* SIGNUP */}
               <p className="text-gray-500 text-center text-sm">
                 Don’t have an account?{" "}
                 <Link
@@ -270,11 +219,13 @@ export default function Login() {
               </p>
 
             </form>
+
           </div>
+
         </div>
 
       </div>
+
     </div>
-    
   )
 }

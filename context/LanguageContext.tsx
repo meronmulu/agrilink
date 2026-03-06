@@ -37,18 +37,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
-    loadLocaleFile(lang)
-      .then((data) => {
+    const fetchTranslations = async () => {
+      setLoading(true);
+      try {
+        const data = await loadLocaleFile(lang);
         if (!mounted) return;
         setTranslations(data);
-        setLoading(false);
-      })
-      .catch(() => {
+      } catch {
         if (!mounted) return;
         setTranslations(null);
-        setLoading(false);
-      });
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchTranslations();
     return () => {
       mounted = false;
     };
