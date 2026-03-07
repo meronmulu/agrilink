@@ -3,20 +3,24 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from './ui/input'
-import { Lock, Mail, User, Phone, MapPin } from 'lucide-react'
+import { Lock, Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 
 import { useLanguage } from '@/context/LanguageContext'
+import api from '@/axios'
+import OTPVerificationModal from './OTPVerificationModal'
 
 export default function SignUpFarmer({ role }: { role: string }) {
   const { t } = useLanguage()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showOTPModal, setShowOTPModal] = useState(false)
   const [formData, setFormData] = useState({
-    name: '',
-    emailOrPhone: '',
-    location: '',
-    password: ''
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: ''
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,126 +30,155 @@ export default function SignUpFarmer({ role }: { role: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      console.log(`Registering as ${role}:`, formData)
-      // Redirect to farmer dashboard after successful registration
-      router.push('/farmer/crops')
-    } catch (error) {
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match')
+        return
+      }
+
+      const payload = {
+        role: role as 'BUYER' | 'FARMER',
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        phone: formData.phone
+      }
+
+      await api.post('/auth/signup', payload)
+
+      // Show OTP verification modal
+      setShowOTPModal(true)
+    } catch (error: any) {
       console.error('Registration failed:', error)
+      setError(error.response?.data?.message || 'Registration failed')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Name */}
-      <div className="space-y-2">
-        <label htmlFor="name" className="text-sm font-medium text-gray-700">
-          {t('signup_name_label')}
-        </label>
-        <div className="relative group">
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            required
-            value={formData.name}
-            onChange={handleChange}
-            placeholder={t('signup_name_placeholder')}
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Email */}
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            {t('signup_email_label')}
+          </label>
+          <div className="relative group">
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              placeholder={t('signup_email_placeholder')}
+              className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
+            />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+          </div>
         </div>
-      </div>
 
-      {/* Email or Phone */}
-      <div className="space-y-2">
-        <label htmlFor="emailOrPhone" className="text-sm font-medium text-gray-700">
-          {t('signup_email_or_phone_label')}
-        </label>
-        <div className="relative group">
-          <Input
-            id="emailOrPhone"
-            name="emailOrPhone"
-            type="text"
-            required
-            value={formData.emailOrPhone}
-            onChange={handleChange}
-            placeholder={t('signup_phone_placeholder')}
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+        {/* Phone */}
+        <div className="space-y-2">
+          <label htmlFor="phone" className="text-sm font-medium text-gray-700">
+            {t('signup_phone_label')}
+          </label>
+          <div className="relative group">
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              required
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="+251912033566"
+              className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
+            />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+          </div>
         </div>
-      </div>
 
-      {/* Location */}
-      <div className="space-y-2">
-        <label htmlFor="location" className="text-sm font-medium text-gray-700">
-          {t('signup_location_label')}
-        </label>
-        <div className="relative group">
-          <Input
-            id="location"
-            name="location"
-            type="text"
-            required
-            value={formData.location}
-            onChange={handleChange}
-            placeholder={t('signup_location_placeholder')}
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+        {/* Password */}
+        <div className="space-y-2">
+          <label htmlFor="password" className="text-sm font-medium text-gray-700">
+            {t('signup_password_label')}
+          </label>
+          <div className="relative group">
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              placeholder={t('signup_password_placeholder')}
+              className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
+            />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+          </div>
         </div>
-      </div>
 
-      {/* Password */}
-      <div className="space-y-2">
-        <label htmlFor="password" className="text-sm font-medium text-gray-700">
-          {t('signup_password_label')}
-        </label>
-        <div className="relative group">
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            required
-            value={formData.password}
-            onChange={handleChange}
-            placeholder={t('signup_password_placeholder')}
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+        {/* Confirm Password */}
+        <div className="space-y-2">
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+            {t('signup_confirm_password_label')}
+          </label>
+          <div className="relative group">
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm your password"
+              className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
+            />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+          </div>
         </div>
-      </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full h-11 mt-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium shadow-md transition-all flex items-center justify-center disabled:opacity-50"
-      >
-        {isLoading ? (
-          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        ) : (
-          t('signup_farmer_btn')
+        {error && (
+          <div className="text-red-500 text-sm text-center">{error}</div>
         )}
-      </button>
 
-      <div className="space-y-4 mt-6">
-        <p className="text-gray-500 text-center text-sm">
-          {t('signup_already_account')}{" "}
-          <Link
-            href="/login"
-            className="text-emerald-600 hover:text-emerald-700 font-medium"
-          >
-            {t('signup_signin_link')}
-          </Link>
-        </p>
-      </div>
-    </form>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full h-11 mt-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium shadow-md transition-all flex items-center justify-center disabled:opacity-50"
+        >
+          {isLoading ? (
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            t('signup_farmer_btn')
+          )}
+        </button>
+
+        <div className="space-y-4 mt-6">
+          <p className="text-gray-500 text-center text-sm">
+            {t('signup_already_account')}{" "}
+            <Link
+              href="/login"
+              className="text-emerald-600 hover:text-emerald-700 font-medium"
+            >
+              {t('signup_signin_link')}
+            </Link>
+          </p>
+        </div>
+      </form>
+
+      <OTPVerificationModal
+        open={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        identifier={formData.email || formData.phone}
+        purpose="SIGNUP"
+        onVerified={() => {}}
+        userRole={role}
+      />
+    </>
   )
 }

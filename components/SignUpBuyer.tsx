@@ -3,19 +3,24 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from './ui/input'
-import { Lock, Mail, User } from 'lucide-react'
+import { Lock, Mail, User, Phone } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import Link from 'next/link'
+import api from '@/axios'
+import OTPVerificationModal from './OTPVerificationModal'
 
 export default function SignUpBuyer({ role }: { role: string }) {
   const { t } = useLanguage()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showOTPModal, setShowOTPModal] = useState(false)
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: '',
+    phone: ''
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,43 +30,38 @@ export default function SignUpBuyer({ role }: { role: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      console.log(`Registering as ${role}:`, formData)
-      // Redirect to buyer marketplace after successful registration
-      router.push('/buyer/marketplace')
-    } catch (error) {
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match')
+        return
+      }
+
+      const payload = {
+        role: role as 'BUYER' | 'FARMER',
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        phone: formData.phone
+      }
+
+      await api.post('/auth/signup', payload)
+
+      // Show OTP verification modal
+      setShowOTPModal(true)
+    } catch (error: any) {
       console.error('Registration failed:', error)
+      setError(error.response?.data?.message || 'Registration failed')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      {/* Name */}
-      <div className="space-y-2">
-        <label htmlFor="name" className="text-sm font-medium text-gray-700">
-          {t('signup_name_label')}
-        </label>
-        <div className="relative group">
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            required
-            value={formData.name}
-            onChange={handleChange}
-            placeholder={t('signup_name_placeholder')}
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-        </div>
-      </div>
-
+    <>
+      <form onSubmit={handleSubmit} className="space-y-3">
       {/* Email */}
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -79,6 +79,26 @@ export default function SignUpBuyer({ role }: { role: string }) {
             className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+        </div>
+      </div>
+
+      {/* Phone */}
+      <div className="space-y-2">
+        <label htmlFor="phone" className="text-sm font-medium text-gray-700">
+          {t('signup_phone_label')}
+        </label>
+        <div className="relative group">
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            required
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="+251912033566"
+            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
+          />
+          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
         </div>
       </div>
 
@@ -101,6 +121,30 @@ export default function SignUpBuyer({ role }: { role: string }) {
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
         </div>
       </div>
+
+      {/* Confirm Password */}
+      <div className="space-y-2">
+        <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+          {t('signup_confirm_password_label')}
+        </label>
+        <div className="relative group">
+          <Input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            required
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="Confirm your password"
+            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
+          />
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
+        </div>
+      </div>
+
+      {error && (
+        <div className="text-red-500 text-sm text-center">{error}</div>
+      )}
 
       <div className="space-y-4 mt-6">
         <p className="text-gray-500 text-center text-sm">
@@ -128,5 +172,15 @@ export default function SignUpBuyer({ role }: { role: string }) {
         )}
       </button>
     </form>
+
+    <OTPVerificationModal
+      open={showOTPModal}
+      onClose={() => setShowOTPModal(false)}
+      identifier={formData.email || formData.phone}
+      purpose="SIGNUP"
+      onVerified={() => {}}
+      userRole={role}
+    />
+    </>
   )
 }

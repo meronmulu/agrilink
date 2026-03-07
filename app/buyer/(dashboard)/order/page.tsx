@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { useLanguage } from '@/context/LanguageContext'
 import {
     Select,
     SelectContent,
@@ -33,6 +34,7 @@ import Header from '@/components/Header'
 import { Search, Filter, MoreHorizontal, Download, Eye, FileText } from 'lucide-react'
 
 export default function OrdersPage() {
+    const { t } = useLanguage()
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
 
@@ -128,10 +130,10 @@ export default function OrdersPage() {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
                             <h1 className="text-3xl font-bold bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent">
-                                My Orders
+                                {t('orders_title')}
                             </h1>
                             <p className="text-gray-600 mt-2">
-                                Manage and track your agricultural trade transactions
+                                {t('orders_subtitle')}
                             </p>
                         </div>
 
@@ -143,7 +145,7 @@ export default function OrdersPage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                     <Card className=" shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="">
-                            <p className="text-sm font-medium text-gray-500">Total Orders</p>
+                            <p className="text-sm font-medium text-gray-500">{t('orders_total_orders')}</p>
                             <p className="text-2xl font-bold text-gray-900">{invoices.length}</p>
                             <p className="text-xs text-green-600 mt-1">+12% from last month</p>
                         </CardContent>
@@ -151,7 +153,7 @@ export default function OrdersPage() {
 
                     <Card className=" shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="">
-                            <p className="text-sm font-medium text-gray-500">Completed</p>
+                            <p className="text-sm font-medium text-gray-500">{t('orders_completed')}</p>
                             <p className="text-2xl font-bold text-green-600">
                                 {invoices.filter(i => i.paymentStatus === 'Paid').length}
                             </p>
@@ -161,7 +163,7 @@ export default function OrdersPage() {
 
                     <Card className="shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="">
-                            <p className="text-sm font-medium text-gray-500">Pending</p>
+                            <p className="text-sm font-medium text-gray-500">{t('orders_pending')}</p>
                             <p className="text-2xl font-bold text-yellow-600">
                                 {invoices.filter(i => i.paymentStatus === 'Pending').length}
                             </p>
@@ -171,7 +173,7 @@ export default function OrdersPage() {
 
                     <Card className="border-green-100 shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="">
-                            <p className="text-sm font-medium text-gray-500">Total Value</p>
+                            <p className="text-sm font-medium text-gray-500">{t('orders_total_value')}</p>
                             <p className="text-2xl font-bold text-gray-900">
                                 ${totalAmount.toFixed(2)}
                             </p>
@@ -188,7 +190,7 @@ export default function OrdersPage() {
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 <Input
                                     type="text"
-                                    placeholder="Search by Order ID or payment method..."
+                                    placeholder={t('orders_search_placeholder')}
                                     className="pl-10  "
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -202,7 +204,7 @@ export default function OrdersPage() {
                                         <SelectValue placeholder="Filter by status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Status</SelectItem>
+                                        <SelectItem value="all">{t('orders_all_status')}</SelectItem>
                                         <SelectItem value="paid">Paid</SelectItem>
                                         <SelectItem value="pending">Pending</SelectItem>
                                         <SelectItem value="unpaid">Unpaid</SelectItem>

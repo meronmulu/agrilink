@@ -2,21 +2,23 @@
 
 import Image from 'next/image'
 import img from "../public/Agricultural.jpg"
-import { Lock, Eye, EyeOff, User } from "lucide-react"
+import { Lock, Eye, EyeOff, User, Phone } from "lucide-react"
 import { Input } from './ui/input'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
-import { signIn } from 'next-auth/react';
 import { useLanguage } from '@/context/LanguageContext'
+import api from '@/axios'
+import ForgotPasswordModal from './ForgotPasswordModal'
 
 export default function Login() {
   const { t } = useLanguage()
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({ email: '', password: '' })
+  const [formData, setFormData] = useState({ email: '', password: '', phone: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
   const router = useRouter()
   const { login } = useAuth()
 
@@ -25,22 +27,16 @@ export default function Login() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  async function submitToServer(data: { email: string; password: string }) {
-    // POST to your auth endpoint; server should set httpOnly refresh cookie and return access token
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // important for httpOnly cookies
-      body: JSON.stringify(data),
-    })
+  async function submitToServer(data: { email: string; password: string; phone: string }) {
+    // POST to your auth endpoint; server should set httpOnly refresh cookie and return access token + user role
+    const res = await api.post('/api/auth/login', data)
 
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}))
-      const message = body?.message || `Login failed (${res.status})`
+    if (res.status !== 200 && res.status !== 201) {
+      const message = res.data?.message || `Login failed (${res.status})`
       throw new Error(message)
     }
 
-    return res.json()
+    return res.data // Should include accessToken and user role
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,37 +46,39 @@ export default function Login() {
 
     try {
       // Basic client-side validation
-      if (!formData.email || !formData.password) {
+      if (!formData.email || !formData.password || !formData.phone) {
         setError(t('login_err_empty'))
         return
       }
 
       // Try server login
-      try {
-        const payload = await submitToServer(formData)
-        // If your AuthContext.login expects credentials or token, pass it
-        // Here we call login() to update local state and localStorage (AuthContext handles persistence)
-        login(formData)
-        // Optionally store access token in memory via a more advanced AuthContext
-        // e.g. auth.setAccessToken(payload.accessToken)
-      } catch (serverErr) {
-        // If server is not available or returns 4xx/5xx, surface message
-        // For local dev you may want to fallback to client-only login:
-        // login() // <-- uncomment to allow local fallback
-        throw serverErr
+      const payload = await submitToServer(formData)
+
+      // Store the access token
+      if (payload.accessToken) {
+        localStorage.setItem('token', payload.accessToken)
+        sessionStorage.setItem('accessToken', payload.accessToken)
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1200))
-      console.log('Login attempt:', formData)
+      // If your AuthContext.login expects credentials or token, pass it
+      // Here we call login() to update local state and localStorage (AuthContext handles persistence)
+      login(formData)
 
-      // Simple mock logic: if email contains 'agent', route to agent dashboard
-      if (formData.email.toLowerCase().includes('agent')) {
+      // Redirect immediately based on user role from login response
+      const userRole = (payload.role || payload.userRole || payload.roleName || '').toUpperCase()
+
+      if (userRole === 'FARMER') {
+        router.push('/farmer/crops')
+      } else if (userRole === 'AGENT') {
         router.push('/agent/dashboard')
       } else {
+        // Default to buyer marketplace for BUYER role or unknown roles
         router.push('/buyer/marketplace')
       }
+
     } catch (err) {
       console.error('Login failed:', err)
+      setError((err as Error).message || t('login_err_generic'))
     } finally {
       setIsLoading(false)
     }
@@ -90,12 +88,36 @@ export default function Login() {
     setIsLoading(true);
     setError(null);
     try {
-      // Redirects to Google and then back to callback route handled by NextAuth
-      await signIn('google', { callbackUrl: '/buyer/marketplace' });
-      // signIn will redirect; code after this may not run
-    } catch (err) {
+      // Call the custom Google signin API
+      const response = await api.post('/auth/google-signin')
+
+      if (response.status === 201 || response.status === 200) {
+        const payload = response.data
+
+        // Store the access token
+        if (payload.accessToken) {
+          localStorage.setItem('token', payload.accessToken)
+          sessionStorage.setItem('accessToken', payload.accessToken)
+        }
+
+        // Update local auth state
+        login({ email: payload.email || '', password: '', phone: payload.phone || '' })
+
+        // Redirect immediately based on user role from response
+        const userRole = (payload.role || payload.userRole || payload.roleName || '').toUpperCase()
+
+        if (userRole === 'FARMER') {
+          router.push('/farmer/crops')
+        } else if (userRole === 'AGENT') {
+          router.push('/agent/dashboard')
+        } else {
+          // Default to buyer marketplace for BUYER role or unknown roles
+          router.push('/buyer/marketplace')
+        }
+      }
+    } catch (err: any) {
       console.error('Google sign-in error', err);
-      setError(t('login_err_google'));
+      setError(err.response?.data?.message || t('login_err_google'));
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +125,8 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
 
       <div className="grid lg:grid-cols-2 w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
 
@@ -172,6 +195,37 @@ export default function Login() {
                   />
                 </div>
               </div>
+
+              {/* Phone */}
+              <div className="space-y-1">
+                <label
+                  htmlFor="phone"
+                  className="text-sm font-medium text-gray-700 block"
+                >
+                  Phone
+                </label>
+
+                <div className="relative group">
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    disabled={isLoading}
+                    placeholder="+251912033566"
+                    className="h-10 pl-10 rounded-lg border border-gray-200 bg-gray-50
+                    focus:bg-white focus:ring-2 focus:ring-emerald-500/20
+                    focus:border-emerald-500 transition-all duration-200"
+                  />
+                  <Phone
+                    className="absolute left-3 top-1/2 -translate-y-1/2
+                    text-gray-400 group-focus-within:text-emerald-500"
+                    size={16}
+                  />
+                </div>
+              </div>
               {/* Password */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
@@ -183,6 +237,7 @@ export default function Login() {
                   </label>
                   <button
                     type="button"
+                    onClick={() => setShowForgotPassword(true)}
                     className="text-xs text-emerald-600 hover:text-emerald-700"
                   >
                     {t('login_forgot_password')}
@@ -282,5 +337,10 @@ export default function Login() {
       </div>
     </div>
 
+      <ForgotPasswordModal
+        open={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+      />
+    </>
   )
 }

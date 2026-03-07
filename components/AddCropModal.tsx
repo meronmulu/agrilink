@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { X, Loader2, Upload, ImageIcon } from 'lucide-react'
+import { X, Loader2, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Crop } from '@/components/CropCard'
@@ -36,8 +36,7 @@ export default function AddCropModal({ open, initialData, onClose, onSaved }: Ad
 
     const [form, setForm] = useState(emptyForm)
     const [imageFile, setImageFile] = useState<File | null>(null)
-    const [imagePreview, setImagePreview] = useState<string | null>(null) // existing URL or local object URL
-    const [uploading, setUploading] = useState(false)
+    const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
@@ -72,9 +71,6 @@ export default function AddCropModal({ open, initialData, onClose, onSaved }: Ad
         }
     }, [imagePreview])
 
-    const set = (field: string, value: string) =>
-        setForm((prev) => ({ ...prev, [field]: value }))
-
     // Handle file selection — generate local preview immediately
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -97,23 +93,14 @@ export default function AddCropModal({ open, initialData, onClose, onSaved }: Ad
         setImagePreview(objectUrl)
     }
 
-    // Upload image to backend, returns the stored URL
-    const uploadImage = async (): Promise<string | undefined> => {
-        if (!imageFile) return undefined
-        setUploading(true)
-        try {
-            const formData = new FormData()
-            formData.append('image', imageFile)
-            const res = await api.post<{ url: string }>('/api/uploads', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
-            return res.data.url
-        } catch {
-            throw new Error('Image upload failed. Please try again.')
-        } finally {
-            setUploading(false)
-        }
-    }
+
+
+    const set = (field: string, value: string) =>
+        setForm((prev) => ({ ...prev, [field]: value }))
+
+
+
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -125,29 +112,28 @@ export default function AddCropModal({ open, initialData, onClose, onSaved }: Ad
 
         setSaving(true)
         try {
-            // 1. Upload image if a new file was picked
-            let imageUrl: string | undefined = initialData?.image
+            // Create FormData to send file and other data
+            const formData = new FormData()
+            formData.append('name', form.name.trim())
+            formData.append('category', form.category)
+            formData.append('price', String(Number(form.price)))
+            formData.append('unit', form.unit)
+            formData.append('currentStock', String(Number(form.currentStock)))
+            formData.append('maxStock', String(Number(form.maxStock)))
+            formData.append('status', form.status)
             if (imageFile) {
-                imageUrl = await uploadImage()
-            }
-
-            // 2. Save crop (create or update)
-            const payload = {
-                name: form.name.trim(),
-                category: form.category,
-                price: Number(form.price),
-                unit: form.unit,
-                currentStock: Number(form.currentStock),
-                maxStock: Number(form.maxStock),
-                image: imageUrl,
-                status: form.status,
+                formData.append('image', imageFile)
             }
 
             let res
             if (isEdit && initialData) {
-                res = await api.patch(`/api/crops/${initialData.id}`, payload)
+                res = await api.patch(`/api/crops/${initialData.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                })
             } else {
-                res = await api.post('/api/crops', payload)
+                res = await api.post('/api/crops', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                })
             }
 
             onSaved(res.data as Crop)
@@ -163,7 +149,7 @@ export default function AddCropModal({ open, initialData, onClose, onSaved }: Ad
         }
     }
 
-    const isLoading = uploading || saving
+    const isLoading = saving
 
     if (!open) return null
 
@@ -240,13 +226,6 @@ export default function AddCropModal({ open, initialData, onClose, onSaved }: Ad
                                 <span className="text-sm font-medium">Click to upload an image</span>
                                 <span className="text-xs">JPEG, PNG, WebP · max 5 MB</span>
                             </button>
-                        )}
-
-                        {uploading && (
-                            <div className="flex items-center gap-2 mt-2 text-xs text-emerald-600 font-medium">
-                                <Loader2 size={14} className="animate-spin" />
-                                Uploading image…
-                            </div>
                         )}
                     </div>
 
@@ -360,7 +339,7 @@ export default function AddCropModal({ open, initialData, onClose, onSaved }: Ad
                         {isLoading ? (
                             <>
                                 <Loader2 size={16} className="mr-2 animate-spin" />
-                                {uploading ? 'Uploading…' : 'Saving…'}
+                                Saving…
                             </>
                         ) : isEdit ? 'Save Changes' : 'Post Crop'}
                     </Button>
