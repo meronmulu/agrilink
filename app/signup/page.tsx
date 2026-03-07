@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import img from "../../public/Agricultural.jpg"
 import SignUp from '@/components/SignUp'
+import { useLanguage } from '@/context/LanguageContext'
 
 
 export default function SignupPage() {
@@ -59,6 +60,5 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-    </div>
   )
 }
