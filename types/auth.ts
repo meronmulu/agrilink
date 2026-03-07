@@ -21,3 +21,13 @@ export interface VerifyOtpRequest {
   code: string
   purpose: "SIGNUP" | "LOGIN" | "RESET"
 }
+
+export interface LoginResponse {
+  token: string
+  user: {
+    id: string
+    role: string
+    email?: string
+    phone?: string
+  }
+}

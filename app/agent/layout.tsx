@@ -1,26 +1,35 @@
-import React from 'react'
-import AgentSidebar from '@/components/AgentSidebar'
+import React from "react"
+import FarmerHeader from "@/components/FarmerHeader"
+import FarmerSidebar from "@/components/FarmerSidebar"
+import Link from "next/link"
+import Header from "@/components/Header"
+import AgentSidebar from "@/components/AgentSidebar"
 
-export default function AgentLayout({
+export default function FarmerLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     return (
-        <div className="flex h-screen bg-gray-50 flex-col md:flex-row mt-16 pb-16 md:pb-0">
-            {/* Sidebar (desktop) */}
-            <div className="hidden md:block">
-                <AgentSidebar />
-            </div>
-
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto">
-                <div className="p-4 md:p-8 max-w-7xl mx-auto pb-24 md:pb-8 h-full">
-                    {children}
+        <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+                    {/* Top Navbar */}
+                    <div className="flex items-center h-16 shrink-0 border-b border-gray-200 bg-white">
+                        <div className="flex-1">
+                            <Header />
+                        </div>
+                    </div>
+                    {/* Main Content Area */}
+                    <div className="flex flex-1 overflow-hidden">
+                        {/* Sidebar */}
+                        <AgentSidebar/>
+        
+                        {/* Page Content Scrollable */}
+                        <main className="flex-1 overflow-y-auto p-7 ">
+                            <div className="max-w-7xl mx-auto">
+                                {children}
+                            </div>
+                        </main>
+                    </div>
                 </div>
-            </main>
-
-            {/* Mobile Nav could be added here later */}
-        </div>
     )
 }

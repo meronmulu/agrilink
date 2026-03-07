@@ -10,10 +10,10 @@ export default function AgentSidebar() {
     const pathname = usePathname()
 
     const navItems = [
-        { name: 'Overview', href: '/agent/dashboard', icon: LayoutDashboard },
-        { name: 'Register Farmer', href: '/agent/register-farmer', icon: Users },
-        { name: 'Training Modules', href: '/agent/training', icon: BookOpen },
-        { name: 'Settings', href: '/agent/settings', icon: Settings },
+        { name: 'Overview', href: '/Agent/dashboard', icon: LayoutDashboard },
+        { name: 'Register Farmer', href: '/Agent/register-farmer', icon: Users },
+        { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
+        { name: 'Settings', href: '/Agent/settings', icon: Settings },
     ]
 
     return (

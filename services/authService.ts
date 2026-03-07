@@ -1,5 +1,5 @@
 import instance from "@/axios"
-import { RegisterRequest, VerifyOtpRequest } from "@/types/auth"
+import { LoginResponse, RegisterRequest, VerifyOtpRequest } from "@/types/auth"
 import { User } from "next-auth"
 
 
@@ -23,30 +23,40 @@ export const register = async (userData: RegisterRequest): Promise<User | null> 
 
 
 
-export const login = async (credentials: { email: string; password: string }) => {
+
+
+
+export const login = async (credentials: { email?: string; phone?: string; password: string }): Promise<LoginResponse | null> => {
   try {
-    const res = await instance.post("/users/login", credentials);
+    console.log("Sending login request:", credentials);
 
-    if (res.data?.token) {
-      // decode token to extract role
-      const decoded = JSON.parse(
-        atob(res.data.token.split('.')[1])
-      );
+    const res = await instance.post("/auth/signin", credentials);
+    // console.log("API response:", res.data);
 
+    if (res.data?.token && res.data?.user) {
+      const decoded = JSON.parse(atob(res.data.token.split('.')[1]));
+      console.log("Decoded JWT:", decoded);
+
+      // Use role from API response (safer)
       const user = {
-        id: decoded.userId,
-        role: decoded.role,
+        id: res.data.user.id,
+        role: res.data.user.role , 
+        email: res.data.user.email,
+        phone: res.data.user.phone
       };
+
+      // console.log("User object returned:", user);
 
       return {
         token: res.data.token,
-        user,
+        user
       };
     }
 
     return null;
   } catch (error) {
-    console.log("Login error:", error);
+    console.error("Login error:", error);
+    return null;
   }
 };
 
