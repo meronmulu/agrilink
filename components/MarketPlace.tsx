@@ -6,6 +6,7 @@ import { Button } from './ui/button'
 import Image from 'next/image'
 import { Search, ChevronDown, Loader2, ShoppingBag } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useCart } from '@/context/CartContext'
 import Link from 'next/link'
 import api from '@/axios'
 
@@ -23,6 +24,7 @@ interface Product {
 
 export default function MarketPlace() {
   const { t } = useLanguage()
+  const { addItem } = useCart()
 
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,6 +33,8 @@ export default function MarketPlace() {
   // Search & filter state
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<string>('All')
+  const [minPrice, setMinPrice] = useState<string>('')
+  const [maxPrice, setMaxPrice] = useState<string>('')
   const [showCatDrop, setShowCatDrop] = useState(false)
   const catRef = useRef<HTMLDivElement>(null)
 
@@ -46,6 +50,20 @@ export default function MarketPlace() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // ─── Add to cart ──────────────────────────────────────────────────
+  const handleAddToCart = (product: Product) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image || '',
+      seller: product.farmerId, // Using farmerId as seller identifier
+      quantity: 1, // Start with 1 unit
+      unit: 'kg', // Default unit, could be made configurable
+      maxQuantity: product.amount, // Available stock
+    })
   }
 
   useEffect(() => { fetchProducts() }, [])
@@ -70,6 +88,8 @@ export default function MarketPlace() {
   // ─── Filtered products ─────────────────────────────────────────
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
+    const min = minPrice ? parseFloat(minPrice) : 0
+    const max = maxPrice ? parseFloat(maxPrice) : Infinity
     return products.filter((p) => {
       const matchSearch =
         !q ||
@@ -77,9 +97,10 @@ export default function MarketPlace() {
         (p.description ?? '').toLowerCase().includes(q) ||
         (p.category ?? '').toLowerCase().includes(q)
       const matchCat = activeCategory === 'All' || p.category === activeCategory
-      return matchSearch && matchCat
+      const matchPrice = p.price >= min && p.price <= max
+      return matchSearch && matchCat && matchPrice
     })
-  }, [products, search, activeCategory])
+  }, [products, search, activeCategory, minPrice, maxPrice])
 
   // ─── Skeleton cards ────────────────────────────────────────────
   const Skeleton = () => (
@@ -139,6 +160,29 @@ export default function MarketPlace() {
             </div>
           )}
         </div>
+
+        {/* Price Range */}
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            placeholder="Min price"
+            className="w-24 h-10 px-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          />
+          <span className="text-gray-400">-</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            placeholder="Max price"
+            className="w-24 h-10 px-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          />
+        </div>
       </div>
 
       {/* Error Banner */}
@@ -167,9 +211,9 @@ export default function MarketPlace() {
               ? 'Check back soon — farmers are adding their crops.'
               : 'Try a different search term or category.'}
           </p>
-          {search || activeCategory !== 'All' ? (
+          {search || activeCategory !== 'All' || minPrice || maxPrice ? (
             <button
-              onClick={() => { setSearch(''); setActiveCategory('All') }}
+              onClick={() => { setSearch(''); setActiveCategory('All'); setMinPrice(''); setMaxPrice('') }}
               className="mt-4 text-sm text-emerald-600 font-semibold underline hover:text-emerald-700"
             >
               Clear filters
@@ -211,11 +255,12 @@ export default function MarketPlace() {
 
                 {/* Action Buttons */}
                 <div className="mt-4 flex gap-2">
-                  <Link href="/cart">
-                    <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
-                      {t('market_add_cart')}
-                    </Button>
-                  </Link>
+                  <Button
+                    onClick={() => handleAddToCart(product)}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                  >
+                    {t('market_add_cart')}
+                  </Button>
                   <Link href={`/buyer/marketplace/${product.id}`}>
                     <Button className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700">
                       {t('market_view_details')}
@@ -233,6 +278,7 @@ export default function MarketPlace() {
         <p className="text-center text-xs text-gray-400 pb-8">
           Showing {filtered.length} of {products.length} product{products.length !== 1 ? 's' : ''}
           {activeCategory !== 'All' ? ` in "${activeCategory}"` : ''}
+          {(minPrice || maxPrice) ? ` priced ${minPrice ? `from $${minPrice}` : ''}${minPrice && maxPrice ? ' ' : ''}${maxPrice ? `to $${maxPrice}` : ''}` : ''}
           {search ? ` matching "${search}"` : ''}
         </p>
       )}

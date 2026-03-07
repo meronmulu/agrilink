@@ -28,6 +28,7 @@ export default function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     setIsLoading(true)
 
     try {
@@ -162,5 +163,15 @@ export default function SignUp() {
         )}
       </button>
     </form>
+
+    <OTPVerificationModal
+      open={showOTPModal}
+      onClose={() => setShowOTPModal(false)}
+      identifier={formData.email || formData.phone}
+      purpose="SIGNUP"
+      onVerified={() => {}}
+      userRole={role}
+    />
+    </>
   )
 }

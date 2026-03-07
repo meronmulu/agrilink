@@ -2,13 +2,15 @@
 
 import Image from 'next/image'
 import img from "../public/Agricultural.jpg"
-import { Lock, Eye, EyeOff, User } from "lucide-react"
+import { Lock, Eye, EyeOff, User, Phone } from "lucide-react"
 import { Input } from './ui/input'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
+import api from '@/axios'
+import ForgotPasswordModal from './ForgotPasswordModal'
 
 export default function Login() {
   const { t } = useLanguage()
@@ -61,6 +63,7 @@ export default function Login() {
       } else {
         setError("Invalid email/phone or password");
       }
+
     } catch (err) {
       console.error(err);
       setError("Login failed");

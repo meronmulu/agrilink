@@ -8,20 +8,35 @@ import CropCard, { Crop } from '@/components/CropCard'
 import HarvestForecast from '@/components/HarvestForecast'
 import AIStorageTips from '@/components/AIStorageTips'
 import AddCropModal from '@/components/AddCropModal'
-import api from '@/axios'
+import { useLanguage } from '@/context/LanguageContext'
 
-const CATEGORIES = ['All Categories', 'Grains', 'Fruits', 'Vegetables', 'Commodity', 'Legumes', 'Spices', 'Other']
-const STATUSES = ['All Status', 'In Stock', 'Low Stock', 'Out of Season']
+const CATEGORIES = [
+    t('crops_all_categories'), 
+    t('crops_grains'), 
+    t('crops_fruits'), 
+    t('crops_vegetables'), 
+    t('crops_commodity'), 
+    t('crops_legumes'), 
+    t('crops_spices'), 
+    t('crops_other')
+]
+const STATUSES = [
+    t('crops_all_status'), 
+    t('crops_in_stock'), 
+    t('crops_low_stock'), 
+    t('crops_out_of_season')
+]
 
 export default function MyCropsPage() {
+    const { t } = useLanguage()
     const [crops, setCrops] = useState<Crop[]>([])
     const [loading, setLoading] = useState(true)
     const [fetchError, setFetchError] = useState<string | null>(null)
 
     // Filters
     const [search, setSearch] = useState('')
-    const [categoryFilter, setCategoryFilter] = useState('All Categories')
-    const [statusFilter, setStatusFilter] = useState('All Status')
+    const [categoryFilter, setCategoryFilter] = useState(t('crops_all_categories'))
+    const [statusFilter, setStatusFilter] = useState(t('crops_all_status'))
     const [showCatDrop, setShowCatDrop] = useState(false)
     const [showStatusDrop, setShowStatusDrop] = useState(false)
     const catRef = useRef<HTMLDivElement>(null)
@@ -62,9 +77,9 @@ export default function MyCropsPage() {
         const q = search.toLowerCase()
         return crops.filter((c) => {
             const matchSearch = !q || c.name.toLowerCase().includes(q) || c.category.toLowerCase().includes(q)
-            const matchCat = categoryFilter === 'All Categories' || c.category === categoryFilter
+            const matchCat = categoryFilter === t('crops_all_categories') || c.category === categoryFilter
             const matchStatus =
-                statusFilter === 'All Status' ||
+                statusFilter === t('crops_all_status') ||
                 c.status.replace(' (placeholder)', '') === statusFilter
             return matchSearch && matchCat && matchStatus
         })
