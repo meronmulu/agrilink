@@ -1,95 +1,83 @@
-"use client"
+'use client'
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState, useEffect } from "react"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { useState } from "react"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { Button } from "@/components/ui/button"
 import { verifyOtp } from "@/services/authService"
 
 export default function VerifyOTP() {
   const router = useRouter()
   const params = useSearchParams()
-  const email = params.get("email") || "" // fallback to empty string
+
+  const identifier = params.get("identifier") || ""
+  const purpose = params.get("purpose") || "SIGNUP" // could be SIGNUP | LOGIN | RESET
 
   const [otp, setOtp] = useState("")
   const [loading, setLoading] = useState(false)
 
-  // Debug: log OTP changes
-  useEffect(() => {
-    console.log("Current OTP:", otp)
-  }, [otp])
-
   const handleVerify = async () => {
-    console.log("Verify button clicked")
-
-    if (!email) {
-      alert("Email/identifier missing. Please register again.")
-      return
-    }
-
-    if (otp.length < 6) {
-      alert("Please enter 6-digit OTP")
-      return
-    }
+    if (!identifier) return alert("Identifier missing")
+    if (otp.length < 6) return alert("Enter 6-digit OTP")
 
     try {
       setLoading(true)
+      const res = await verifyOtp({ identifier, code: otp, purpose: purpose as "SIGNUP" | "LOGIN" | "RESET" })
+      console.log("OTP Verified:", res)
+      // alert(res.message)
 
-      const res = await verifyOtp({
-        identifier: email,
-        code: otp,
-        purpose: "SIGNUP",
-      })
-
-      console.log("OTP verified:", res)
-      alert(res?.message || "Account verified successfully")
-
-      router.push("/login")
+      // Handle after OTP based on purpose
+      switch (purpose) {
+        case "SIGNUP":
+          router.push("/login") // after signup OTP, go to login
+          break
+        case "RESET":
+          router.push(`/resetPassword?identifier=${encodeURIComponent(identifier)}&otp=${otp}`) // go to reset page
+          break
+        case "LOGIN":
+          router.push("/dashboard") // after login OTP, go to dashboard
+          break
+      }
 
     } catch (error) {
-        console.log(error)
+      console.log(error)
+
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-muted px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle>Verify OTP</CardTitle>
-          <CardDescription>
-            Enter the 6-digit code sent to <span className="font-medium">{email}</span>
-          </CardDescription>
-        </CardHeader>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+      <div className="w-full max-w-md space-y-6">
+        <h1 className="text-2xl font-bold text-center">Verify OTP</h1>
+        <p className="text-center text-sm text-gray-600">
+          Enter the 6-digit code sent to <span className="font-medium">{identifier}</span>
+        </p>
 
-        <CardContent className="space-y-6 flex flex-col items-center">
-          <InputOTP
-            maxLength={6}
-            value={otp}
-            onChange={(value: string) => setOtp(value)}
-          >
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
+        <InputOTP
+          maxLength={6}
+          value={otp}
+          onChange={(value) => setOtp(value)}
+        >
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+            <InputOTPSlot index={3} />
+            <InputOTPSlot index={4} />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </InputOTP>
 
-          <Button
-            className="w-full bg-emerald-600 hover:bg-emerald-700"
-            onClick={handleVerify}
-            disabled={loading}
-          >
-            {loading ? "Verifying..." : "Verify OTP"}
-          </Button>
-        </CardContent>
-      </Card>
+        <Button
+          className="w-full bg-emerald-600 hover:bg-emerald-700 h-11"
+          onClick={handleVerify}
+          disabled={loading}
+        >
+          {loading ? "Verifying..." : "Verify OTP"}
+        </Button>
+      </div>
     </div>
   )
 }

@@ -6,7 +6,6 @@ import { Button } from './ui/button'
 import Image from 'next/image'
 import { Search, ChevronDown, Loader2, ShoppingBag } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useCart } from '@/context/CartContext'
 import Link from 'next/link'
 import api from '@/axios'
 
@@ -24,7 +23,6 @@ interface Product {
 
 export default function MarketPlace() {
   const { t } = useLanguage()
-  const { addItem } = useCart()
 
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -52,32 +50,7 @@ export default function MarketPlace() {
     }
   }
 
-  // ─── Add to cart ──────────────────────────────────────────────────
-  const handleAddToCart = (product: Product) => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image || '',
-      seller: product.farmerId, // Using farmerId as seller identifier
-      quantity: 1, // Start with 1 unit
-      unit: 'kg', // Default unit, could be made configurable
-      maxQuantity: product.amount, // Available stock
-    })
-  }
-
-  useEffect(() => { fetchProducts() }, [])
-
-  // ─── Close category dropdown on outside click ──────────────────
-  useEffect(() => {
-    function handle(e: MouseEvent) {
-      if (catRef.current && !catRef.current.contains(e.target as Node)) {
-        setShowCatDrop(false)
-      }
-    }
-    document.addEventListener('mousedown', handle)
-    return () => document.removeEventListener('mousedown', handle)
-  }, [])
+ 
 
   // ─── Derived unique categories ─────────────────────────────────
   const categories = useMemo(() => {

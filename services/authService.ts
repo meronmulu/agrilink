@@ -1,5 +1,5 @@
 import instance from "@/axios"
-import { LoginResponse, RegisterRequest, VerifyOtpRequest } from "@/types/auth"
+import { ForgotPasswordRequest, Kebele, LoginResponse, Region, RegisterRequest, ResetPasswordRequest, VerifyOtpRequest, Woreda, Zone } from "@/types/auth"
 import { User } from "next-auth"
 
 
@@ -20,11 +20,6 @@ export const register = async (userData: RegisterRequest): Promise<User | null> 
     return null
   }
 }
-
-
-
-
-
 
 export const login = async (credentials: { email?: string; phone?: string; password: string }): Promise<LoginResponse | null> => {
   try {
@@ -62,12 +57,86 @@ export const login = async (credentials: { email?: string; phone?: string; passw
 
 export const verifyOtp = async (data: VerifyOtpRequest) => {
   try {
-     const res = await instance.post("/auth/verify-otp", data)
-     console.log("Otp:", res.data)
-
-  return res.data
+    const res = await instance.post("/auth/verify-otp", data)
+    // console.log("OTP Response:", res.data)
+    return res.data
   } catch (error) {
     console.log(error)
+    throw error
   }
- 
+}
+
+
+export const forgotPassword = async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
+  try {
+    console.log("Forgot Password Request:", data) 
+    const res = await instance.post("/auth/forgot-password", data)
+    // console.log("Forgot Password Response:", res.data) 
+    return res.data
+  } catch (error) {
+      console.log(error)
+    throw error
+  }
+}
+
+export const resetPassword = async (data: ResetPasswordRequest): Promise<{ message: string }> => {
+  try {
+    console.log("Reset Password Request:", data) 
+    const res = await instance.post("/auth/reset-password", data)
+    // console.log("Reset Password Response:", res.data) 
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
+
+
+
+
+
+
+export const getRegions = async (): Promise<Region[]> => {
+  try {
+    const res = await instance.get("/regions")
+    console.log("Regions API response:", res.data)
+    return res.data
+  } catch (error) {
+    console.error("Error fetching regions:", error)
+    return []
+  }
+}
+
+
+export const getZones = async (regionId: string): Promise<Zone[]> => {
+  try {
+    const res = await instance.get(`/zones/by-region/${regionId}`)
+    return res.data
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}
+
+
+export const getWoredas = async (zoneId: string): Promise<Woreda[]> => {
+  try {
+    const res = await instance.get(`/woredas/by-zone/${zoneId}`)
+    return res.data
+  } catch (error) {
+     console.log(error)
+    return []
+  }
+}
+
+
+export const getKebeles = async (woredaId: string): Promise<Kebele[]> => {
+  try {
+    const res = await instance.get(`/kebeles/by-woreda/${woredaId}`)
+    return res.data
+  } catch (error) {
+    console.log(error)
+    return []
+  }
 }

@@ -1,184 +1,174 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Input } from './ui/input'
-import { Lock, Mail, Phone } from 'lucide-react'
-import Link from 'next/link'
+import { useEffect, useState } from "react"
+import { getRegions, getZones, getWoredas, getKebeles } from "@/services/authService"
+import { Region, Zone, Woreda, Kebele } from "@/types/auth"
 
-import { useLanguage } from '@/context/LanguageContext'
-import api from '@/axios'
-import OTPVerificationModal from './OTPVerificationModal'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { Input } from "./ui/input"
 
-export default function SignUpFarmer({ role }: { role: string }) {
-  const { t } = useLanguage()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [showOTPModal, setShowOTPModal] = useState(false)
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: ''
-  })
+export default function RegionLocationSelector() {
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+  const [regions, setRegions] = useState<Region[]>([])
+  const [zones, setZones] = useState<Zone[]>([])
+  const [woredas, setWoredas] = useState<Woreda[]>([])
+  const [kebeles, setKebeles] = useState<Kebele[]>([])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsLoading(true)
+  const [regionId, setRegionId] = useState("")
+  const [zoneId, setZoneId] = useState("")
+  const [woredaId, setWoredaId] = useState("")
+  const [kebeleId, setKebeleId] = useState("")
 
-    try {
-      if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match')
-        return
-      }
-
-      const payload = {
-        role: role as 'BUYER' | 'FARMER',
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword,
-        phone: formData.phone
-      }
-
-      await api.post('/auth/signup', payload)
-
-      // Show OTP verification modal
-      setShowOTPModal(true)
-    } catch (error: any) {
-      console.error('Registration failed:', error)
-      setError(error.response?.data?.message || 'Registration failed')
-    } finally {
-      setIsLoading(false)
+  // Load regions
+  useEffect(() => {
+    const fetchRegions = async () => {
+      const data = await getRegions()
+      setRegions(data)
     }
-  }
+    fetchRegions()
+  }, [])
+
+  // Load zones
+  useEffect(() => {
+    if (!regionId) return
+
+    const fetchZones = async () => {
+      const data = await getZones(regionId)
+      setZones(data)
+
+      setZoneId("")
+      setWoredas([])
+      setKebeles([])
+    }
+
+    fetchZones()
+  }, [regionId])
+
+  // Load woredas
+  useEffect(() => {
+    if (!zoneId) return
+
+    const fetchWoredas = async () => {
+      const data = await getWoredas(zoneId)
+      setWoredas(data)
+
+      setWoredaId("")
+      setKebeles([])
+    }
+
+    fetchWoredas()
+  }, [zoneId])
+
+  // Load kebeles
+  useEffect(() => {
+    if (!woredaId) return
+
+    const fetchKebeles = async () => {
+      const data = await getKebeles(woredaId)
+      setKebeles(data)
+
+      setKebeleId("")
+    }
+
+    fetchKebeles()
+  }, [woredaId])
+
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Email */}
-        <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium text-gray-700">
-            {t('signup_email_label')}
-          </label>
-          <div className="relative group">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              placeholder={t('signup_email_placeholder')}
-              className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-            />
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-          </div>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <label htmlFor="email" className="text-sm font-medium text-gray-700">
+           Full Name
+        </label>
+        <div className="relative group">
+          <Input
+            name="fullname"
+            type="text"
+            placeholder=" Full Name"
+            required
+            className="h-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
+          />
         </div>
+      </div>
 
-        {/* Phone */}
-        <div className="space-y-2">
-          <label htmlFor="phone" className="text-sm font-medium text-gray-700">
-            {t('signup_phone_label')}
-          </label>
-          <div className="relative group">
-            <Input
-              id="phone"
-              name="phone"
-              type="tel"
-              required
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="+251912033566"
-              className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-            />
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-          </div>
-        </div>
+      
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">Role</label>
+        <Select value={regionId} onValueChange={setRegionId}>
+          <SelectTrigger className="h-11 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
+            <SelectValue placeholder="Select Region" />
+          </SelectTrigger>
+          <SelectContent className="w-4xl">
+            {regions.map(region => (
+              <SelectItem key={region.id} value={region.id}>
+                {region.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      {/* Zone */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">Role</label>
+        <Select value={zoneId} onValueChange={setZoneId} disabled={!regionId}>
+          <SelectTrigger className="h-11 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
+            <SelectValue placeholder="Select Zone" />
+          </SelectTrigger>
+          <SelectContent>
+            {zones.map(zone => (
+              <SelectItem key={zone.id} value={zone.id}>
+                {zone.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-        {/* Password */}
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-sm font-medium text-gray-700">
-            {t('signup_password_label')}
-          </label>
-          <div className="relative group">
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              placeholder={t('signup_password_placeholder')}
-              className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-            />
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-          </div>
-        </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">Role</label>
+        <Select value={woredaId} onValueChange={setWoredaId} disabled={!zoneId}>
+          <SelectTrigger className="h-11 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
+            <SelectValue placeholder="Select Woreda" />
+          </SelectTrigger>
+          <SelectContent>
+            {woredas.map(w => (
+              <SelectItem key={w.id} value={w.id}>
+                {w.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-        {/* Confirm Password */}
-        <div className="space-y-2">
-          <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-            {t('signup_confirm_password_label')}
-          </label>
-          <div className="relative group">
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm your password"
-              className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-            />
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-          </div>
-        </div>
 
-        {error && (
-          <div className="text-red-500 text-sm text-center">{error}</div>
-        )}
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full h-11 mt-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium shadow-md transition-all flex items-center justify-center disabled:opacity-50"
-        >
-          {isLoading ? (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
-            t('signup_farmer_btn')
-          )}
-        </button>
 
-        <div className="space-y-4 mt-6">
-          <p className="text-gray-500 text-center text-sm">
-            {t('signup_already_account')}{" "}
-            <Link
-              href="/login"
-              className="text-emerald-600 hover:text-emerald-700 font-medium"
-            >
-              {t('signup_signin_link')}
-            </Link>
-          </p>
-        </div>
-      </form>
 
-      <OTPVerificationModal
-        open={showOTPModal}
-        onClose={() => setShowOTPModal(false)}
-        identifier={formData.email || formData.phone}
-        purpose="SIGNUP"
-        onVerified={() => {}}
-        userRole={role}
-      />
-    </>
+      {/* Kebele */}
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">Role</label>
+        <Select value={kebeleId} onValueChange={setKebeleId} disabled={!woredaId}>
+          <SelectTrigger className="h-11 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
+            <SelectValue placeholder="Select Kebele" />
+          </SelectTrigger>
+          <SelectContent>
+            {kebeles.map(k => (
+              <SelectItem key={k.id} value={k.id}>
+                {k.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+
+    </div>
   )
 }

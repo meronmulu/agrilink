@@ -9,8 +9,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
-import api from '@/axios'
-import ForgotPasswordModal from './ForgotPasswordModal'
 
 export default function Login() {
   const { t } = useLanguage()
@@ -137,7 +135,7 @@ export default function Login() {
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-medium text-gray-700">Password</label>
-                  <Link href="/forgot-password" className="text-emerald-600 hover:text-emerald-700">
+                  <Link href="/forgotPassword" className="text-emerald-600 hover:text-emerald-700">
                     Forgot password?
                   </Link>
                 </div>
