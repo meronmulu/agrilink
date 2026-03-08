@@ -52,7 +52,7 @@ export default function Login() {
       if (user) {
         const roleRoutes: Record<string, string> = {
           ADMIN: "/admin",
-          AGENT: "/agent/dashboard",
+          AGENT: "/Agent/dashboard",
           BUYER: "/buyer",
           FARMER: "/farmer",
         };

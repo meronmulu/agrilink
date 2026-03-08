@@ -1,6 +1,5 @@
 'use client'
 
-import React, { useState } from 'react'
 import Image from 'next/image'
 import img from "../../public/Agricultural.jpg"
 import SignUp from '@/components/SignUp'
@@ -9,10 +8,9 @@ import { useLanguage } from '@/context/LanguageContext'
 
 export default function SignupPage() {
   const { t } = useLanguage()
-  const [role, setRole] = useState<'BUYER' | 'FARMER'>('BUYER')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center ">
 
       <div className="grid lg:grid-cols-2 w-full max-w-6xl bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl overflow-hidden mt-16 md:mt-0">
 
@@ -37,15 +35,15 @@ export default function SignupPage() {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center justify-center p-8 lg:p-14 bg-white/80 backdrop-blur-xl">
+        <div className="flex items-center justify-center p-6 lg:p-14 bg-white/80 backdrop-blur-xl">
           <div className="w-full max-w-md">
 
             {/* Header */}
-            <div className="mb-8 text-center lg:text-left">
+            <div className=" text-center lg:text-left">
               <h2 className="text-3xl font-bold text-gray-900">
                 {t('signup_header')}
               </h2>
-              <p className="text-gray-500 mt-2 text-sm">
+              <p className="text-gray-500 text-sm">
                 {t('signup_subheader')}
               </p>
             </div>

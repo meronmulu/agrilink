@@ -5,6 +5,8 @@ import { useState } from "react"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Button } from "@/components/ui/button"
 import { verifyOtp } from "@/services/authService"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 
 export default function VerifyOTP() {
   const router = useRouter()
@@ -48,36 +50,77 @@ export default function VerifyOTP() {
   }
 
   return (
+    // <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+    //   <div className="w-full max-w-md space-y-6">
+    //     <h1 className="text-2xl font-bold text-center">Verify OTP</h1>
+    //     <p className="text-center text-sm text-gray-600">
+    //       Enter the 6-digit code sent to <span className="font-medium">{identifier}</span>
+    //     </p>
+
+    //     <InputOTP
+    //       maxLength={6}
+    //       value={otp}
+    //       onChange={(value) => setOtp(value)}
+    //       className="text-center"
+    //     >
+    //       <InputOTPGroup>
+    //         <InputOTPSlot index={0} />
+    //         <InputOTPSlot index={1} />
+    //         <InputOTPSlot index={2} />
+    //         <InputOTPSlot index={3} />
+    //         <InputOTPSlot index={4} />
+    //         <InputOTPSlot index={5} />
+    //       </InputOTPGroup>
+    //     </InputOTP>
+
+    //     <Button
+    //       className="w-full bg-emerald-600 hover:bg-emerald-700 h-11"
+    //       onClick={handleVerify}
+    //       disabled={loading}
+    //     >
+    //       {loading ? "Verifying..." : "Verify OTP"}
+    //     </Button>
+    //   </div>
+    // </div>
+
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-md space-y-6">
-        <h1 className="text-2xl font-bold text-center">Verify OTP</h1>
-        <p className="text-center text-sm text-gray-600">
-          Enter the 6-digit code sent to <span className="font-medium">{identifier}</span>
-        </p>
+      <Card className="w-full max-w-md p-6 shadow-lg rounded-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Verify OTP</CardTitle>
+          <CardDescription>
+            Enter the 6-digit code sent to <span className="font-medium">{identifier}</span>
+          </CardDescription>
+        </CardHeader>
 
-        <InputOTP
-          maxLength={6}
-          value={otp}
-          onChange={(value) => setOtp(value)}
-        >
-          <InputOTPGroup>
-            <InputOTPSlot index={0} />
-            <InputOTPSlot index={1} />
-            <InputOTPSlot index={2} />
-            <InputOTPSlot index={3} />
-            <InputOTPSlot index={4} />
-            <InputOTPSlot index={5} />
-          </InputOTPGroup>
-        </InputOTP>
+        <CardContent className="space-y-4 ">
+          <div className="flex justify-center py-2">
+            <InputOTP
+              maxLength={6}
+              value={otp}
+              onChange={(value) => setOtp(value)}
+              className=""
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
 
-        <Button
-          className="w-full bg-emerald-600 hover:bg-emerald-700 h-11"
-          onClick={handleVerify}
-          disabled={loading}
-        >
-          {loading ? "Verifying..." : "Verify OTP"}
-        </Button>
-      </div>
+
+          <Button
+            className="w-full bg-emerald-600 hover:bg-emerald-700 h-11"
+            onClick={handleVerify}
+            disabled={loading}
+          >
+            {loading ? "Verifying..." : "Verify OTP"}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }

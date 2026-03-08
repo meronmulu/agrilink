@@ -3,6 +3,7 @@ import FarmerHeader from "@/components/FarmerHeader"
 import FarmerSidebar from "@/components/FarmerSidebar"
 import Link from "next/link"
 import Header from "@/components/Header"
+import Sidebar from "@/components/Sidebar"
 
 export default function FarmerLayout({
     children,
@@ -20,7 +21,7 @@ export default function FarmerLayout({
                     {/* Main Content Area */}
                     <div className="flex flex-1 overflow-hidden">
                         {/* Sidebar */}
-                        <FarmerSidebar/>
+                        <Sidebar/>
         
                         {/* Page Content Scrollable */}
                         <main className="flex-1 overflow-y-auto p-7 ">
