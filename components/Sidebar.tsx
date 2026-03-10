@@ -9,31 +9,51 @@ import { useAuth } from '@/context/AuthContext'
 
 export default function Sidebar() {
   const pathname = usePathname()
+  
   const { user } = useAuth()
+console.log("USER ROLE:", user?.role)
 
-  const roleNav = {
-    BUYER: [
-      { name: 'Overview', href: '/buyer/overview', icon: LayoutDashboard },
-      { name: 'Orders', href: '/buyer/order', icon: ShoppingBag },
-      { name: 'Messages', href: '/message', icon: MessageSquare, badge: 3 },
-      { name: 'AI Insights', href: '/buyer/insights', icon: BrainCircuit },
-    ],
 
-    FARMER: [
-      { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
-      { name: 'Sales', href: '/farmer/sales', icon: DollarSign },
-      { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
-      { name: 'AI Insights', href: '/farmer/insights', icon: BrainCircuit },
-      { name: 'Settings', href: '/farmer/settings', icon: Settings },
-    ],
 
-    AGENT: [
-      { name: 'Overview', href: '/agent/dashboard', icon: LayoutDashboard },
-      { name: 'Register Farmer', href: '/agent/register-farmer', icon: Users },
-      { name: 'Training Modules', href: '/agent/training', icon: BookOpen },
-      { name: 'Settings', href: '/agent/settings', icon: Settings },
-    ],
-  }
+
+  type NavItem = {
+  name: string
+  href: string
+  icon: React.ElementType
+  badge?: number
+}
+
+const roleNav: Record<string, NavItem[]> = {
+  BUYER: [
+    { name: 'Overview', href: '/buyer/overview', icon: LayoutDashboard },
+    { name: 'Orders', href: '/buyer/order', icon: ShoppingBag },
+    { name: 'Messages', href: '/message', icon: MessageSquare, badge: 3 },
+    { name: 'AI Insights', href: '/buyer/insights', icon: BrainCircuit },
+  ],
+
+  FARMER: [
+    { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
+    { name: 'Sales', href: '/farmer/sales', icon: DollarSign },
+    { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
+    { name: 'AI Insights', href: '/farmer/insights', icon: BrainCircuit },
+    { name: 'Settings', href: '/farmer/settings', icon: Settings },
+  ],
+
+  AGENT: [
+    { name: 'Overview', href: '/agent/dashboard', icon: LayoutDashboard },
+    { name: 'Register Farmer', href: '/agent/register-farmer', icon: Users },
+    { name: 'Training Modules', href: '/agent/training', icon: BookOpen },
+    { name: 'Settings', href: '/agent/settings', icon: Settings },
+  ],
+
+  ADMIN: [
+    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'User Managment', href: '/admin/user', icon: Users },
+    { name: 'Products', href: '/admin/products', icon: BookOpen },
+    { name: 'Agent Approval', href: '/admin/agent-approval', icon: Settings },
+    { name: 'Catagories', href: '/admin/catagory', icon: Settings },
+  ],
+}
 
   const navItems = roleNav[user?.role as keyof typeof roleNav] || []
 

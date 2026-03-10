@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from './ui/input'
-import { Lock, Mail, User } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { useLanguage } from '@/context/LanguageContext'
 import Link from 'next/link'
@@ -33,22 +32,33 @@ export default function SignUp() {
         console.log("User registered successfully", user)
 
         // Redirect to OTP verification page
-        router.push(`/verify-otp?identifier=${encodeURIComponent(email || phone)}&purpose=SIGNUP&role=${role}`)
+        const identifier = email || phone
+        router.push(`/verify-otp?identifier=${encodeURIComponent(identifier)}&purpose=SIGNUP&role=${role}`)
       }
-    } catch (err) {
-      console.error("Registration failed:", err)
-      setError( "Registration failed")
+    } catch (error) {
+      console.log(error )
+
+      // Handle server timeout
+      // if (err.response?.status === 504) {
+      //   setError("Server timed out. OTP may still be sent. Try again or check your email/phone.")
+      // }
+      // // Handle conflict (duplicate email/phone)
+      // else if (err.response?.status === 409) {
+      //   setError("This email or phone number is already registered.")
+      // } else {
+      //   setError("Registration failed. Please try again.")
+      // }
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-1">
+    <form onSubmit={handleSubmit} className="space-y-2">
 
       {/* Role */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">Role</label>
+        <label className="text-sm font-medium text-gray-700">Role</label>
         <Select onValueChange={setRole} value={role}>
           <SelectTrigger className="h-11 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
             <SelectValue placeholder="Select user role" />
@@ -62,93 +72,64 @@ export default function SignUp() {
 
       {/* Email */}
       <div className="space-y-2">
-        <label htmlFor="email" className="text-sm font-medium text-gray-700">
-          {t('signup_email_label')}
-        </label>
-        <div className="relative group">
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-        </div>
+        <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+        />
       </div>
 
       {/* Phone */}
       <div className="space-y-2">
-        <label htmlFor="phone" className="text-sm font-medium text-gray-700">
-          Phone
-        </label>
-        <div className="relative group">
-          <Input
-            id="phone"
-            name="phone"
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+251......"
-            required
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-        </div>
+        <label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone</label>
+        <Input
+          id="phone"
+          type="text"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+251..."
+          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+        />
       </div>
 
       {/* Password */}
       <div className="space-y-2">
-        <label htmlFor="password" className="text-sm font-medium text-gray-700">
-          {t('signup_password_label')}
-        </label>
-        <div className="relative group">
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-        </div>
+        <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+        />
       </div>
 
       {/* Confirm Password */}
       <div className="space-y-2">
-        <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-          Confirm Password
-        </label>
-        <div className="relative group">
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-            className="h-11 pl-10 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
-          />
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={18} />
-        </div>
+        <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password</label>
+        <Input
+          id="confirmPassword"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="••••••••"
+          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+        />
       </div>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
-      {/* Submit */}
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full h-11 mt-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium shadow-md transition-all flex items-center justify-center disabled:opacity-50"
+        className="w-full h-11 mt-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium flex items-center justify-center disabled:opacity-50"
       >
-        {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : t('signup_buyer_btn')}
+        {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Sign Up"}
       </button>
 
       <p className="text-gray-500 text-center text-sm mt-2">

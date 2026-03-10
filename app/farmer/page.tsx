@@ -1,5 +1,14 @@
-import { redirect } from 'next/navigation'
+import Footer from '@/components/Footer'
+import Header from '@/components/Header'
+import Marketplace from '@/components/MarketPlace'
 
-export default function FarmerPage() {
-  redirect('/farmer/crops')
+export default function page() {
+  return (
+    <div>
+        <Header/>
+        <Marketplace/>
+        <Footer/> 
+    </div>
+  )
 }
+ 

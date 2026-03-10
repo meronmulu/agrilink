@@ -12,6 +12,7 @@
     "axios": "^1.13.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "firebase": "^12.10.0",
     "i18n-client": "^0.0.5",
     "i18next": "^25.8.13",
     "i18next-http-backend": "^3.0.2",

@@ -9,11 +9,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
+import { googleSignin } from '@/services/authService'
+
 
 export default function Login() {
   const { t } = useLanguage()
   const router = useRouter()
   const { login } = useAuth()
+  const { setUser } = useAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -51,7 +54,7 @@ export default function Login() {
 
       if (user) {
         const roleRoutes: Record<string, string> = {
-          ADMIN: "/admin",
+          ADMIN: "/admin/dashboard",
           AGENT: "/Agent/dashboard",
           BUYER: "/buyer",
           FARMER: "/farmer",
@@ -70,9 +73,39 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    console.log("Google login not implemented yet")
+
+const handleGoogleLogin = async () => {
+  try {
+    const res = await googleSignin();
+
+    // console.log("GOOGLE LOGIN RESPONSE:", res);
+    // console.log("USER ROLE:", res.user.role);
+
+    // Update AuthContext
+    setUser({
+      id: res.user.id,
+      role: res.user.role,
+      email: res.user.email ?? '',
+      phone: res.user.phone ?? '',
+    });
+
+    // Save in localStorage
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('user', JSON.stringify(res.user));
+
+    // Role-based routing
+    const roleRoutes: Record<string, string> = {
+      ADMIN: "/admin/dashboard",
+      AGENT: "/Agent/dashboard",
+      BUYER: "/buyer",
+      FARMER: "/farmer",
+    };
+
+    router.push(roleRoutes[res.user.role] || "/");
+  } catch (error) {
+    console.error("Google login failed", error);
   }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">

@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import * as AuthService from '@/services/authService';
 import { User } from '@/types/auth';
 
-
 interface AuthContextType {
   user: User | null;
   login: (credentials: { email?: string; phone?: string; password: string }) => Promise<User | null>;
   logout: () => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (credentials: { email?: string; phone?: string; password: string }) => {
     const res = await AuthService.login(credentials);
-    // console.log("LOGIN RESPONSE:", res);
+    console.log("LOGIN RESPONSE:", res);
 
     if (res?.token && res.user) {
       localStorage.setItem('token', res.token);
@@ -55,19 +55,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (token && userString) {
       const parsedUser = JSON.parse(userString);
-      setTimeout(() => {
-        setUser({
-          id: parsedUser.id,
-          role: parsedUser.role,
-          email: parsedUser.email ?? '',
-          phone: parsedUser.phone ?? '',
-        });
-      }, 0);
+
+     Promise.resolve().then(() =>
+      setUser({
+        id: parsedUser.id,
+        role: parsedUser.role,
+        email: parsedUser.email ?? '',
+        phone: parsedUser.phone ?? '',
+      })
+    );
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,8 @@
 import instance from "@/axios"
 import { ForgotPasswordRequest, Kebele, LoginResponse, Region, RegisterRequest, ResetPasswordRequest, VerifyOtpRequest, Woreda, Zone } from "@/types/auth"
 import { User } from "next-auth"
+import { signInWithPopup } from "firebase/auth"
+import { auth, googleProvider } from "@/lib/firebase"
 
 
 export const register = async (userData: RegisterRequest): Promise<User | null> => {
@@ -93,6 +95,28 @@ export const resetPassword = async (data: ResetPasswordRequest): Promise<{ messa
 
 
 
+export const googleSignin = async () => {
+  try {
+    // Open Google login popup
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    // Get Firebase ID token
+    const idToken = await user.getIdToken();
+    console.log("🔐 Firebase Token:", idToken);
+
+    // ✅ Send token in body ONLY (backend expects this)
+    const res = await instance.post("/auth/google-signin", { idToken });
+
+    // Store token locally for future requests if needed
+    localStorage.setItem("token", idToken);
+
+    return res.data;
+  } catch (error) {
+    console.error("Google Signin Error:", error);
+    throw error;
+  }
+};
 
 
 
