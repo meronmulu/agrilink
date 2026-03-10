@@ -1,4 +1,3 @@
-// app/categories/page.tsx
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
@@ -10,23 +9,17 @@ import {
   deleteCategory,
   updateSubCategory,
   deleteSubCategory,
+  getSubCategories,
 } from '@/services/categoryService'
 
-import { Category } from '@/types/category'
+import { Category, SubCategory } from '@/types/category'
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
+
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import {
   Dialog,
   DialogContent,
@@ -42,8 +35,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Separator } from '@/components/ui/separator'
-import { ScrollArea } from '@/components/ui/scroll-area'
+
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 import {
@@ -59,34 +51,13 @@ import {
   Search,
   Grid3x3,
   List,
-  Layers,
-  Hash,
-  Calendar,
-  Archive,
-  Eye,
-  EyeOff,
-  RefreshCw,
 } from 'lucide-react'
 
-type Subcategory = {
-  id: string
-  name: string
-  categoryId: string
-  productCount?: number
-  status?: 'active' | 'inactive'
-  createdAt?: string
-}
 
-interface CategoryWithMeta extends Category {
-  productCount?: number
-  status?: 'active' | 'inactive'
-  createdAt?: string
-  updatedAt?: string
-}
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<CategoryWithMeta[]>([])
-  const [subcategories, setSubcategories] = useState<Subcategory[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [subcategories, setSubcategories] = useState<SubCategory[]>([])
 
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -95,23 +66,27 @@ export default function CategoriesPage() {
 
   // Form states
   const [newCategoryName, setNewCategoryName] = useState('')
-  const [newCategoryDescription, setNewCategoryDescription] = useState('')
   const [newSubName, setNewSubName] = useState('')
-  const [newSubDescription, setNewSubDescription] = useState('')
   const [parentCategoryId, setParentCategoryId] = useState('')
 
   // UI states
   const [open, setOpen] = useState<string[]>([])
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editValue, setEditValue] = useState('')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState<{ id: string; type: 'category' | 'subcategory' } | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<CategoryWithMeta | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)
+
+  // Dialog states
+  const [subDialogOpen, setSubDialogOpen] = useState(false)
+  const [editCategoryDialogOpen, setEditCategoryDialogOpen] = useState(false)
+  const [editSubDialogOpen, setEditSubDialogOpen] = useState(false)
+
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null)
+  const [editingSubId, setEditingSubId] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState('')
 
   useEffect(() => {
     fetchCategories()
-    // Simulate fetching subcategories with metadata
     fetchSubcategoriesWithMeta()
   }, [])
 
@@ -119,15 +94,7 @@ export default function CategoriesPage() {
     setLoading(true)
     try {
       const data = await getCategories()
-      // Add mock metadata for demonstration
-      const categoriesWithMeta = data.map((cat: Category) => ({
-        ...cat,
-        productCount: Math.floor(Math.random() * 50),
-        status: Math.random() > 0.2 ? 'active' : 'inactive',
-        createdAt: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
-        updatedAt: new Date().toISOString(),
-      }))
-      setCategories(categoriesWithMeta)
+      setCategories(data)
     } catch (err) {
       console.error(err)
     } finally {
@@ -137,9 +104,8 @@ export default function CategoriesPage() {
 
   const fetchSubcategoriesWithMeta = async () => {
     try {
-      // This would be replaced with actual API call
-      const mockSubs: Subcategory[] = []
-      setSubcategories(mockSubs)
+      const data = await getSubCategories()
+      setSubcategories(data)
     } catch (err) {
       console.error(err)
     }
@@ -157,20 +123,12 @@ export default function CategoriesPage() {
 
     setSubmitting(true)
     try {
-      const created = await addCategory({ 
-        name: newCategoryName,
-      })
+      const created = await addCategory({ name: newCategoryName })
+      setCategories((prev) => [
+        ...prev,
 
-      setCategories((prev) => [...prev, { 
-        ...created, 
-        productCount: 0, 
-        status: 'active',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }])
-      
-      setNewCategoryName('')
-      setNewCategoryDescription('')
+      ])
+      setNewCategoryName(created)
     } catch (err) {
       console.error(err)
     }
@@ -187,17 +145,12 @@ export default function CategoriesPage() {
         name: newSubName,
         categoryId: parentCategoryId,
       })
-
-      setSubcategories((prev) => [...prev, { 
-        ...created, 
-        productCount: 0, 
-        status: 'active',
-        createdAt: new Date().toISOString()
-      }])
-      
-      setNewSubName('')
-      setNewSubDescription('')
+      setSubcategories((prev) => [
+        ...prev,
+      ])
+      setNewSubName(created)
       setParentCategoryId('')
+      setSubDialogOpen(false)
     } catch (err) {
       console.error(err)
     }
@@ -205,39 +158,87 @@ export default function CategoriesPage() {
   }
 
   const handleDelete = async () => {
-    if (!itemToDelete) return
+  if (!itemToDelete) return
 
+  setSubmitting(true)
+  try {
+    if (itemToDelete.type === 'category') {
+      await deleteCategory(itemToDelete.id)
+      setCategories((prev) => prev.filter((c) => c.id !== itemToDelete.id))
+      setSubcategories((prev) =>
+        prev.filter((s) => s.categoryId !== itemToDelete.id)
+      )
+    } else {
+      await deleteSubCategory(itemToDelete.id)
+      setSubcategories((prev) => prev.filter((s) => s.id !== itemToDelete.id))
+    }
+  } catch (err) {
+    console.error('Failed to delete:', err)
+    alert('Failed to delete. Please try again.')
+  } finally {
+    setDeleteDialogOpen(false)
+    setItemToDelete(null)
+    setSubmitting(false)
+  }
+}
+
+  const handleEditCategory = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingCategoryId || !editValue.trim()) return
+
+    setSubmitting(true)
     try {
-      if (itemToDelete.type === 'category') {
-        await deleteCategory(itemToDelete.id)
-        setCategories((prev) => prev.filter((c) => c.id !== itemToDelete.id))
-      } else {
-        await deleteSubCategory(itemToDelete.id)
-        setSubcategories((prev) => prev.filter((s) => s.id !== itemToDelete.id))
+      const updated = await updateCategory(editingCategoryId, { name: editValue })
+
+      if (!updated || !updated.name) {
+        throw new Error('No data returned from updateCategory')
       }
+
+      setCategories(prev =>
+        prev.map(cat =>
+          cat.id === editingCategoryId ? { ...cat, name: updated.name } : cat
+        )
+      )
+      setEditCategoryDialogOpen(false)
+      setEditValue('')
+      setEditingCategoryId(null)
+    } catch (err) {
+      console.error('Edit category failed:', err)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleEditSubCategory = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingSubId || !editValue.trim()) return
+    setSubmitting(true)
+    try {
+      const updated = await updateSubCategory(editingSubId, { name: editValue })
+      setSubcategories(prev =>
+        prev.map(sub =>
+          sub.id === editingSubId ? { ...sub, name: updated.name } : sub
+        )
+      )
+      setEditSubDialogOpen(false)
+      setEditValue('')
+      setEditingSubId(null)
     } catch (err) {
       console.error(err)
     }
-
-    setDeleteDialogOpen(false)
-    setItemToDelete(null)
+    setSubmitting(false)
   }
 
   const grouped = useMemo(() => {
     return categories
-      .filter(cat => 
-        cat.name.toLowerCase().includes(searchTerm.toLowerCase())      )
-      .map((cat) => ({
+      .filter(cat => cat.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .map(cat => ({
         ...cat,
         subs: subcategories
-          .filter((s) => s.categoryId === cat.id)
-          .filter(sub => 
-            sub.name.toLowerCase().includes(searchTerm.toLowerCase()) 
-          ),
+          .filter(s => s.categoryId === cat.id)
+          .filter(sub => sub.name.toLowerCase().includes(searchTerm.toLowerCase())),
       }))
   }, [categories, subcategories, searchTerm])
-
- 
 
   if (loading && categories.length === 0) {
     return (
@@ -263,10 +264,7 @@ export default function CategoriesPage() {
             <div className="flex items-center gap-3">
               <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className='bg-gradient-to-r 
-                  from-emerald-600 to-teal-600
-                  hover:from-emerald-700 hover:to-teal-700
-                  text-white '>
+                  <Button className='bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
                     <PlusCircle className="h-4 w-4 mr-2" />
                     Add Category
                   </Button>
@@ -286,12 +284,11 @@ export default function CategoriesPage() {
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
                         placeholder="e.g., Electronics"
-                        className="mt-1"
+                        className="mt-4"
                       />
                     </div>
-                    
                     <DialogFooter>
-                      <Button type="submit" disabled={submitting}>
+                      <Button type="submit" disabled={submitting} className='bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
                         {submitting ? (
                           <>
                             <Loader2 className="animate-spin mr-2 h-4 w-4" />
@@ -312,20 +309,8 @@ export default function CategoriesPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      
         <Tabs defaultValue="view" className="space-y-6">
           <div className="flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="view" className="px-6">
-                <Eye className="h-4 w-4 mr-2" />
-                View All
-              </TabsTrigger>
-              <TabsTrigger value="create" className="px-6">
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Create New
-              </TabsTrigger>
-            </TabsList>
-
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -333,7 +318,7 @@ export default function CategoriesPage() {
                   placeholder="Search categories..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 w-[250px]"
+                  className="pl-9 md:w-4xl"
                 />
               </div>
               <Button
@@ -353,11 +338,7 @@ export default function CategoriesPage() {
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Folder className="h-12 w-12 text-gray-300 mb-4" />
                   <p className="text-lg font-medium text-gray-900">No categories found</p>
-                  <p className="text-sm text-gray-500 mb-4">Get started by creating your first category</p>
-                  <Button onClick={() => document.querySelector('[data-dialog-trigger]')?.dispatchEvent(new Event('click'))}>
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Create Category
-                  </Button>
+
                 </CardContent>
               </Card>
             ) : (
@@ -365,7 +346,7 @@ export default function CategoriesPage() {
                 {grouped.map((cat) => (
                   <Card key={cat.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                     {/* Category Header */}
-                    <div className="p-4 bg-white border-b">
+                    <div className="p-2 bg-white border-b">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 flex-1">
                           <button
@@ -378,22 +359,15 @@ export default function CategoriesPage() {
                               <ChevronRight className="h-4 w-4 text-gray-500" />
                             )}
                           </button>
-                          
-                          <div 
+                          <div
                             className="flex items-center gap-3 flex-1 cursor-pointer"
-                            onClick={() => {
-                              setSelectedCategory(cat)
-                              setDetailDialogOpen(true)
-                            }}
+                            onClick={() => setSelectedCategory(cat)}
                           >
-                            
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <h3 className="font-semibold text-gray-900">{cat.name}</h3>
                               </div>
-                              <p className="text-xs text-gray-500">
-                                   • {cat.subs.length} subcategories
-                              </p>
+                              <p className="text-xs text-gray-500">• {cat.subs.length} subcategories</p>
                             </div>
                           </div>
                         </div>
@@ -405,22 +379,24 @@ export default function CategoriesPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => {
-                              setEditingId(cat.id)
-                              setEditValue(cat.name)
-                            }}>
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
+                            <DropdownMenuItem
+                              className=''
+                              onClick={() => {
+                                setEditingCategoryId(cat.id)
+                                setEditValue(cat.name)
+                                setEditCategoryDialogOpen(true)
+                              }}
+                            >
+                              <Pencil className="h-4 w-4 mr-2" /> Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               className="text-red-600"
                               onClick={() => {
                                 setItemToDelete({ id: cat.id, type: 'category' })
                                 setDeleteDialogOpen(true)
                               }}
                             >
-                              <Trash className="h-4 w-4 mr-2" />
-                              Delete
+                              <Trash className="h-4 w-4 mr-2" /> Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -430,30 +406,43 @@ export default function CategoriesPage() {
                     {/* Subcategories */}
                     {open.includes(cat.id) && (
                       <div className="p-4 bg-gray-50/50">
+                        <div className='flex items-center justify-end' >
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="mb-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:text-white text-white "
+                            onClick={() => {
+                              setParentCategoryId(cat.id)
+                              setSubDialogOpen(true)
+                            }}
+                          >
+                            <PlusCircle className="h-4 w-4 mr-2" />
+                            Add Subcategory
+                          </Button>
+
+                        </div>
                         {cat.subs.length > 0 ? (
                           <div className="space-y-2">
+
+
                             {cat.subs.map((sub) => (
-                              <div
-                                key={sub.id}
-                                className="flex items-center justify-between p-2 bg-white rounded-lg border"
-                              >
+                              <div key={sub.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
                                 <div className="flex items-center gap-3">
                                   <Package className="h-4 w-4 text-gray-400" />
                                   <div>
                                     <p className="text-sm font-medium">{sub.name}</p>
-                                    <p className="text-xs text-gray-500">
-                                      {sub.productCount || 0} products
-                                    </p>
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8"
+                                    className="h-8 w-8 "
                                     onClick={() => {
-                                      setEditingId(sub.id)
+                                      setEditingSubId(sub.id)
                                       setEditValue(sub.name)
+                                      setEditSubDialogOpen(true)
                                     }}
                                   >
                                     <Pencil className="h-3 w-3" />
@@ -475,23 +464,13 @@ export default function CategoriesPage() {
                           </div>
                         ) : (
                           <Alert>
-                            <AlertDescription className="text-sm text-gray-500">
-                              No subcategories yet. Click "Add Subcategory" to create one.
+                            <AlertDescription className="text-sm text-center text-gray-500">
+                              No subcategories yet. Click Add Subcategory  to create one.
                             </AlertDescription>
                           </Alert>
                         )}
 
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="mt-3 w-full"
-                          onClick={() => {
-                            setParentCategoryId(cat.id)
-                          }}
-                        >
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Add Subcategory
-                        </Button>
+
                       </div>
                     )}
                   </Card>
@@ -499,112 +478,7 @@ export default function CategoriesPage() {
               </div>
             )}
           </TabsContent>
-
-          {/* CREATE TAB */}
-           <TabsContent value="create">
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Folder className="h-5 w-5" />
-                    Create Category
-                  </CardTitle>
-                  <CardDescription>
-                    Add a new main category for your products
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleCreateCategory} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="cat-name">Category Name *</Label>
-                      <Input
-                        id="cat-name"
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                        placeholder="e.g., Electronics, Clothing, Books"
-                      />
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      disabled={submitting || !newCategoryName.trim()}
-                    >
-                      {submitting ? (
-                        <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                      ) : (
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                      )}
-                      Create Category
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Layers className="h-5 w-5" />
-                    Create Subcategory
-                  </CardTitle>
-                  <CardDescription>
-                    Add a subcategory under an existing category
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleCreateSubCategory} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="sub-name">Subcategory Name </Label>
-                      <Input
-                        id="sub-name"
-                        value={newSubName}
-                        onChange={(e) => setNewSubName(e.target.value)}
-                        placeholder="e.g., Smartphones, T-shirts, Fiction"
-                      />
-                    </div>
-
-                  
-
-                    <div className="space-y-2">
-                      <Label htmlFor="parent-cat">Category</Label>
-                      <Select
-                        value={parentCategoryId}
-                        onValueChange={setParentCategoryId}
-                      >
-                        <SelectTrigger id="parent-cat">
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((cat) => (
-                            <SelectItem key={cat.id} value={cat.id}>
-                              <div className="flex items-center gap-2">
-                                <Folder className="h-4 w-4" />
-                                {cat.name}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={submitting || !newSubName.trim() || !parentCategoryId}
-                    >
-                      {submitting ? (
-                        <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                      ) : (
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                      )}
-                      Create Subcategory
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs> 
+        </Tabs>
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -618,17 +492,93 @@ export default function CategoriesPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
-            </Button>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-     
+      {/* Add Subcategory Dialog */}
+      <Dialog open={subDialogOpen} onOpenChange={setSubDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Subcategory</DialogTitle>
+            <DialogDescription>Add a subcategory under this category</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateSubCategory} className="space-y-4">
+            <div>
+              <Label>Subcategory Name</Label>
+              <Input
+                value={newSubName}
+                onChange={(e) => setNewSubName(e.target.value)}
+                placeholder="Enter subcategory"
+                className='mt-3'
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={submitting} className=' bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:text-white text-white'>
+                {submitting ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Creating...
+                  </>
+                ) : "Create"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Category Dialog */}
+      <Dialog open={editCategoryDialogOpen} onOpenChange={setEditCategoryDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Category</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditCategory} className="space-y-4">
+            <div>
+              <Label>Category Name</Label>
+              <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} className='mt-3' />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={submitting} className=' bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:text-white text-white'>
+                {submitting ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Updating...
+                  </>
+                ) : "Update"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Subcategory Dialog */}
+      <Dialog open={editSubDialogOpen} onOpenChange={setEditSubDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Subcategory</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubCategory} className="space-y-4">
+            <div>
+              <Label>Subcategory Name</Label>
+              <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} className='mt-3' />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={submitting} className=' bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:text-white text-white'>
+                {submitting ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Updating...
+                  </>
+                ) : "Update"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
     </div>
   )
 }

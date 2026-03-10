@@ -1,5 +1,5 @@
 import instance from "@/axios"
-import { Category, CreateCategoryPayload, CreateSubcategoryPayload } from "@/types/category"
+import { Category, CreateCategoryPayload, CreateSubcategoryPayload, SubCategory } from "@/types/category"
 
 export const getCategories = async (): Promise<Category[]> => {
   try {
@@ -20,11 +20,45 @@ export const addCategory = async (data: CreateCategoryPayload) => {
     console.log("Response:", res.data)
     return res.data
 
-  } catch (error: any) {
-    console.error("Add category error:", error?.response?.data || error)
-    throw error
+  } catch (error) {
+    console.log(error)
   }
 }
+
+export const updateCategory = async (id: string, data: { name: string }) => {
+  try {
+    const res = await instance.patch(`/category/${id}`, data)
+    console.log(res)
+    return res.data
+  } catch (error) {
+    console.log(error)
+  }
+  
+}
+
+export const deleteCategory = async (id: string) => {
+  try {
+    const res = await instance.delete(`/category/${id}`)
+    return res.data
+  } catch (error: any) {
+    console.error('Delete category error:', error.response?.data || error.message)
+    throw error  // <-- important, so the page knows it failed
+  }
+}
+
+
+
+
+export const getSubCategories = async (): Promise<SubCategory[]> => {
+  try {
+    const res = await instance.get("/subcategory")
+    return res.data
+  } catch (error) {
+    console.error("Get categories error:", error)
+    return []
+  }
+}
+
 
 export const addSubCategory = async (data: CreateSubcategoryPayload) => {
   try {
@@ -36,22 +70,24 @@ export const addSubCategory = async (data: CreateSubcategoryPayload) => {
   }
 }
 
-export const updateCategory = async (id: string, data: { name: string }) => {
-  const res = await instance.put(`/category/${id}`, data)
-  return res.data
-}
 
-export const deleteCategory = async (id: string) => {
-  const res = await instance.delete(`/category/${id}`)
-  return res.data
-}
 
 export const updateSubCategory = async (id: string, data: { name: string }) => {
-  const res = await instance.put(`/subcategory/${id}`, data)
-  return res.data
+   try {
+    const res = await instance.patch(`/subcategory/${id}`, data)
+    return res.data
+   } catch (error) {
+     console.log(error)
+   }
+  
 }
 
 export const deleteSubCategory = async (id: string) => {
-  const res = await instance.delete(`/subcategory/${id}`)
-  return res.data
+  try {
+    const res = await instance.delete(`/subcategory/${id}`)
+    return res.data
+  } catch (error) {
+    console.log(error)
+  }
+  
 }

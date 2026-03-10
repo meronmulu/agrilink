@@ -7,6 +7,12 @@ export interface CreateCategoryPayload {
   name: string
 }
 
+export interface SubCategory {
+  id: string
+  name: string
+  categoryId: string
+}
+
 export interface CreateSubcategoryPayload {
   name: string
   categoryId: string
