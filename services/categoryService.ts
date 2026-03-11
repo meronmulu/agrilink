@@ -40,9 +40,9 @@ export const deleteCategory = async (id: string) => {
   try {
     const res = await instance.delete(`/category/${id}`)
     return res.data
-  } catch (error: any) {
-    console.error('Delete category error:', error.response?.data || error.message)
-    throw error  // <-- important, so the page knows it failed
+  } catch (error) {
+    console.log(error)
+    throw error  
   }
 }
 
@@ -86,8 +86,8 @@ export const deleteSubCategory = async (id: string) => {
   try {
     const res = await instance.delete(`/subcategory/${id}`)
     return res.data
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
+    console.error("Delete subcategory error:", error.response?.data || error)
+    throw error
   }
-  
 }

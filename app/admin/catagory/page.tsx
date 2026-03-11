@@ -117,70 +117,88 @@ export default function CategoriesPage() {
     )
   }
 
-  const handleCreateCategory = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newCategoryName.trim()) return
-
-    setSubmitting(true)
-    try {
-      const created = await addCategory({ name: newCategoryName })
-      setCategories((prev) => [
-        ...prev,
-
-      ])
-      setNewCategoryName(created)
-    } catch (err) {
-      console.error(err)
-    }
-    setSubmitting(false)
-  }
-
-  const handleCreateSubCategory = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newSubName.trim() || !parentCategoryId) return
-
-    setSubmitting(true)
-    try {
-      const created = await addSubCategory({
-        name: newSubName,
-        categoryId: parentCategoryId,
-      })
-      setSubcategories((prev) => [
-        ...prev,
-      ])
-      setNewSubName(created)
-      setParentCategoryId('')
-      setSubDialogOpen(false)
-    } catch (err) {
-      console.error(err)
-    }
-    setSubmitting(false)
-  }
-
-  const handleDelete = async () => {
-  if (!itemToDelete) return
+const handleCreateCategory = async (e: React.FormEvent) => {
+  e.preventDefault()
+  if (!newCategoryName.trim()) return
 
   setSubmitting(true)
+
   try {
-    if (itemToDelete.type === 'category') {
-      await deleteCategory(itemToDelete.id)
-      setCategories((prev) => prev.filter((c) => c.id !== itemToDelete.id))
-      setSubcategories((prev) =>
-        prev.filter((s) => s.categoryId !== itemToDelete.id)
-      )
-    } else {
-      await deleteSubCategory(itemToDelete.id)
-      setSubcategories((prev) => prev.filter((s) => s.id !== itemToDelete.id))
-    }
+    const created = await addCategory({ name: newCategoryName })
+
+    setCategories((prev) => [...prev, created])
+
+    setNewCategoryName('')
+    setDetailDialogOpen(false)
   } catch (err) {
-    console.error('Failed to delete:', err)
-    alert('Failed to delete. Please try again.')
+    console.error(err)
   } finally {
-    setDeleteDialogOpen(false)
-    setItemToDelete(null)
     setSubmitting(false)
   }
 }
+
+ const handleCreateSubCategory = async (e: React.FormEvent) => {
+  e.preventDefault()
+
+  if (!newSubName.trim() || !parentCategoryId) return
+
+  setSubmitting(true)
+
+  try {
+    const created = await addSubCategory({
+      name: newSubName,
+      categoryId: parentCategoryId,
+    })
+
+    setSubcategories((prev) => [...prev, created])
+
+    setNewSubName('')
+    setParentCategoryId('')
+    setSubDialogOpen(false)
+  } catch (err) {
+    console.error(err)
+  } finally {
+    setSubmitting(false)
+  }
+}
+
+const handleDelete = async () => {
+  if (!itemToDelete) return;
+
+  setSubmitting(true);
+  try {
+    if (itemToDelete.type === 'category') {
+      // Check if category has subcategories
+      const hasSubcategories = subcategories.some(
+        (s) => s.categoryId === itemToDelete.id
+      );
+
+      if (hasSubcategories) {
+        alert(
+          'Cannot delete category with existing subcategories. Please delete the subcategories first.'
+        );
+        return; 
+      }
+
+      // Safe to delete category
+      await deleteCategory(itemToDelete.id);
+      setCategories((prev) => prev.filter((c) => c.id !== itemToDelete.id));
+    } else {
+      // Delete subcategory
+      await deleteSubCategory(itemToDelete.id);
+      setSubcategories((prev) =>
+        prev.filter((s) => s.id !== itemToDelete.id)
+      );
+    }
+  } catch (err) {
+    console.error('Failed to delete:', err);
+    alert('Failed to delete. Please try again.');
+  } finally {
+    setDeleteDialogOpen(false);
+    setItemToDelete(null);
+    setSubmitting(false);
+  }
+};
 
   const handleEditCategory = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -230,24 +248,16 @@ export default function CategoriesPage() {
   }
 
   const grouped = useMemo(() => {
-    return categories
-      .filter(cat => cat.name.toLowerCase().includes(searchTerm.toLowerCase()))
-      .map(cat => ({
-        ...cat,
-        subs: subcategories
-          .filter(s => s.categoryId === cat.id)
-          .filter(sub => sub.name.toLowerCase().includes(searchTerm.toLowerCase())),
-      }))
-  }, [categories, subcategories, searchTerm])
-
-  if (loading && categories.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="animate-spin h-12 w-12 text-primary mb-4" />
-        <p className="text-muted-foreground">Loading your categories...</p>
-      </div>
+  return categories
+    .filter((cat) =>
+      cat.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
-  }
+    .map((cat) => ({
+      ...cat,
+      subs: subcategories.filter((s) => s.categoryId === cat.id),
+    }))
+}, [categories, subcategories, searchTerm])
+  
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -283,7 +293,7 @@ export default function CategoriesPage() {
                         id="name"
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
-                        placeholder="e.g., Electronics"
+                        placeholder="e.g., Fresh Produce"
                         className="mt-4"
                       />
                     </div>
@@ -424,8 +434,6 @@ export default function CategoriesPage() {
                         </div>
                         {cat.subs.length > 0 ? (
                           <div className="space-y-2">
-
-
                             {cat.subs.map((sub) => (
                               <div key={sub.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
                                 <div className="flex items-center gap-3">
