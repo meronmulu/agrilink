@@ -1,25 +1,29 @@
 import instance from "@/axios"
-import { ForgotPasswordRequest, Kebele, LoginResponse, Region, RegisterRequest, ResetPasswordRequest, VerifyOtpRequest, Woreda, Zone } from "@/types/auth"
+import { ForgotPasswordRequest, LoginResponse, RegisterRequest, ResetPasswordRequest, VerifyOtpRequest} from "@/types/auth"
 import { User } from "next-auth"
 import { signInWithPopup } from "firebase/auth"
 import { auth, googleProvider } from "@/lib/firebase"
 
 
-export const register = async (userData: RegisterRequest): Promise<User | null> => {
+export const register = async (userData: RegisterRequest): Promise<User> => {
   try {
     const res = await instance.post<User>("/auth/signup", userData)
-    
-    console.log("Full Server Response:", res.data)
-
-   
-    if (res.data) {
-      return res.data
+    console.log(res)
+    return res.data
+  } catch (error: any) {
+    if (error.response) {
+      const err = new Error(error.response.data?.message || "Registration failed")
+      ;(err as any).status = error.response.status
+      throw err
+    } else if (error.code === "ECONNABORTED") {
+      const err = new Error("Server timeout. Please try again.")
+      ;(err as any).status = 504
+      throw err
+    } else {
+      const err = new Error("Network error. Please try again.")
+      ;(err as any).status = 0
+      throw err
     }
-
-    return null
-  } catch (error) {
-    console.log(error)
-    return null
   }
 }
 

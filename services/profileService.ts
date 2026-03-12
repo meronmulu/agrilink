@@ -2,6 +2,33 @@ import instance from "@/axios"
 import { Kebele, Region, Woreda, Zone } from "@/types/profile"
 
 
+export const addRegion = async (data: Region) => {
+  try {
+    console.log("Sending region:", data)
+
+    const res = await instance.post("/regions", data)
+
+    console.log("Response:", res.data)
+    return res.data
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const addZone = async (data: { name: string; regionId: string }) => {
+  try {
+    console.log("Sending zone:", data)
+
+    const res = await instance.post("/zones", data)
+
+    console.log("Response:", res.data)
+    return res.data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export const getRegions = async (): Promise<Region[]> => {
   try {
     const res = await instance.get("/regions")
@@ -10,6 +37,16 @@ export const getRegions = async (): Promise<Region[]> => {
   } catch (error) {
     console.error("Error fetching regions:", error)
     return []
+  }
+}
+
+export const deleteRegion = async (id: string) => {
+  try {
+    const res = await instance.delete(`/regions/${id}`)
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error  
   }
 }
 
@@ -45,3 +82,46 @@ export const getKebeles = async (woredaId: string): Promise<Kebele[]> => {
     return []
   }
 }
+
+
+
+export const createProfile = async (data: {
+  fullName: string
+  kebeleId: string
+  image?: File
+}) => {
+  try {
+    const token = localStorage.getItem("token") // get the token stored after OTP verification
+    if (!token) throw new Error("User is not authenticated")
+
+    const formData = new FormData()
+    formData.append("fullName", data.fullName)
+    formData.append("kebeleId", data.kebeleId)
+
+    if (data.image) {
+      formData.append("image", data.image)
+    }
+
+    const res = await instance.post("/profile", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`, // <-- add token here
+      },
+    })
+
+    return res.data
+   } catch (error) {
+    console.log("Create profile error:", error)
+    throw error
+  }
+}
+
+// export const getProfile = async (): Promise<[]> => {
+//   try {
+//     const res = await instance.get("/category")
+//     return res.data
+//   } catch (error) {
+//     console.error("Get categories error:", error)
+//     return []
+//   }
+// }

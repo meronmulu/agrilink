@@ -1,16 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
 import Image from 'next/image'
 import img from "../../public/Agricultural.jpg"
-import SignUp from '@/components/SignUp'
 import { useLanguage } from '@/context/LanguageContext'
-import RegionLocationSelector from '@/components/SignUpFarmer'
+import OtherSignUpPage from '@/components/OtherSignUpPage'
 
 
 export default function SignupPage() {
   const { t } = useLanguage()
-  const [role, setRole] = useState<'BUYER' | 'FARMER'>('BUYER')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center p-4">
@@ -53,7 +50,7 @@ export default function SignupPage() {
 
            
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                  <RegionLocationSelector/>
+                  <OtherSignUpPage/>
                 </div>
             
             </div>

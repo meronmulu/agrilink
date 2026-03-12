@@ -4,10 +4,11 @@ import Marketplace from '@/components/MarketPlace'
 
 export default function page() {
   return (
-    <div>
+    <div className='overflow-y-hidden'>
         <Header/>
         <Marketplace/>
         <Footer/> 
+        
     </div>
   )
 }

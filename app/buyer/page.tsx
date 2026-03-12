@@ -5,10 +5,11 @@ import Marketplace from '@/components/MarketPlace'
 export default function page() {
   return (
     <div>
-        <Header/>
-        <Marketplace/>
-        <Footer/> 
+        <Header />
+        <Marketplace />
+        <Footer />
+
+
     </div>
   )
 }
- 

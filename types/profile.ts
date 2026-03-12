@@ -20,3 +20,10 @@ export interface Kebele {
   name: string
   woredaId: string
 }
+// export interface Profile {
+//   id: string
+//   fullName: string
+//   email?: string
+//   phone?: string
+//   image?: string
+// }

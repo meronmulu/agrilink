@@ -92,7 +92,7 @@ export default function Header() {
                 </div>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end" className="w-56 bg-white">
+              <DropdownMenuContent align="end" className="w-40 bg-white">
                 <DropdownMenuItem className="hover:bg-gray-50">
                   {(user?.role === "BUYER" || user?.role === "FARMER") && (
 
@@ -104,7 +104,7 @@ export default function Header() {
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="hover:bg-gray-50">
-                  <Link href="" className="w-full">
+                  <Link href="/profile" className="w-full">
                     Profile
                   </Link>
                 </DropdownMenuItem>

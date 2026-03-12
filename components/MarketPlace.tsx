@@ -21,6 +21,7 @@ import {
 import { Category, SubCategory } from '@/types/category'
 import Image, { StaticImageData } from 'next/image'
 import img from '../public/agriGirl.jpg'
+import { useAuth } from '@/context/AuthContext'
 
 interface Product {
   id: string
@@ -33,6 +34,8 @@ interface Product {
 
 export default function MarketPlace() {
   const { t } = useLanguage()
+  const { user } = useAuth();
+
 
   const [search, setSearch] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
@@ -100,12 +103,22 @@ export default function MarketPlace() {
     <div className="pt-20 flex flex-col bg-[#fcfdfd] min-h-screen">
 
       {/* Header */}
-      <div className="mx-4 md:mx-10 mb-6">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-800">
-          {t('market_title')}
-        </h1>
-        <p className="text-gray-600">{t('market_subtitle')}</p>
+      <div className='flex items-center justify-between mx-4 md:mx-10 mb-6'>
+        <div className="  ">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-800">
+            {t('market_title')}
+          </h1>
+          <p className="text-gray-600">{t('market_subtitle')}</p>
+        </div>
+        {(user?.role === "FARMER") && (       
+        <div>
+          <Button className="mt-3  bg-emerald-500 hover:bg-emerald-600">
+             + Add Products
+          </Button>
+        </div>
+        )}
       </div>
+
 
       {/* Search & Dropdown */}
       <div className="flex flex-col md:flex-row items-center gap-4 mx-4 md:mx-10 mb-10">
@@ -130,7 +143,7 @@ export default function MarketPlace() {
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="w-56" align="start">
+          <DropdownMenuContent className="w-40" align="start">
             <DropdownMenuGroup>
 
               {categories.map((cat) => (
@@ -173,16 +186,16 @@ export default function MarketPlace() {
           <Card key={product.id} className="hover:shadow-lg transition ">
 
             <CardContent className="">
-               <div className="relative h-50 w-full mb-6">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                </div>
+              <div className="relative h-50 w-full mb-6">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+              </div>
               <div className='p-4'>
-               
+
 
                 <h3 className="font-semibold text-lg">{product.name}</h3>
                 <p className="text-emerald-600 font-bold mt-1">
@@ -199,10 +212,6 @@ export default function MarketPlace() {
 
                 </div>
               </div>
-
-
-
-
             </CardContent>
 
           </Card>

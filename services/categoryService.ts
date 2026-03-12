@@ -86,8 +86,8 @@ export const deleteSubCategory = async (id: string) => {
   try {
     const res = await instance.delete(`/subcategory/${id}`)
     return res.data
-  } catch (error: any) {
-    console.error("Delete subcategory error:", error.response?.data || error)
+  } catch (error) {
+    console.log(error)
     throw error
   }
 }

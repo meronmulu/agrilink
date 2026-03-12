@@ -3,6 +3,7 @@ import axios from "axios";
 const instance = axios.create({
   baseURL: "https://agrilink-1-x6ph.onrender.com",
   headers: { "Content-Type": "application/json" },
+  
 });
 
 instance.interceptors.request.use(
