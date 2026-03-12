@@ -38,7 +38,7 @@ export default function AdminProductsPage() {
 
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="">
+        <Card className="p-6">
           <CardHeader>
             <CardTitle>Total Products</CardTitle>
           </CardHeader>
@@ -49,7 +49,7 @@ export default function AdminProductsPage() {
           </CardContent>
         </Card>
 
-        <Card className="">
+        <Card className="p-6">
           <CardHeader>
             <CardTitle>Total Sold Products</CardTitle>
           </CardHeader>
@@ -60,7 +60,7 @@ export default function AdminProductsPage() {
           </CardContent>
         </Card>
 
-        <Card className="">
+        <Card className="p-6">
           <CardHeader>
             <CardTitle>Total In-Store Products</CardTitle>
           </CardHeader>
@@ -71,7 +71,7 @@ export default function AdminProductsPage() {
           </CardContent>
         </Card>
 
-        <Card className="">
+        <Card className="p-6">
           <CardHeader>
             <CardTitle>Total Farmers</CardTitle>
           </CardHeader>
@@ -82,7 +82,7 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Products Table */}
-      <Card>
+      <Card className="p-6">
         <CardHeader>
           <CardTitle>All Products</CardTitle>
         </CardHeader>

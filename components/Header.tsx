@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger
 } from "./ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
+import { createRoleRequest } from "@/services/roleRequestService";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -25,6 +26,18 @@ export default function Header() {
       : user?.role === "BUYER"
         ? "/buyer/overview"
         : "/";
+
+  const handleRoleRequest = async () => {
+  try {
+    const res = await createRoleRequest()
+    console.log("Request sent:", res)
+    alert("Role request submitted successfully")
+  } catch (error) {
+    alert("Failed to send request")
+  }
+}
+
+
   return (
     <header className="w-full fixed h-16 top-0 left-0 z-50 bg-white border-b shadow-sm">
       <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
@@ -74,7 +87,7 @@ export default function Header() {
 
             {user?.role === "BUYER" && (
               <Button
-                // onClick={() => router.push("/signup")}
+                onClick={handleRoleRequest}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 rounded-lg"
               >
                 Ask to agent
