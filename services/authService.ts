@@ -1,5 +1,5 @@
 import instance from "@/axios"
-import { ForgotPasswordRequest, LoginResponse, RegisterRequest, ResetPasswordRequest, VerifyOtpRequest} from "@/types/auth"
+import { ForgotPasswordRequest, LoginResponse, RegisterRequest, ResetPasswordRequest, VerifyOtpRequest } from "@/types/auth"
 import { User } from "next-auth"
 import { signInWithPopup } from "firebase/auth"
 import { auth, googleProvider } from "@/lib/firebase"
@@ -13,15 +13,15 @@ export const register = async (userData: RegisterRequest): Promise<User> => {
   } catch (error: any) {
     if (error.response) {
       const err = new Error(error.response.data?.message || "Registration failed")
-      ;(err as any).status = error.response.status
+        ; (err as any).status = error.response.status
       throw err
     } else if (error.code === "ECONNABORTED") {
       const err = new Error("Server timeout. Please try again.")
-      ;(err as any).status = 504
+        ; (err as any).status = 504
       throw err
     } else {
       const err = new Error("Network error. Please try again.")
-      ;(err as any).status = 0
+        ; (err as any).status = 0
       throw err
     }
   }
@@ -41,7 +41,7 @@ export const login = async (credentials: { email?: string; phone?: string; passw
       // Use role from API response (safer)
       const user = {
         id: res.data.user.id,
-        role: res.data.user.role ,
+        role: res.data.user.role,
         email: res.data.user.email,
         phone: res.data.user.phone
       };
@@ -56,18 +56,17 @@ export const login = async (credentials: { email?: string; phone?: string; passw
 
     throw new Error("Invalid credentials");
   } catch (error: any) {
-    console.error("Login error:", error);
     if (error.response) {
       const err = new Error(error.response.data?.message || "Login failed")
-      ;(err as any).status = error.response.status
+        ; (err as any).status = error.response.status
       throw err
     } else if (error.code === "ECONNABORTED") {
       const err = new Error("Server timeout. Please try again.")
-      ;(err as any).status = 504
+        ; (err as any).status = 504
       throw err
     } else {
       const err = new Error("Network error. Please try again.")
-      ;(err as any).status = 0
+        ; (err as any).status = 0
       throw err
     }
   }
@@ -84,22 +83,32 @@ export const verifyOtp = async (data: VerifyOtpRequest) => {
   }
 }
 
+export const resendOtp = async (identifier: string, purpose: string) => {
+  try {
+    const res = await instance.post("/auth/resend-otp", { identifier, purpose })
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
 
 export const forgotPassword = async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
   try {
-    console.log("Forgot Password Request:", data) 
+    console.log("Forgot Password Request:", data)
     const res = await instance.post("/auth/forgot-password", data)
     // console.log("Forgot Password Response:", res.data) 
     return res.data
   } catch (error) {
-      console.log(error)
+    console.log(error)
     throw error
   }
 }
 
 export const resetPassword = async (data: ResetPasswordRequest): Promise<{ message: string }> => {
   try {
-    console.log("Reset Password Request:", data) 
+    console.log("Reset Password Request:", data)
     const res = await instance.post("/auth/reset-password", data)
     // console.log("Reset Password Response:", res.data) 
     return res.data

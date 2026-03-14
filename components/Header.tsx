@@ -29,14 +29,14 @@ export default function Header() {
         : "/";
 
   const handleRoleRequest = async () => {
-  try {
-    const res = await createRoleRequest()
-    console.log("Request sent:", res)
-    alert("Role request submitted successfully")
-  } catch (error) {
-    alert("Failed to send request")
+    try {
+      const res = await createRoleRequest()
+      console.log("Request sent:", res)
+      alert("Role request submitted successfully")
+    } catch (error) {
+      alert("Failed to send request")
+    }
   }
-}
 
 
   return (
@@ -108,8 +108,8 @@ export default function Header() {
                 </div>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end" className="w-40 bg-white">
-                <DropdownMenuItem className="hover:bg-gray-50">
+              <DropdownMenuContent align="end" className="w-40 bg-white dark:bg-gray-800 border dark:border-gray-700">
+                <DropdownMenuItem className="hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-700 dark:focus:bg-gray-700">
                   {(user?.role === "BUYER" || user?.role === "FARMER") && (
 
                     <Link href={dashboardRoute}>
@@ -119,7 +119,7 @@ export default function Header() {
                     </Link>
                   )}
                 </DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-gray-50">
+                <DropdownMenuItem className="hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-700 dark:focus:bg-gray-700">
                   <Link href="/profile" className="w-full">
                     Profile
                   </Link>
@@ -128,7 +128,7 @@ export default function Header() {
 
                 <DropdownMenuItem
                   onClick={logout}
-                  className="flex items-center gap-2 text-red-500 hover:bg-gray-50"
+                  className="flex items-center gap-2 text-red-500 hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-700 dark:focus:bg-gray-700"
                 >
                   <LogOut size={16} />
                   Logout

@@ -25,6 +25,7 @@ export default function Login() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [needsVerification, setNeedsVerification] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -64,10 +65,16 @@ export default function Login() {
       }
 
     } catch (error: any) {
-      console.error("Login error:", error);
+      setNeedsVerification(false);
+
+      const msg = (error?.message || "").toLowerCase();
+      const isUnverified = msg.includes("verif") || msg.includes("unverified");
 
       // Handle different error types
-      if (error.status === 401) {
+      if (isUnverified) {
+        setError(error.message || "Your account is not verified. Please verify to continue.");
+        setNeedsVerification(true);
+      } else if (error.status === 401) {
         setError("Invalid email/phone or password");
       } else if (error.status === 504) {
         setError("Server timed out. Please try again.");
@@ -82,42 +89,42 @@ export default function Login() {
   };
 
 
-const handleGoogleLogin = async () => {
-  try {
-    const res = await googleSignin();
+  const handleGoogleLogin = async () => {
+    try {
+      const res = await googleSignin();
 
-    // console.log("GOOGLE LOGIN RESPONSE:", res);
-    // console.log("USER ROLE:", res.user.role);
+      // console.log("GOOGLE LOGIN RESPONSE:", res);
+      // console.log("USER ROLE:", res.user.role);
 
-    // Update AuthContext
-    setUser({
-      id: res.user.id,
-      role: res.user.role,
-      email: res.user.email ?? '',
-      phone: res.user.phone ?? '',
-    });
+      // Update AuthContext
+      setUser({
+        id: res.user.id,
+        role: res.user.role,
+        email: res.user.email ?? '',
+        phone: res.user.phone ?? '',
+      });
 
-    // Save in localStorage
-    localStorage.setItem('token', res.token);
-    localStorage.setItem('user', JSON.stringify(res.user));
+      // Save in localStorage
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('user', JSON.stringify(res.user));
 
-    // Role-based routing
-    const roleRoutes: Record<string, string> = {
-      ADMIN: "/admin/dashboard",
-      AGENT: "/Agent/dashboard",
-      BUYER: "/buyer",
-      FARMER: "/farmer",
-    };
+      // Role-based routing
+      const roleRoutes: Record<string, string> = {
+        ADMIN: "/admin/dashboard",
+        AGENT: "/Agent/dashboard",
+        BUYER: "/buyer",
+        FARMER: "/farmer",
+      };
 
-    router.push(roleRoutes[res.user.role] || "/");
-  } catch (error) {
-    console.error("Google login failed", error);
-  }
-};
+      router.push(roleRoutes[res.user.role] || "/");
+    } catch (error) {
+      console.error("Google login failed", error);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="grid lg:grid-cols-2 w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+      <div className="grid lg:grid-cols-2 w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border dark:border-gray-700">
 
         {/* LEFT IMAGE */}
         <div className="relative hidden lg:block">
@@ -141,7 +148,7 @@ const handleGoogleLogin = async () => {
         <div className="flex items-center justify-center p-6 lg:p-10">
           <div className="w-full max-w-sm">
             <div className="text-center lg:text-left mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">{t('login_header')}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('login_header')}</h2>
               <p className="text-gray-500 mt-1 text-sm">{t('login_subheader')}</p>
             </div>
 
@@ -149,7 +156,7 @@ const handleGoogleLogin = async () => {
 
               {/* IDENTIFIER (EMAIL OR PHONE) */}
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700 block">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
                   Email or Phone
                 </label>
                 <div className="relative">
@@ -161,9 +168,9 @@ const handleGoogleLogin = async () => {
                     required
                     disabled={isLoading}
                     placeholder="Enter email or phone"
-                    className="h-10 pl-10 rounded-lg border border-gray-200 bg-gray-50
-                      focus:bg-white focus:ring-2 focus:ring-emerald-500/20
-                      focus:border-emerald-500"
+                    className="h-10 pl-10 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white
+                      focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-emerald-500/20
+                      focus:border-emerald-500 placeholder:dark:text-gray-400"
                   />
                   <User
                     size={16}
@@ -175,7 +182,7 @@ const handleGoogleLogin = async () => {
               {/* PASSWORD */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-gray-700">Password</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
                   <Link href="/forgotPassword" className="text-emerald-600 hover:text-emerald-700">
                     Forgot password?
                   </Link>
@@ -189,9 +196,9 @@ const handleGoogleLogin = async () => {
                     required
                     disabled={isLoading}
                     placeholder="Enter password"
-                    className="h-10 pl-10 pr-10 rounded-lg border border-gray-200 bg-gray-50
-                      focus:bg-white focus:ring-2 focus:ring-emerald-500/20
-                      focus:border-emerald-500"
+                    className="h-10 pl-10 pr-10 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white
+                      focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-emerald-500/20
+                      focus:border-emerald-500 placeholder:dark:text-gray-400"
                   />
                   <Lock
                     size={16}
@@ -209,7 +216,18 @@ const handleGoogleLogin = async () => {
 
               {/* ERROR */}
               {error && (
-                <p className="text-red-500 text-sm">{error}</p>
+                <div className="flex flex-col gap-2 py-1">
+                  <p className="text-red-500 text-sm">{error}</p>
+                  {needsVerification && (
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/verify-otp?identifier=${encodeURIComponent(formData.identifier)}&purpose=SIGNUP`)}
+                      className="text-emerald-600 hover:text-emerald-700 text-sm font-medium underline text-left w-fit"
+                    >
+                      Verify your account now
+                    </button>
+                  )}
+                </div>
               )}
 
               {/* LOGIN BUTTON */}
@@ -232,9 +250,9 @@ const handleGoogleLogin = async () => {
 
               {/* Divider */}
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400">{t('login_or')}</span>
-                <div className="flex-1 h-px bg-gray-200" />
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                <span className="text-xs text-gray-400 dark:text-gray-500">{t('login_or')}</span>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
               </div>
 
               {/* GOOGLE LOGIN */}
@@ -242,8 +260,8 @@ const handleGoogleLogin = async () => {
                 type="button"
                 onClick={handleGoogleLogin}
                 className="w-full h-10 flex items-center justify-center gap-2
-                  border border-gray-200 rounded-lg bg-white
-                  hover:bg-gray-50 transition-all text-sm font-medium"
+                  border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700
+                  hover:bg-gray-50 dark:hover:bg-gray-600 transition-all text-sm font-medium dark:text-gray-200"
               >
                 <Image
                   src="https://www.svgrepo.com/show/475656/google-color.svg"

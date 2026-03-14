@@ -1,10 +1,10 @@
 'use client'
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Button } from "@/components/ui/button"
-import { verifyOtp } from "@/services/authService"
+import { verifyOtp, resendOtp } from "@/services/authService"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/AuthContext"
 
@@ -20,6 +20,15 @@ export default function VerifyOTP() {
 
   const [otp, setOtp] = useState("")
   const [loading, setLoading] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [countdown, setCountdown] = useState(60)
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(prev => prev - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [countdown])
 
   const handleVerify = async () => {
     console.log("handleVerify called, otp:", otp, "length:", otp.length)
@@ -73,6 +82,22 @@ export default function VerifyOTP() {
     }
   }
 
+  const handleResend = async () => {
+    if (!identifier) return alert("Identifier missing")
+
+    try {
+      setResendLoading(true)
+      await resendOtp(identifier, purpose)
+      setCountdown(60)
+      alert("OTP resent successfully")
+    } catch (error) {
+      console.log("Resend failed:", error)
+      alert("Failed to resend OTP. Please try again.")
+    } finally {
+      setResendLoading(false)
+    }
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
       <Card className="w-full max-w-md p-6 shadow-lg rounded-2xl">
@@ -119,6 +144,22 @@ export default function VerifyOTP() {
           >
             {loading ? "Verifying..." : "Verify OTP"}
           </Button>
+
+          <div className="text-center mt-4">
+            {countdown > 0 ? (
+              <p className="text-sm text-gray-500">
+                Resend code in {countdown}s
+              </p>
+            ) : (
+              <button
+                onClick={handleResend}
+                disabled={resendLoading}
+                className="text-sm text-emerald-600 hover:text-emerald-700 font-medium disabled:opacity-50"
+              >
+                {resendLoading ? 'Sending...' : 'Resend Code'}
+              </button>
+            )}
+          </div>
 
         </CardContent>
 
