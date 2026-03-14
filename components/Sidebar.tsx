@@ -36,14 +36,12 @@ const roleNav: Record<string, NavItem[]> = {
     { name: 'Sales', href: '/farmer/sales', icon: DollarSign },
     { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
     { name: 'AI Insights', href: '/farmer/insights', icon: BrainCircuit },
-    { name: 'Settings', href: '/farmer/settings', icon: Settings },
   ],
 
   AGENT: [
     { name: 'Overview', href: '/agent/dashboard', icon: LayoutDashboard },
     { name: 'Register Farmer', href: '/agent/register-farmer', icon: Users },
     { name: 'Training Modules', href: '/agent/training', icon: BookOpen },
-    { name: 'Settings', href: '/agent/settings', icon: Settings },
   ],
 
   ADMIN: [

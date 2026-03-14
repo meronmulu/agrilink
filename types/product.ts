@@ -13,3 +13,21 @@ export type Product = {
   subCategory?: SubCategory
 //   farmer?: Farmer
 }
+
+export type CreateProductPayload = {
+  name: string
+  subCategoryId: string
+  amount: number
+  price: number
+  description?: string
+  image: Blob
+}
+
+export type UpdateProductPayload = {
+  name?: string
+  subCategoryId?: string
+  amount?: number
+  price?: number
+  description?: string
+  image?: Blob
+}

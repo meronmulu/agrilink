@@ -33,6 +33,7 @@ export default function Header() {
     console.log("Request sent:", res)
     alert("Role request submitted successfully")
   } catch (error) {
+    console.log(error)
     alert("Failed to send request")
   }
 }

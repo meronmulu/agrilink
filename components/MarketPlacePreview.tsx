@@ -1,95 +1,135 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, CardContent } from './ui/card'
-import { BarChart3, Bot, Store } from 'lucide-react'
+import { ArrowRight, Package } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { getProducts } from '@/services/productService'
+import { Product } from '@/types/product'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export default function MarketPlacePreview() {
   const { t } = useLanguage()
+  const [latestProducts, setLatestProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const data = await getProducts()
+
+        // Sort by newest first
+        const sorted = data.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime()
+        )
+
+        setLatestProducts(sorted.slice(0, 4))
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      }
+    }
+
+    fetchLatest()
+  },[])
+
   return (
     <section className="w-full py-20 bg-white">
-      <div className="max-w-6xl mx-auto px-6">
-
-        <div className="mb-16 mt-5 ">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-            {t('market_preview_title')}
-          </h2>
-          <p className="mt-4 text-gray-500 max-w-2xl ">
-            {t('market_preview_subtitle')}
-          </p>
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 mt-5 gap-4">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+              {t('market_preview_title')}
+            </h2>
+            <p className="mt-3 text-gray-500 max-w-2xl text-lg">
+              {t('market_preview_subtitle')}
+            </p>
+          </div>
+          
+          <Link 
+            href="/market" 
+            className="group flex items-center text-emerald-600 font-semibold hover:text-emerald-700 transition-colors"
+          >
+            View all products
+            <ArrowRight size={18} className="ml-2 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
 
-        {/* Cards */}
-        <div className="grid gap-8 md:grid-cols-4">
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {latestProducts.map((product) => (
+            <Link key={product.id} href={`/market/${product.id}`} className="block h-full">
+              <Card className="group flex flex-col rounded-2xl border border-gray-100 bg-white hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden h-full">
+                
+                {/* Image Container with Zoom */}
+                <div className="relative h-52 w-full overflow-hidden bg-gray-50">
+                  <Image
+                    src={product.image || '/placeholder.png'}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  
+                  {/* "New" Badge */}
+                  <span className="absolute top-3 left-3 bg-emerald-500/95 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+                    New Arrival
+                  </span>
+                </div>
 
-          {/* Card 1 */}
-          <Card className="rounded-2xl shadow-sm hover:shadow-md transition">
-            <CardContent className="p-8">
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-green-100 mb-6">
-                <BarChart3 className="text-green-600" size={24} />
-              </div>
+                <CardContent className="p-5 flex flex-col grow">
+                  
+                  {/* Subcategory (Moved to Top) */}
+                  <span className="text-[11px] font-bold text-emerald-500 mb-2 uppercase tracking-wider">
+                    {product.subCategory?.name || 'Uncategorized'}
+                  </span>
 
-              <h3 className="text-lg font-semibold mb-3">
-                {t('coreFeature_title1')}
-              </h3>
+                  {/* Product Name */}
+                  <h4 className="font-semibold text-gray-900 text-lg leading-tight mb-3 line-clamp-2 group-hover:text-emerald-600 transition-colors">
+                    {product.name}
+                  </h4>
 
-              <p className="text-gray-500 text-sm leading-relaxed">
-                {t('coreFeature_desc1')}
-              </p>
-            </CardContent>
-          </Card>
+                  {/* Stock Amount Indicator */}
+                  <div className="flex items-center gap-1.5 mb-4">
+                    <Package size={14} className={product.amount > 0 ? "text-emerald-500" : "text-red-400"} />
+                    {product.amount > 0 ? (
+                      <span className="text-xs font-medium text-gray-600">
+                        <strong className="text-gray-900">{product.amount}</strong> in stock
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-red-500">
+                        Out of stock
+                      </span>
+                    )}
+                  </div>
 
-          {/* Card 2 */}
-          <Card className="rounded-2xl shadow-sm hover:shadow-md transition">
-            <CardContent className="p-8">
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-green-100 mb-6">
-                <Store className="text-green-600" size={24} />
-              </div>
+                  {/* Price & Action (Pushed to bottom using mt-auto) */}
+                  <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] text-gray-400 font-medium mb-0.5 uppercase tracking-wider">
+                        Price
+                      </p>
+                      <p className="text-emerald-600 font-black text-xl">
+                        ETB {product.price}
+                      </p>
+                    </div>
+                    
+                    {/* Subtle interaction button */}
+                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                      <ArrowRight size={18} className="-rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+                    </div>
+                  </div>
 
-              <h3 className="text-lg font-semibold mb-3">
-                {t('coreFeature_title2')}
-              </h3>
+                </CardContent>
+              </Card>
 
-              <p className="text-gray-500 text-sm leading-relaxed">
-                {t('coreFeature_desc2')}
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Card 3 */}
-          <Card className="rounded-2xl shadow-sm hover:shadow-md transition">
-            <CardContent className="p-8">
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-green-100 mb-6">
-                <Bot className="text-green-600" size={24} />
-              </div>
-
-              <h3 className="text-lg font-semibold mb-3">
-                {t('coreFeature_title3')}
-              </h3>
-
-              <p className="text-gray-500 text-sm leading-relaxed">
-                {t('coreFeature_desc3')}
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="rounded-2xl shadow-sm hover:shadow-md transition">
-            <CardContent className="p-8">
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-green-100 mb-6">
-                <Bot className="text-green-600" size={24} />
-              </div>
-
-              <h3 className="text-lg font-semibold mb-3">
-                {t('coreFeature_title3')}
-              </h3>
-
-              <p className="text-gray-500 text-sm leading-relaxed">
-                {t('coreFeature_desc3')}
-              </p>
-            </CardContent>
-          </Card>
-
+              
+            </Link>
+          ))}
         </div>
+
       </div>
     </section>
   )
