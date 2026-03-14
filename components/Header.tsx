@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { Flower2, LogOut, UserIcon } from "lucide-react";
 import LanguageDropdown from "./LanguageDropdown";
+import ThemeToggle from "./ThemeToggle";
 import { useLanguage } from "@/context/LanguageContext";
 import {
   DropdownMenu,
@@ -39,7 +40,7 @@ export default function Header() {
 
 
   return (
-    <header className="w-full fixed h-16 top-0 left-0 z-50 bg-white border-b shadow-sm">
+    <header className="w-full fixed h-16 top-0 left-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
 
         {/* Logo - always visible */}
@@ -67,6 +68,7 @@ export default function Header() {
                 {t("aboutUs")}
               </p>
               <LanguageDropdown />
+              <ThemeToggle />
             </nav>
 
             <div className="hidden md:flex items-center gap-3">
@@ -98,6 +100,7 @@ export default function Header() {
 
 
             <LanguageDropdown />
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-medium text-sm cursor-pointer hover:ring-2 hover:ring-emerald-600 transition">
