@@ -10,20 +10,23 @@ export const register = async (userData: RegisterRequest): Promise<User> => {
     const res = await instance.post<User>("/auth/signup", userData)
     console.log(res)
     return res.data
-  } catch (error: any) {
-    if (error.response) {
-      const err = new Error(error.response.data?.message || "Registration failed")
-        ; (err as any).status = error.response.status
-      throw err
-    } else if (error.code === "ECONNABORTED") {
-      const err = new Error("Server timeout. Please try again.")
-        ; (err as any).status = 504
-      throw err
-    } else {
-      const err = new Error("Network error. Please try again.")
-        ; (err as any).status = 0
-      throw err
-    }
+  } catch (error) {
+    // if (error.response) {
+    //   const err = new Error(error.response.data?.message || "Registration failed")
+    //   ;(err as any).status = error.response.status
+    //   throw err
+    // } else if (error.code === "ECONNABORTED") {
+    //   const err = new Error("Server timeout. Please try again.")
+    //   ;(err as any).status = 504
+    //   throw err
+    // } else {
+    //   const err = new Error("Network error. Please try again.")
+    //   ;(err as any).status = 0
+      // throw err
+    // }
+    console.log(error)
+      throw error
+
   }
 }
 

@@ -1,15 +1,15 @@
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
-import Marketplace from '@/components/MarketPlace'
+import MarketPlace from '@/components/MarketPlace'
 
 export default function page() {
   return (
-    <div>
-        <Header />
-        <Marketplace />
-        <Footer />
-
-
-    </div>
+    <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1">
+            <MarketPlace/>
+          </main>
+          <Footer />
+  </div>
   )
 }

@@ -6,6 +6,7 @@ import { Card, CardContent } from './ui/card'
 import { Search, ChevronDown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { getCategories, getSubCategories } from '@/services/categoryService'
+import { getProducts } from '@/services/productService'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,110 +20,72 @@ import {
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
 import { Category, SubCategory } from '@/types/category'
-import Image, { StaticImageData } from 'next/image'
-import img from '../public/agriGirl.jpg'
-import { useAuth } from '@/context/AuthContext'
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  categoryId: string
-  subcategoryId: string
-  image: StaticImageData
-}
+import Image from 'next/image'
+import { Product } from '@/types/product'
 
 export default function MarketPlace() {
-  const { t } = useLanguage()
-  const { user } = useAuth();
 
+  const { t } = useLanguage()
 
   const [search, setSearch] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<SubCategory[]>([])
   const [products, setProducts] = useState<Product[]>([])
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const cats = await getCategories()
-        const subs = await getSubCategories()
+        const [cats, subs, prods] = await Promise.all([
+          getCategories(),
+          getSubCategories(),
+          getProducts()
+        ])
 
         setCategories(cats)
         setSubcategories(subs)
+        setProducts(prods)
 
       } catch (error) {
-        console.error("Error fetching data:", error)
+        console.error("Error fetching marketplace data:", error)
       }
     }
 
     fetchData()
-
-    // Dummy products
-    setProducts([
-      {
-        id: "1",
-        name: "Fresh Carrots",
-        price: 2.5,
-        categoryId: "1",
-        subcategoryId: "1",
-        image: img
-      },
-      {
-        id: "2",
-        name: "Organic Tomatoes",
-        price: 3.2,
-        categoryId: "1",
-        subcategoryId: "2",
-        image: img
-      },
-      {
-        id: "3",
-        name: "Red Apples",
-        price: 4.0,
-        categoryId: "2",
-        subcategoryId: "3",
-        image: img
-      },
-      {
-        id: "4",
-        name: "Bananas",
-        price: 1.8,
-        categoryId: "2",
-        subcategoryId: "4",
-        image: img
-      }
-    ])
   }, [])
 
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  )
+  // ✅ Search + SubCategory Filter
+  const filteredProducts = products.filter((product) => {
+    const matchesName = product.name
+      .toLowerCase()
+      .includes(search.toLowerCase())
+
+    const matchesSubCategory =
+      !selectedSubCategory ||
+      product.subCategoryId === selectedSubCategory
+
+    return matchesName && matchesSubCategory
+  })
 
   return (
     <div className="pt-20 flex flex-col bg-[#fcfdfd] min-h-screen">
 
       {/* Header */}
       <div className='flex items-center justify-between mx-4 md:mx-10 mb-6'>
-        <div className="  ">
+        <div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-800">
             {t('market_title')}
           </h1>
-          <p className="text-gray-600">{t('market_subtitle')}</p>
+          <p className="text-gray-600">
+            {t('market_subtitle')}
+          </p>
         </div>
-        {(user?.role === "FARMER") && (       
-        <div>
-          <Button className="mt-3  bg-emerald-500 hover:bg-emerald-600">
-             + Add Products
-          </Button>
-        </div>
-        )}
       </div>
 
+      {/* Search & Filter */}
+      <div className="flex flex-row items-center gap-4 mx-4 md:mx-10 mb-10">
 
-      {/* Search & Dropdown */}
-      <div className="flex flex-col md:flex-row items-center gap-4 mx-4 md:mx-10 mb-10">
-
+        {/* Search */}
         <div className="flex-1 relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
@@ -138,86 +101,119 @@ export default function MarketPlace() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="border-2 h-10 bg-white hover:bg-gray-50 text-black border-gray-200 gap-2">
-              <ChevronDown size={16} className="text-gray-400" />
-              Categories
+              <ChevronDown size={16} />
+              {selectedSubCategory
+                ? subcategories.find(s => s.id === selectedSubCategory)?.name
+                : "Categories"}
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="w-40" align="start">
-            <DropdownMenuGroup>
+          <DropdownMenuContent className="w-56">
 
+            {/* Reset Filter */}
+            <DropdownMenuItem onClick={() => setSelectedSubCategory(null)}>
+              All Categories
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuGroup>
               {categories.map((cat) => (
                 <DropdownMenuSub key={cat.id}>
-
                   <DropdownMenuSubTrigger>
                     {cat.name}
                   </DropdownMenuSubTrigger>
 
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-
                       {subcategories
                         .filter((sub) => sub.categoryId === cat.id)
                         .map((sub) => (
-                          <DropdownMenuItem key={sub.id}>
+                          <DropdownMenuItem
+                            key={sub.id}
+                            onClick={() => setSelectedSubCategory(sub.id)}
+                          >
                             {sub.name}
                           </DropdownMenuItem>
                         ))}
-
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
-
                 </DropdownMenuSub>
               ))}
-
             </DropdownMenuGroup>
-
-            <DropdownMenuSeparator />
 
           </DropdownMenuContent>
         </DropdownMenu>
 
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-7 mx-6 md:mx-10">
+      {/* Products Section */}
 
-        {filteredProducts.map((product) => (
-          <Card key={product.id} className="hover:shadow-lg transition ">
+      {filteredProducts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <p className="text-lg font-medium text-gray-600">
+            No products in this category
+          </p>
+          <p className="text-sm text-gray-400 mt-2">
+            Try selecting another category or search again.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-7 mx-6 md:mx-10">
 
-            <CardContent className="">
-              <div className="relative h-50 w-full mb-6">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover rounded-lg"
-                />
-              </div>
-              <div className='p-4'>
+          {filteredProducts.map((product) => (
+            <Card key={product.id} className="hover:shadow-lg transition">
 
+              <CardContent className="p-0">
 
-                <h3 className="font-semibold text-lg">{product.name}</h3>
-                <p className="text-emerald-600 font-bold mt-1">
-                  ${product.price}
-                </p>
+                <div className="relative h-52 w-full">
+                  <Image
+                    src={product.image || '/placeholder.png'}
+                    alt={product.name}
+                    fill
+                    className="object-cover rounded-t-lg"
+                  />
+                </div>
 
-                <div className='flex items-center justify-between'>
-                  <Button className="mt-3  bg-emerald-500 hover:bg-emerald-600">
-                    {t('market_add_cart')}
-                  </Button>
-                  <Button className="mt-3 bg-[#F9FAFB] text-black hover:bg-[#F9FAFB] ">
-                    Veiw Detail
-                  </Button>
+                <div className="p-4">
+
+                  <h3 className="font-semibold text-lg">
+                    {product.name}
+                  </h3>
+
+                  <p className="text-sm text-gray-500">
+                    {product.subCategory?.name}
+                  </p>
+
+                  <p className="text-emerald-600 font-bold mt-1">
+                    ETB {product.price}
+                  </p>
+
+                  <p className="text-sm text-gray-600">
+                    Available: {product.amount}
+                  </p>
+
+                  <div className='flex items-center justify-between mt-4'>
+
+                    <Button className="bg-emerald-500 hover:bg-emerald-600">
+                      {t('market_add_cart')}
+                    </Button>
+
+                    <Button variant="outline">
+                      View Detail
+                    </Button>
+
+                  </div>
 
                 </div>
-              </div>
-            </CardContent>
 
-          </Card>
-        ))}
+              </CardContent>
 
-      </div>
+            </Card>
+          ))}
+
+        </div>
+      )}
 
     </div>
   )
