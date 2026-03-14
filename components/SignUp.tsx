@@ -25,6 +25,23 @@ export default function SignUp() {
     setError(null)
     setIsLoading(true)
 
+    // Basic validation
+    if (!email && !phone) {
+      setError("Please provide either email or phone number.")
+      setIsLoading(false)
+      return
+    }
+    if (!password) {
+      setError("Password is required.")
+      setIsLoading(false)
+      return
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.")
+      setIsLoading(false)
+      return
+    }
+
     try {
       const user = await register({ email, phone, password, confirmPassword, role })
 
@@ -35,19 +52,19 @@ export default function SignUp() {
         const identifier = email || phone
         router.push(`/verify-otp?identifier=${encodeURIComponent(identifier)}&purpose=SIGNUP&role=${role}`)
       }
-    } catch (error) {
-      console.log(error )
+    } catch (error: any) {
+      console.log("Registration error:", error)
 
-      // Handle server timeout
-      // if (err.response?.status === 504) {
-      //   setError("Server timed out. OTP may still be sent. Try again or check your email/phone.")
-      // }
-      // // Handle conflict (duplicate email/phone)
-      // else if (err.response?.status === 409) {
-      //   setError("This email or phone number is already registered.")
-      // } else {
-      //   setError("Registration failed. Please try again.")
-      // }
+      // Handle different error types
+      if (error.status === 504) {
+        setError("Server timed out. OTP may still be sent. Try again or check your email/phone.")
+      } else if (error.status === 409) {
+        setError("This email or phone number is already registered.")
+      } else if (error.status === 400) {
+        setError(error.message || "Invalid input. Please check your details.")
+      } else {
+        setError(error.message || "Registration failed. Please try again.")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -66,6 +83,7 @@ export default function SignUp() {
           <SelectContent className="bg-white">
             <SelectItem value="BUYER">Buyer</SelectItem>
             <SelectItem value="FARMER">Farmer</SelectItem>
+            <SelectItem value="AGENT">Agent</SelectItem>
           </SelectContent>
         </Select>
       </div>

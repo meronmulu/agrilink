@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { CartProvider } from '@/context/CartContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import i18n from '@/lib/i18n';
 
 export default function ClientProviders({ children }: { children: React.ReactNode }) {
@@ -17,12 +18,14 @@ export default function ClientProviders({ children }: { children: React.ReactNod
   }, []);
 
   return (
-    <AuthProvider>
-      <LanguageProvider>
-        <CartProvider>
-          {children}
-        </CartProvider>
-      </LanguageProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <CartProvider>
+            {children}
+          </CartProvider>
+        </LanguageProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -37,6 +37,7 @@ export default function OtherSignUpPage() {
   useEffect(() => {
     const fetchRegions = async () => {
       const data = await getRegions()
+      console.log("Loaded regions:", data)
       setRegions(data || [])
     }
     fetchRegions()
@@ -48,6 +49,7 @@ export default function OtherSignUpPage() {
 
     const fetchZones = async () => {
       const data = await getZones(regionId)
+      console.log("Loaded zones for region", regionId, ":", data)
       setZones(data || [])
 
       setZoneId("")
@@ -64,6 +66,7 @@ export default function OtherSignUpPage() {
 
     const fetchWoredas = async () => {
       const data = await getWoredas(zoneId)
+      console.log("Loaded woredas for zone", zoneId, ":", data)
       setWoredas(data || [])
 
       setWoredaId("")
@@ -79,6 +82,7 @@ export default function OtherSignUpPage() {
 
     const fetchKebeles = async () => {
       const data = await getKebeles(woredaId)
+      console.log("Loaded kebeles for woreda", woredaId, ":", data)
       setKebeles(data || [])
 
       setKebeleId("")
@@ -90,6 +94,8 @@ export default function OtherSignUpPage() {
 
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault()
+
+  console.log("Submitting profile:", { fullName, kebeleId, regionId, zoneId, woredaId })
 
   if (!fullName || !kebeleId) {
     alert("Please fill all fields")
@@ -112,6 +118,8 @@ export default function OtherSignUpPage() {
       router.push("/buyer")
     else if (role === "FARMER") 
       router.push("/farmer")
+    else if (role === "AGENT")
+      router.push("/agent/dashboard")
 
     console.log("Profile created:", res)
 

@@ -55,19 +55,27 @@ export default function Login() {
       if (user) {
         const roleRoutes: Record<string, string> = {
           ADMIN: "/admin/dashboard",
-          AGENT: "/Agent/dashboard",
+          AGENT: "/agent/dashboard",
           BUYER: "/buyer",
           FARMER: "/farmer",
         };
         console.log("USER ROLE:", user.role);
         router.push(roleRoutes[user.role] || "/");
-      } else {
-        setError("Invalid email/phone or password");
       }
 
-    } catch (err) {
-      console.error(err);
-      setError("Login failed");
+    } catch (error: any) {
+      console.error("Login error:", error);
+
+      // Handle different error types
+      if (error.status === 401) {
+        setError("Invalid email/phone or password");
+      } else if (error.status === 504) {
+        setError("Server timed out. Please try again.");
+      } else if (error.status === 400) {
+        setError(error.message || "Invalid input. Please check your details.");
+      } else {
+        setError(error.message || "Login failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

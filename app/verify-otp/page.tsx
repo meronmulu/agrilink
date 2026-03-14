@@ -22,6 +22,7 @@ export default function VerifyOTP() {
   const [loading, setLoading] = useState(false)
 
   const handleVerify = async () => {
+    console.log("handleVerify called, otp:", otp, "length:", otp.length)
     if (!identifier) return alert("Identifier missing")
     if (otp.length < 6) return alert("Enter 6-digit OTP")
 
@@ -93,7 +94,10 @@ export default function VerifyOTP() {
             <InputOTP
               maxLength={6}
               value={otp}
-              onChange={(value) => setOtp(value)}
+              onChange={(value) => {
+                console.log("OTP input changed:", value)
+                setOtp(value)
+              }}
             >
               <InputOTPGroup>
                 <InputOTPSlot index={0} />
@@ -105,6 +109,8 @@ export default function VerifyOTP() {
               </InputOTPGroup>
             </InputOTP>
           </div>
+
+          <p className="text-center text-sm text-gray-500">OTP: {otp} (length: {otp.length})</p>
 
           <Button
             className="w-full bg-emerald-600 hover:bg-emerald-700 h-11"

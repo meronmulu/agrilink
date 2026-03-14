@@ -30,7 +30,7 @@ export const register = async (userData: RegisterRequest): Promise<User> => {
   }
 }
 
-export const login = async (credentials: { email?: string; phone?: string; password: string }): Promise<LoginResponse | null> => {
+export const login = async (credentials: { email?: string; phone?: string; password: string }): Promise<LoginResponse> => {
   try {
     console.log("Sending login request:", credentials);
 
@@ -44,7 +44,7 @@ export const login = async (credentials: { email?: string; phone?: string; passw
       // Use role from API response (safer)
       const user = {
         id: res.data.user.id,
-        role: res.data.user.role , 
+        role: res.data.user.role ,
         email: res.data.user.email,
         phone: res.data.user.phone
       };
@@ -57,10 +57,22 @@ export const login = async (credentials: { email?: string; phone?: string; passw
       };
     }
 
-    return null;
-  } catch (error) {
+    throw new Error("Invalid credentials");
+  } catch (error: any) {
     console.error("Login error:", error);
-    return null;
+    if (error.response) {
+      const err = new Error(error.response.data?.message || "Login failed")
+      ;(err as any).status = error.response.status
+      throw err
+    } else if (error.code === "ECONNABORTED") {
+      const err = new Error("Server timeout. Please try again.")
+      ;(err as any).status = 504
+      throw err
+    } else {
+      const err = new Error("Network error. Please try again.")
+      ;(err as any).status = 0
+      throw err
+    }
   }
 };
 
