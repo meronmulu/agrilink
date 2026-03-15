@@ -1,3 +1,4 @@
+import { User } from "./auth"
 import { SubCategory } from "./category"
 
 export type Product = {
@@ -5,13 +6,14 @@ export type Product = {
   name: string
   subCategoryId: string
   amount: number
+  amountSold?: number
   price: number
   description?: string
   image?: string
   createdAt: string
 
   subCategory?: SubCategory
-//   farmer?: Farmer
+  farmer?: User 
 }
 
 export type CreateProductPayload = {

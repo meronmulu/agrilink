@@ -47,6 +47,7 @@ export const getProducts= async (): Promise<Product[]> => {
 export const getProductById = async (id: string) => {
   try {
     const res = await instance.get(`/product/${id}`)
+    // console.log(res.data)
     return res.data
   } catch (error) {
     console.log("Get product by id error:", error)

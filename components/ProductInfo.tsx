@@ -1,130 +1,403 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Star, MessageSquare, ShoppingCart, Minus, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { useParams, useRouter } from 'next/navigation'
+import {
+  Star,
+  MessageCircle,
+  ShoppingCart,
+  CheckCircle2,
+  Loader2,
+  Calendar,
+  Package,
+  MapPin
+} from 'lucide-react'
 
-export default function ProductInfo() {
-    const [quantity, setQuantity] = useState(1)
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import { Button } from '@/components/ui/button'
 
+import { getProductById } from '@/services/productService'
+import { Product } from '@/types/product'
+
+export default function ProductDetailPage() {
+
+  const router = useRouter()
+  const params = useParams()
+  const id = params?.id as string
+
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [showPhone, setShowPhone] = useState(false)
+
+  useEffect(() => {
+
+    if (!id) return
+
+    const fetchProduct = async () => {
+      try {
+        const data = await getProductById(id)
+        setProduct(data)
+        setSelectedImage(data.image)
+      } catch (error) {
+        console.error("Failed to fetch product:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProduct()
+
+  }, [id])
+
+
+  if (loading) {
     return (
-        <div className="flex flex-col h-full bg-white p-6 md:p-8 rounded-2xl lg:rounded-l-none border border-gray-100 lg:border-l-0 shadow-sm lg:shadow-none">
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="animate-spin text-emerald-500" size={40} />
+        </div>
+        <Footer />
+      </div>
+    )
+  }
 
-            {/* Header Info */}
-            <div className="mb-6">
-                <p className="text-emerald-600 text-xs font-bold tracking-wider uppercase mb-2">
-                    Premium Harvest
-                </p>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3">
-                    Premium Brown Teff<br />from Gojjam
-                </h1>
+  if (!product) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <h1 className="text-xl font-bold">Product Not Found</h1>
+          <Button onClick={() => router.push('/marketplace')}>
+            Back to Marketplace
+          </Button>
+        </div>
+        <Footer />
+      </div>
+    )
+  }
 
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1 text-amber-500">
-                        <Star className="fill-current" size={16} />
-                        <Star className="fill-current" size={16} />
-                        <Star className="fill-current" size={16} />
-                        <Star className="fill-current" size={16} />
-                        <Star className="fill-current" size={16} />
-                        <span className="font-semibold text-gray-900 ml-1">4.8</span>
-                    </div>
-                    <span className="text-gray-300">|</span>
-                    <a href="#reviews" className="hover:text-emerald-600 underline underline-offset-2">124 reviews</a>
-                </div>
+  const images = [
+    product.image,
+    product.image,
+    product.image,
+    product.image
+  ]
+
+  return (
+    <div className="min-h-screen flex flex-col bg-white">
+
+      <Header />
+
+      <main className="flex-1 pt-20 pb-16 px-4 max-w-7xl mx-auto w-full">
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+          {/* PRODUCT IMAGES */}
+
+          <div className="flex flex-col gap-4">
+
+            <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border bg-gray-50">
+
+              <div className="absolute top-4 left-4 z-10 bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow">
+                <CheckCircle2 size={14} />
+                Available: {product.amount}
+              </div>
+
+              <Image
+                src={selectedImage || "/placeholder.png"}
+                alt={product.name}
+                fill
+                className="object-cover"
+              />
+
             </div>
 
-            {/* Price & Stock */}
-            <div className="mb-8">
-                <div className="flex items-end gap-2 mb-2">
-                    <span className="text-4xl font-extrabold text-emerald-600">ETB 180</span>
-                    <span className="text-gray-500 font-medium pb-1">/ kg</span>
+            {/* THUMBNAILS */}
+
+            <div className="flex gap-2 mt-2">
+
+              {images.map((img, index) => (
+
+                <div
+                  key={index}
+                  onClick={() => setSelectedImage(img || "/placeholder.png")}
+                  className={`relative h-16 w-16 rounded-md overflow-hidden border cursor-pointer transition
+                   ${selectedImage === img ? "border-emerald-500" : "border-gray-200 hover:border-emerald-400"}`}
+                >
+
+                  <Image
+                    src={img || "/placeholder.png"}
+                    alt={`preview-${index}`}
+                    fill
+                    className="object-cover"
+                  />
+
                 </div>
-                <div className="flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    In Stock & Ready to Ship
-                </div>
+
+              ))}
+
             </div>
 
-            {/* Seller Profile */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 mb-8">
+          </div>
+
+
+          {/* PRODUCT INFO */}
+
+          <div className="flex flex-col">
+
+            <span className="text-xs font-bold text-emerald-600 tracking-widest uppercase mb-2">
+              {product.subCategory?.name || "General Product"}
+            </span>
+
+            <h1 className="text-3xl font-bold text-gray-900 mb-4 capitalize">
+              {product.name}
+            </h1>
+
+
+            {/* REVIEWS */}
+
+            <div className="flex items-center gap-2 mb-6">
+
+              <div className="flex text-yellow-400">
+
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <Star size={16} className="text-gray-300" />
+
+              </div>
+
+              <span className="text-sm font-semibold">4.8</span>
+
+              <span className="text-sm text-gray-500 underline cursor-pointer">
+                124 reviews
+              </span>
+
+            </div>
+
+
+            {/* PRICE */}
+
+            <div className="mb-3">
+
+              <span className="text-3xl font-bold text-emerald-600">
+                ETB {product.price}
+              </span>
+
+            </div>
+
+
+            {/* STOCK STATUS */}
+
+            <div className="flex items-center gap-2 text-sm text-emerald-600 mb-8">
+
+              <div className={`h-2 w-2 rounded-full ${product.amount > 0 ? 'bg-emerald-500' : 'bg-red-500'}`} />
+
+              {product.amount > 0
+                ? 'In Stock & Ready to Ship'
+                : 'Out of Stock'}
+
+            </div>
+
+
+            {/* FARMER CARD */}
+
+            {product.farmer && (
+
+              <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border mb-8">
+
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                        <Image
-                            src="https://images.unsplash.com/photo-1595804562098-b807df4567ac?q=80&w=2071&auto=format&fit=crop"
-                            alt="Farmer Profile"
-                            width={48}
-                            height={48}
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-gray-900 flex items-center gap-1">
-                            Abebe Bikila
-                            <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                        </h4>
-                        <p className="text-xs text-gray-500">Verified Farmer • 4.9 Rating</p>
-                    </div>
+
+                  <div className="relative h-12 w-12 rounded-full overflow-hidden bg-gray-200">
+
+                    <Image
+                      src="/placeholder.png"
+                      alt="Farmer"
+                      fill
+                      className="object-cover"
+                    />
+
+                  </div>
+
+                  <div>
+
+                    <h3 className="font-semibold text-sm text-gray-900">
+                      {product.farmer.email}
+                    </h3>
+
+                    {product.farmer.phone && (
+
+                      <div className="text-xs text-gray-500 mt-1">
+
+                        {!showPhone ? (
+
+                          <button
+                            onClick={() => setShowPhone(true)}
+                            className="text-emerald-600 font-medium hover:underline"
+                          >
+                            Show Phone Number
+                          </button>
+
+                        ) : (
+
+                          <span>
+                            Farmer • {product.farmer.phone}
+                          </span>
+
+                        )}
+
+                      </div>
+
+                    )}
+
+                  </div>
+
                 </div>
-                <Button variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-xs font-semibold h-8 rounded-lg px-3">
-                    <MessageSquare size={14} className="mr-1.5" />
-                    Message Farmer
+
+                <Button
+                  variant="outline"
+                  className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg text-sm h-9"
+                >
+                  <MessageCircle size={16} className="mr-2" />
+                  Message
                 </Button>
+
+              </div>
+
+            )}
+
+
+            {/* ACTION BUTTONS */}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+
+              <Button
+                disabled={product.amount <= 0}
+                className="h-12 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium"
+              >
+                <ShoppingCart size={18} className="mr-2" />
+                {product.amount > 0 ? 'Add to Cart' : 'Out of Stock'}
+              </Button>
+
+              <Button
+                disabled={product.amount <= 0}
+                variant="outline"
+                className="h-12 rounded-lg border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 text-sm font-medium"
+              >
+                Buy Now
+              </Button>
+
             </div>
 
-            {/* Actions */}
-            <div className="space-y-3 mb-8">
-                <div className="flex gap-3">
-                    {/* Quantity Selector */}
-                    <div className="flex items-center justify-between border border-gray-200 rounded-xl w-32 bg-gray-50 h-12">
-                        <button
-                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                            className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-gray-900"
-                        >
-                            <Minus size={16} />
-                        </button>
-                        <span className="font-semibold text-gray-900">{quantity}</span>
-                        <button
-                            onClick={() => setQuantity(quantity + 1)}
-                            className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-gray-900"
-                        >
-                            <Plus size={16} />
-                        </button>
-                    </div>
 
-                    <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold h-12 rounded-xl text-base shadow-sm">
-                        <ShoppingCart size={18} className="mr-2" />
-                        Add to Cart
-                    </Button>
-                </div>
-                <Button variant="outline" className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-bold h-12 rounded-xl text-base">
-                    Buy Now
-                </Button>
+            {/* PRODUCT INFO */}
+
+            <div className="grid grid-cols-2 gap-5 bg-gray-50 p-5 rounded-xl border">
+
+              {/* CATEGORY */}
+
+              <div>
+                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                  <Package size={12} />
+                  Category
+                </p>
+
+                <p className="text-sm font-semibold">
+                  {product.subCategory?.categoryId?.name || "General"}
+                </p>
+              </div>
+
+
+              {/* SUB CATEGORY */}
+
+              <div>
+                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                  <Package size={12} />
+                  Sub Category
+                </p>
+
+                <p className="text-sm font-semibold">
+                  {product.subCategory?.name || "General"}
+                </p>
+              </div>
+
+
+              {/* LOCATION */}
+
+              <div>
+                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                  <MapPin size={12} />
+                  Location
+                </p>
+
+                <p className="text-sm font-semibold">
+                  {product.farmer?.profile?.kebele?.name},{" "}
+                  {product.farmer?.profile?.kebele?.woreda?.name}
+                </p>
+              </div>
+
+
+              {/* POSTED DATE */}
+
+              <div>
+                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                  <Calendar size={12} />
+                  Posted Date
+                </p>
+
+                <p className="text-sm font-semibold">
+                  {new Date(product.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+
+
+              {/* STOCK */}
+
+              <div>
+                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                  <Package size={12} />
+                  Stock
+                </p>
+
+                <p className="text-sm font-semibold">
+                  {product.amount} Units
+                </p>
+              </div>
+
             </div>
 
-            {/* Meta Traits Grid */}
-            <div className="grid grid-cols-2 gap-4 mt-auto">
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Origin</p>
-                    <p className="text-sm font-semibold text-gray-900">Gojjam, Ethiopia</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Harvest Date</p>
-                    <p className="text-sm font-semibold text-gray-900">November 2023</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Pack Sizes</p>
-                    <p className="text-sm font-semibold text-gray-900">1kg, 5kg, 25kg</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Certifications</p>
-                    <div className="flex gap-2">
-                        <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Organic</span>
-                        <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">Fair Trade</span>
-                    </div>
-                </div>
-            </div>
+          </div>
 
         </div>
-    )
+
+
+        {/* DESCRIPTION */}
+
+        {product.description && (
+
+          <div className="mt-12 max-w-4xl">
+
+            <h3 className="text-xl font-bold mb-3">
+              About this product
+            </h3>
+
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {product.description}
+            </p>
+
+          </div>
+
+        )}
+
+      </main>
+
+      <Footer />
+
+    </div>
+  )
 }

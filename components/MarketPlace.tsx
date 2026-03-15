@@ -22,6 +22,7 @@ import {
 import { Category, SubCategory } from '@/types/category'
 import Image from 'next/image'
 import { Product } from '@/types/product'
+import Link from 'next/link'
 
 export default function MarketPlace() {
 
@@ -198,10 +199,12 @@ export default function MarketPlace() {
                     <Button className="bg-emerald-500 hover:bg-emerald-600">
                       {t('market_add_cart')}
                     </Button>
-
-                    <Button variant="outline">
+                  <Link href={`/product/${product.id}`}>
+                  <Button variant="outline" >
                       View Detail
                     </Button>
+                  </Link>
+                    
 
                   </div>
 

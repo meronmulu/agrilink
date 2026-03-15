@@ -69,7 +69,7 @@ export default function Header() {
                 {t("aboutUs")}
               </p>
               <LanguageDropdown />
-              <ThemeToggle />
+              {/* <ThemeToggle /> */}
             </nav>
 
             <div className="hidden md:flex items-center gap-3">
@@ -101,7 +101,7 @@ export default function Header() {
 
 
             <LanguageDropdown />
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-medium text-sm cursor-pointer hover:ring-2 hover:ring-emerald-600 transition">

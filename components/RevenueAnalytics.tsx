@@ -27,7 +27,7 @@ export default function RevenueAnalytics({ t }: { t: any }) {
                 <div className="h-48 mt-4 flex items-end justify-between px-2 gap-2">
                     {bars.map((bar, idx) => (
                         <div key={idx} className="flex flex-col items-center gap-2 flex-1">
-                            <div className={`w-full max-w-[24px] ${bar.height} rounded-t-sm ${bar.color} opacity-90 transition-all hover:opacity-100 cursor-pointer`}></div>
+                            <div className={`w-full max-w-6 ${bar.height} rounded-t-sm ${bar.color} opacity-90 transition-all hover:opacity-100 cursor-pointer`}></div>
                             <span className={`text-[10px] font-medium ${idx === bars.length - 1 ? 'text-gray-900 font-bold' : 'text-gray-400'}`}>
                                 {bar.month}
                             </span>
