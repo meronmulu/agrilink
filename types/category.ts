@@ -11,6 +11,7 @@ export interface SubCategory {
   id: string
   name: string
   categoryId: string
+  category?: Category
 }
 
 export interface CreateSubcategoryPayload {

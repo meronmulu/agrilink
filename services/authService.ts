@@ -121,8 +121,6 @@ export const resetPassword = async (data: ResetPasswordRequest): Promise<{ messa
   }
 }
 
-
-
 export const googleSignin = async () => {
   try {
     // Open Google login popup
@@ -145,6 +143,43 @@ export const googleSignin = async () => {
     throw error;
   }
 };
+
+export const getUsers= async (): Promise<User[]> => {
+  try {
+    const res = await instance.get("/user")
+    console.log(res.data)
+    return res.data
+    
+  } catch (error) {
+    console.error("Get users error:", error)
+    return []
+  }
+}
+export const deleteUser = async (id: string) => {
+  try {
+    const res = await instance.delete(`/user/${id}`)
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
+
+export const getUserById = async (id: string) => {
+  try {
+    const res = await instance.get(`/user/${id}`)
+    console.log(res.data)
+    return res.data
+    
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
+
+
 
 
 

@@ -116,12 +116,22 @@ export const createProfile = async (data: {
   }
 }
 
-// export const getProfile = async (): Promise<[]> => {
-//   try {
-//     const res = await instance.get("/category")
-//     return res.data
-//   } catch (error) {
-//     console.error("Get categories error:", error)
-//     return []
-//   }
-// }
+export const updateProfile = async (data: FormData) => {
+  try {
+
+    for (const pair of data.entries()) {
+      console.log(pair[0], pair[1])
+    }
+
+    const res = await instance.patch("/profile", data)
+
+    return res.data
+
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+  
+
+

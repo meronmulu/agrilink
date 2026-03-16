@@ -41,7 +41,7 @@ export default function MyCropsPage() {
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null)
   const [search, setSearch] = useState("")
 
-  // 🔹 Delete dialog state
+  // Delete dialog state
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
   // Fetch crops
@@ -88,7 +88,7 @@ export default function MyCropsPage() {
       // remove from UI
       setCrops((prev) => prev.filter((crop) => crop.id !== deleteId))
 
-      setDeleteId(null) // close dialog
+      setDeleteId(null) 
     } catch (error) {
       console.error("Delete failed:", error)
     }

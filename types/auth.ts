@@ -1,10 +1,14 @@
+import { Profile } from "./profile";
+
 export interface User {
   id: string;
   role: string;
   email?: string;
   phone?: string;
   status?: string;
-  createdAt?: string;
+  createdAt?: Date;
+  profile?: Profile
+  
 }
 
 // Data sent to the backend

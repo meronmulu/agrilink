@@ -6,24 +6,25 @@ export interface Region {
 export interface Zone {
   id: string
   name: string
-  regionId: string
+  region: Region
 }
 
 export interface Woreda {
   id: string
   name: string
-  zoneId: string
+  zone: Zone
 }
 
 export interface Kebele {
   id: string
   name: string
-  woredaId: string
+  woreda: Woreda
 }
-// export interface Profile {
-//   id: string
-//   fullName: string
-//   email?: string
-//   phone?: string
-//   image?: string
-// }
+export interface Profile {
+  id: string
+  fullName: string
+  email?: string
+  phone?: string
+  imageUrl?: string
+  kebele?:Kebele
+}

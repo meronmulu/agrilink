@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
 
           <div className="flex flex-col gap-4">
 
-            <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border bg-gray-50">
+            <div className="relative aspect-4/3 w-full rounded-2xl overflow-hidden border bg-gray-50">
 
               <div className="absolute top-4 left-4 z-10 bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow">
                 <CheckCircle2 size={14} />
@@ -299,20 +299,6 @@ export default function ProductDetailPage() {
 
             <div className="grid grid-cols-2 gap-5 bg-gray-50 p-5 rounded-xl border">
 
-              {/* CATEGORY */}
-
-              <div>
-                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
-                  <Package size={12} />
-                  Category
-                </p>
-
-                <p className="text-sm font-semibold">
-                  {product.subCategory?.categoryId?.name || "General"}
-                </p>
-              </div>
-
-
               {/* SUB CATEGORY */}
 
               <div>
@@ -325,6 +311,19 @@ export default function ProductDetailPage() {
                   {product.subCategory?.name || "General"}
                 </p>
               </div>
+              <div>
+                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                  <Package size={12} />
+                  Stock
+                </p>
+
+                <p className="text-sm font-semibold">
+                  {product.amount} Units
+                </p>
+              </div>
+
+
+
 
 
               {/* LOCATION */}
@@ -358,7 +357,7 @@ export default function ProductDetailPage() {
 
               {/* STOCK */}
 
-              <div>
+              {/* <div>
                 <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
                   <Package size={12} />
                   Stock
@@ -367,7 +366,7 @@ export default function ProductDetailPage() {
                 <p className="text-sm font-semibold">
                   {product.amount} Units
                 </p>
-              </div>
+              </div> */}
 
             </div>
 

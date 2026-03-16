@@ -38,6 +38,7 @@ export default function AdminProductsPage() {
     try {
       const data = await getProducts()
       setProducts(data)
+      console.log(data)
     } catch (err) {
       console.error(err)
     } finally {
@@ -52,6 +53,14 @@ export default function AdminProductsPage() {
 
   const totalFarmers = new Set(products.map(p => p.farmer?.id)).size
 
+
+  if (loading) {
+    return (
+      <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
+      </div>
+    )
+  }
   return (
 
     <div className="p-6 space-y-8">
@@ -112,13 +121,7 @@ export default function AdminProductsPage() {
 
         <CardContent>
 
-          {loading ? (
-
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="animate-spin text-emerald-500" />
-            </div>
-
-          ) : (
+          
 
             <div className="rounded-lg border overflow-hidden">
 
@@ -173,7 +176,7 @@ export default function AdminProductsPage() {
 
                       <TableCell>
                         <Badge variant="secondary">
-                          {product.subCategory?.categoryId?.name || "General"}
+                          {product.subCategory?.category?.name}
                         </Badge>
                       </TableCell>
 
@@ -245,7 +248,7 @@ export default function AdminProductsPage() {
 
             </div>
 
-          )}
+        
 
         </CardContent>
 

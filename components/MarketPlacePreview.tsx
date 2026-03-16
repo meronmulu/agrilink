@@ -8,6 +8,7 @@ import { getProducts } from '@/services/productService'
 import { Product } from '@/types/product'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Button } from './ui/button'
 
 export default function MarketPlacePreview() {
   const { t } = useLanguage()
@@ -35,7 +36,7 @@ export default function MarketPlacePreview() {
   },[])
 
   return (
-    <section className="w-full py-20 bg-white">
+    <section className="w-full bg-white">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Header Section */}
@@ -61,7 +62,7 @@ export default function MarketPlacePreview() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {latestProducts.map((product) => (
-            <Link key={product.id} href={`/market/${product.id}`} className="block h-full">
+            <div key={product.id}  className="block h-full">
               <Card className="group flex flex-col rounded-2xl border border-gray-100 bg-white hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden h-full">
                 
                 {/* Image Container with Zoom */}
@@ -93,20 +94,19 @@ export default function MarketPlacePreview() {
 
                   {/* Stock Amount Indicator */}
                   <div className="flex items-center gap-1.5 mb-4">
-                    <Package size={14} className={product.amount > 0 ? "text-emerald-500" : "text-red-400"} />
                     {product.amount > 0 ? (
                       <span className="text-xs font-medium text-gray-600">
-                        <strong className="text-gray-900">{product.amount}</strong> in stock
+                        Avalable :
+                        <strong className="text-gray-900">{product.amount}</strong> 
                       </span>
                     ) : (
                       <span className="text-xs font-semibold text-red-500">
-                        Out of stock
+                       
                       </span>
                     )}
                   </div>
 
                   {/* Price & Action (Pushed to bottom using mt-auto) */}
-                  <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
                     <div>
                       <p className="text-[11px] text-gray-400 font-medium mb-0.5 uppercase tracking-wider">
                         Price
@@ -116,17 +116,28 @@ export default function MarketPlacePreview() {
                       </p>
                     </div>
                     
-                    {/* Subtle interaction button */}
-                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                      <ArrowRight size={18} className="-rotate-45 group-hover:rotate-0 transition-transform duration-300" />
-                    </div>
+                    {/* Buttons */}
+                  <div className="flex items-center gap-2 pt-2">
+
+                    <Button
+                      className="flex-1 bg-emerald-500 hover:bg-emerald-600"
+                    >
+                      {t("market_add_cart")}
+                    </Button>
+
+                    <Link href={`/product/${product.id}`} className="flex-1">
+                      <Button variant="outline" className="w-full">
+                        View
+                      </Button>
+                    </Link>
+
                   </div>
 
                 </CardContent>
               </Card>
 
               
-            </Link>
+            </div>
           ))}
         </div>
 

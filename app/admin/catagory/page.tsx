@@ -258,7 +258,13 @@ const handleDelete = async () => {
     }))
 }, [categories, subcategories, searchTerm])
   
-
+ if (loading) {
+    return (
+      <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Header Section */}
@@ -274,12 +280,12 @@ const handleDelete = async () => {
             <div className="flex items-center gap-3">
               <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className='bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
+                  <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
                     <PlusCircle className="h-4 w-4 mr-2" />
                     Add Category
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-106.25">
                   <DialogHeader>
                     <DialogTitle>Create New Category</DialogTitle>
                     <DialogDescription>
@@ -298,7 +304,7 @@ const handleDelete = async () => {
                       />
                     </div>
                     <DialogFooter>
-                      <Button type="submit" disabled={submitting} className='bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
+                      <Button type="submit" disabled={submitting} className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
                         {submitting ? (
                           <>
                             <Loader2 className="animate-spin mr-2 h-4 w-4" />
@@ -421,7 +427,7 @@ const handleDelete = async () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="mb-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:text-white text-white "
+                            className="mb-2 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:text-white text-white "
                             onClick={() => {
                               setParentCategoryId(cat.id)
                               setSubDialogOpen(true)

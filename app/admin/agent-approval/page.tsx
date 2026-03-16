@@ -14,7 +14,8 @@ import {
   XCircle,
   BadgeCheck,
   AlertCircle,
-  Filter
+  Filter,
+  Loader2
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -139,13 +140,8 @@ export default function RoleRequestCards() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="relative">
-            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          </div>
-          <p className="text-gray-600 font-medium">Loading role requests...</p>
-        </div>
+      <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
       </div>
     )
   }
