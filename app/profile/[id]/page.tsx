@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label'
 import { Loader2, Camera, Mail, Phone, MapPin, Save } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { getUserById } from '@/services/authService'
-import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { useParams } from 'next/navigation'
 import { User } from '@/types/auth'
@@ -42,7 +41,6 @@ export default function Page() {
 
   const [form, setForm] = useState({
     fullName: '',
-    phone: '',
     kebeleId: '',
     image: null as File | null
   })
@@ -78,7 +76,6 @@ export default function Page() {
 
       setForm({
         fullName: data.profile?.fullName || '',
-        phone: data.phone || '',
         kebeleId: kebele?.id || '',
         image: null
       })
@@ -193,8 +190,8 @@ export default function Page() {
       formData.append("image", form.image)
     }
 
-    await updateProfile(formData)
-
+    const res =  await updateProfile(formData)
+      console.log(res)
   } catch (error) {
     console.error(error)
   } finally {
@@ -219,11 +216,10 @@ export default function Page() {
 
   /* ================= LOADING ================= */
 
-  if (loading || !user) {
-
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-10 h-10" />
+      <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
       </div>
     )
   }
@@ -233,19 +229,19 @@ export default function Page() {
 
   return (
 
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 ">
 
       <Header />
 
-      <div className="max-w-7xl mx-auto p-6 pt-24">
+      <div className="max-w-7xl mx-auto p-6 pt-24 ">
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
           {/* PROFILE CARD */}
 
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 ">
 
-            <Card>
+            <Card className=''>
 
               <CardContent className="p-6 flex flex-col items-center text-center">
 
@@ -316,7 +312,7 @@ export default function Page() {
 
           {/* FORM */}
 
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-8 ">
 
             <Card className="p-7">
 
@@ -339,17 +335,7 @@ export default function Page() {
                   />
                 </div>
 
-                {/* <div className="space-y-2">
-                  <Label>Phone</Label>
-                  <Input
-                    value={form.phone}
-                    onChange={(e) =>
-                      setForm({ ...form, phone: e.target.value })
-                    }
-                  />
-                </div> */}
-
-                <Separator />
+                
 
                 {/* REGION */}
 

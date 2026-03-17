@@ -87,7 +87,7 @@ export default function MarketPlace() {
 
   return (
 
-    <div className="pt-20 flex flex-col bg-[#fcfdfd] min-h-screen">
+    <div className="pt-20 flex flex-col bg-[#fcfdfd] min-h-screen pb-5">
 
       {/* Header */}
 

@@ -83,7 +83,6 @@ export default function SignUp() {
           <SelectContent className="bg-white">
             <SelectItem value="BUYER">Buyer</SelectItem>
             <SelectItem value="FARMER">Farmer</SelectItem>
-            <SelectItem value="AGENT">Agent</SelectItem>
           </SelectContent>
         </Select>
       </div>

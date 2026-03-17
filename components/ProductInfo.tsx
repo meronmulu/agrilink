@@ -41,6 +41,7 @@ export default function ProductDetailPage() {
         const data = await getProductById(id)
         setProduct(data)
         setSelectedImage(data.image)
+        
       } catch (error) {
         console.error("Failed to fetch product:", error)
       } finally {
@@ -335,7 +336,7 @@ export default function ProductDetailPage() {
                 </p>
 
                 <p className="text-sm font-semibold">
-                  {product.farmer?.profile?.kebele?.name},{" "}
+                  {product.farmer?.profile?.kebele?.name},
                   {product.farmer?.profile?.kebele?.woreda?.name}
                 </p>
               </div>

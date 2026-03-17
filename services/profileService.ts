@@ -128,9 +128,11 @@ export const updateProfile = async (data: FormData) => {
     return res.data
 
   } catch (error) {
-    console.log(error)
-    throw error
-  }
+    console.log("ERROR DATA:", error.response?.data)
+    console.log("STATUS:", error.response?.status)
+  } 
+
+  
 }
   
 
