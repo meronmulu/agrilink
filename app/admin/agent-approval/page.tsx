@@ -26,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
 
 interface RoleRequest {
   id: string
@@ -35,8 +36,10 @@ interface RoleRequest {
   user: {
     email: string
     phone: string
-    name?: string
-    department?: string
+    profile?: {
+      fullName?: string
+      image?: string
+    }
   }
 }
 
@@ -53,6 +56,8 @@ export default function RoleRequestCards() {
   const fetchRequests = async () => {
     try {
       const data = await getRoleRequests()
+      console.log("API RESPONSE:", data)
+
       setRequests(data)
     } catch (error) {
       console.error("Failed to fetch role requests", error)
@@ -62,33 +67,54 @@ export default function RoleRequestCards() {
   }
 
   const handleApprove = async (id: string) => {
-    setProcessingId(id)
-    try {
-      const res = await approveRoleRequest(id, true)
-      console.log("Approved:", res)
-      setRequests((prev) =>
-        prev.map((req) =>
-          req.id === id ? { ...req, status: "APPROVED" } : req
-        )
+  setProcessingId(id)
+  try {
+    const res = await approveRoleRequest(id, true)
+
+    if (res) {
+        toast.success("Role request approved successfully", {
+          position: "top-center",
+        })
+      }
+
+    setRequests((prev) =>
+      prev.map((req) =>
+        req.id === id ? { ...req, status: "APPROVED" } : req
       )
-    } catch (error) {
-      console.error("Approve failed", error)
-    } finally {
-      setProcessingId(null)
-    }
+    )
+  } catch (error) {
+    console.error("Approve failed", error)
+ 
+   toast.error("Failed to approve role request", {
+          position: "top-center",
+        })
+     
+  } finally {
+    setProcessingId(null)
   }
+}
 
   const handleReject = async (id: string) => {
     setProcessingId(id)
     try {
       const res = await approveRoleRequest(id, false)
       console.log("Rejected:", res)
+
+      if (res) {
+        toast.success("Role request Rejected successfully", {
+          position: "top-center",
+        })
+      }
       setRequests((prev) =>
         prev.map((req) =>
           req.id === id ? { ...req, status: "REJECTED" } : req
         )
       )
     } catch (error) {
+
+      toast.error("Failed to Rejected role request", {
+          position: "top-center",
+        })
       console.error("Reject failed", error)
     } finally {
       setProcessingId(null)
@@ -217,6 +243,7 @@ export default function RoleRequestCards() {
 
         {/* Requests Grid */}
         {filteredRequests.length === 0 ? (
+          
           <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
               <Shield className="w-10 h-10 text-gray-400" />
@@ -260,13 +287,13 @@ export default function RoleRequestCards() {
                     {/* User Info with Avatar */}
                     <div className="flex items-center gap-4">
                       <Avatar className="h-14 w-14 border-2 border-gray-200 group-hover:border-primary/20 transition-colors">
-                        <AvatarFallback className="bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-semibold text-lg">
-                          {getInitials(req.user.name)}
+                        <AvatarFallback className="bg-linear-to-br from-primary/10 to-primary/5 text-primary font-semibold text-lg">
+                          {getInitials(req.user.profile?.image)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-900 truncate">
-                          {req.user.name || "User"}
+                          {req.user.profile?.fullName || "User"}
                         </p>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <Shield className="w-3.5 h-3.5 text-gray-400" />
@@ -295,21 +322,14 @@ export default function RoleRequestCards() {
                         <span className="truncate flex-1">{req.user.phone}</span>
                       </div>
 
-                      {req.user.department && (
-                        <div className="flex items-center gap-3 text-sm text-gray-600">
-                          <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
-                            <User className="w-4 h-4 text-gray-500" />
-                          </div>
-                          <span className="truncate flex-1">{req.user.department}</span>
-                        </div>
-                      )}
+                     
                     </div>
 
                     {/* Action Buttons */}
                     {req.status === "PENDING" && (
                       <div className="flex gap-3 pt-2">
                         <Button
-                          className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-sm hover:shadow-md transition-all"
+                          className="flex-1 bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-sm hover:shadow-md transition-all"
                           onClick={() => handleApprove(req.id)}
                           disabled={processingId === req.id}
                         >

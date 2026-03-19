@@ -39,9 +39,9 @@ const roleNav: Record<string, NavItem[]> = {
   ],
 
   AGENT: [
-    { name: 'Overview', href: '/agent/dashboard', icon: LayoutDashboard },
-    { name: 'Register Farmer', href: '/agent/register-farmer', icon: Users },
-    { name: 'Training Modules', href: '/agent/training', icon: BookOpen },
+    { name: 'Overview', href: '/Agent/dashboard', icon: LayoutDashboard },
+    { name: 'Register Farmer', href: '/Agent/register-farmer', icon: Users },
+    { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
   ],
 
   ADMIN: [

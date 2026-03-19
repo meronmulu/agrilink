@@ -32,6 +32,7 @@ import {
 import { useAuth } from "@/context/AuthContext"
 import { createRoleRequest } from "@/services/roleRequestService"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export default function Header() {
   const { user, logout } = useAuth()
@@ -46,15 +47,18 @@ export default function Header() {
       ? "/buyer/overview"
       : "/"
 
-  const handleRoleRequest = async () => {
-    try {
-      await createRoleRequest()
-      alert("Role request submitted successfully")
-    } catch (error) {
-      console.log(error)
-      alert("Failed to send request")
-    }
+ const handleRoleRequest = async () => {
+  try {
+    await createRoleRequest();
+
+    toast.success("Role request submitted successfully ");
+
+  } catch (error: any) {
+    console.log(error);
+
+    toast.error(error?.message || "Failed to send request");
   }
+};
 
   type NavItem = {
     name: string
@@ -194,7 +198,7 @@ export default function Header() {
             <div className="hidden md:flex items-center gap-3">
               <Button
                 onClick={() => router.push("/login")}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 rounded-lg"
+                className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-4 rounded-lg"
               >
                 {t("getStarted") || "Get Started"}
               </Button>

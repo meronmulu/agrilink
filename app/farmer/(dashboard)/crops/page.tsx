@@ -28,6 +28,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { toast } from 'sonner'
 
 export default function MyCropsPage() {
 
@@ -78,21 +79,31 @@ export default function MyCropsPage() {
     ? subcategories.filter((sub) => sub.categoryId === selectedCategory)
     : []
 
-  // 🔥 DELETE FUNCTION
-  const handleDelete = async () => {
-    if (!deleteId) return
+  //  DELETE FUNCTION
+ const handleDelete = async () => {
+  if (!deleteId) return
 
-    try {
-      await deleteProducts(deleteId)
+  try {
+    await deleteProducts(deleteId)
 
-      // remove from UI
-      setCrops((prev) => prev.filter((crop) => crop.id !== deleteId))
+    // remove from UI
+    setCrops((prev) => prev.filter((crop) => crop.id !== deleteId))
 
-      setDeleteId(null) 
-    } catch (error) {
-      console.error("Delete failed:", error)
-    }
+               toast.success("Crop deleted successfully. ")
+
+    
+
+    setDeleteId(null)
+  } catch (error) {
+    console.error("Delete failed:", error)
+
+    toast.error(
+      error?.response?.data?.message ||
+      error?.message ||
+      "Something went wrong."
+    )
   }
+}
 
   const clearFilters = () => {
     setSearch("")
@@ -100,7 +111,8 @@ export default function MyCropsPage() {
     setSelectedSubCategory(null)
   }
 
-  const filteredCrops = crops.filter((crop) => {
+ const filteredCrops = crops
+  .filter((crop) => {
     const sub = subcategories.find((s) => s.id === crop.subCategoryId)
 
     const matchSearch = crop.name.toLowerCase().includes(search.toLowerCase())
@@ -108,6 +120,9 @@ export default function MyCropsPage() {
     const matchSubCategory = selectedSubCategory ? crop.subCategoryId === selectedSubCategory : true
 
     return matchSearch && matchCategory && matchSubCategory
+  })
+  .sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
 
   const hasActiveFilters =

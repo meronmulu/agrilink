@@ -178,8 +178,25 @@ export const getUserById = async (id: string) => {
   }
 }
 
-
-
+export const updateUserPassword = async (
+  id: string,
+  data: {
+    currentPassword: string
+    newPassword: string
+    confirmNewPassword: string
+  }
+) => {
+  try {
+    const res = await instance.patch(
+      `/user/update-password/${id}`, 
+      data
+    )
+    return res.data
+  } catch (error: any) {
+    console.log("UPDATE PASSWORD ERROR:", error?.response?.data)
+    throw error
+  }
+}
 
 
 

@@ -64,8 +64,8 @@ export default function MarketPlace() {
   }, [])
 
   // Search + SubCategory Filter
-  const filteredProducts = products.filter((product) => {
-
+  const filteredProducts = products
+  .filter((product) => {
     const matchesName =
       product.name?.toLowerCase().includes(search.toLowerCase())
 
@@ -74,8 +74,10 @@ export default function MarketPlace() {
       product.subCategoryId === selectedSubCategory
 
     return matchesName && matchesSubCategory
-
   })
+  .sort((a, b) =>
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
 
   if (loading) {
     return (

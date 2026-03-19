@@ -14,6 +14,7 @@ import {
 
 import { Input } from "./ui/input"
 import { useRouter, useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 
 export default function OtherSignUpPage() {
   const router = useRouter()
@@ -95,36 +96,57 @@ export default function OtherSignUpPage() {
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault()
 
-  console.log("Submitting profile:", { fullName, kebeleId, regionId, zoneId, woredaId })
+  console.log("Submitting profile:", {
+    fullName,
+    kebeleId,
+    regionId,
+    zoneId,
+    woredaId
+  })
 
+  // 🔍 Validation
   if (!fullName || !kebeleId) {
-    alert("Please fill all fields")
+    toast.error("Please fill all fields")
     return
   }
 
   try {
     setIsLoading(true)
 
+    // ⏳ Loading toast
+    const loadingToast = toast.loading("Creating profile...")
+
     const res = await createProfile({
       fullName,
       kebeleId
     })
 
-    // Log the role
+    console.log("Profile created:", res)
     console.log("Role selected:", role)
 
-    // Redirect based on role
-    if (role === "BUYER") 
-      router.push("/buyer")
-    else if (role === "FARMER") 
-      router.push("/farmer")
-    else if (role === "AGENT")
-      router.push("/agent/dashboard")
+    // ✅ Success
+    toast.dismiss(loadingToast)
+    toast.success("Profile created successfully 🎉")
 
-    console.log("Profile created:", res)
+    // 🔁 Redirect based on role
+    setTimeout(() => {
+      if (role === "BUYER") {
+        router.push("/buyer")
+      } else if (role === "FARMER") {
+        router.push("/farmer")
+      } else if (role === "AGENT") {
+        router.push("/agent/dashboard")
+      }
+    }, 1000)
 
-  } catch (error) {
+  } catch (error: any) {
     console.log(error)
+
+    toast.error(
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to create profile"
+    )
   } finally {
     setIsLoading(false)
   }

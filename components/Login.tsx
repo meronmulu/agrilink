@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { googleSignin } from '@/services/authService'
+import { toast } from 'sonner'
 
 
 export default function Login() {
@@ -32,83 +33,29 @@ export default function Login() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
 
-    if (!formData.identifier || !formData.password) {
-      setError("Please enter email/phone and password");
-      return;
-    }
+  if (!formData.identifier || !formData.password) {
+    toast.error("Please enter email/phone and password");
+    return;
+  }
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      // Send either email or phone as "identifier"
-      const user = await login({
-        email: formData.identifier.includes('@') ? formData.identifier : undefined,
-        phone: !formData.identifier.includes('@') ? formData.identifier : undefined,
-        password: formData.password
-      });
+  try {
+    const user = await login({
+      email: formData.identifier.includes('@') ? formData.identifier : undefined,
+      phone: !formData.identifier.includes('@') ? formData.identifier : undefined,
+      password: formData.password
+    });
 
-      console.log("USER LOGIN RESPONSE:", user);
+    console.log("USER LOGIN RESPONSE:", user);
 
-      if (user) {
-        const roleRoutes: Record<string, string> = {
-          ADMIN: "/admin/dashboard",
-          AGENT: "/Agent/dashboard",
-          BUYER: "/buyer",
-          FARMER: "/farmer",
-        };
-        console.log("USER ROLE:", user.role);
-        router.push(roleRoutes[user.role] || "/");
-      }
+    if (user) {
+      toast.success("Login successful ");
 
-    } catch (error: any) {
-      setNeedsVerification(false);
-
-      const msg = (error?.message || "").toLowerCase();
-      const isUnverified = msg.includes("verif") || msg.includes("unverified");
-
-      // Handle different error types
-      if (isUnverified) {
-        setError(error.message || "Your account is not verified. Please verify to continue.");
-        setNeedsVerification(true);
-      } else if (error.status === 401) {
-        setError("Invalid email/phone or password");
-      } else if (error.status === 504) {
-        setError("Server timed out. Please try again.");
-      } else if (error.status === 400) {
-        setError(error.message || "Invalid input. Please check your details.");
-      } else {
-        setError(error.message || "Login failed. Please try again.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-
-  const handleGoogleLogin = async () => {
-    try {
-      const res = await googleSignin();
-
-      // console.log("GOOGLE LOGIN RESPONSE:", res);
-      // console.log("USER ROLE:", res.user.role);
-
-      // Update AuthContext
-      setUser({
-        id: res.user.id,
-        role: res.user.role,
-        email: res.user.email ?? '',
-        phone: res.user.phone ?? '',
-      });
-
-      // Save in localStorage
-      localStorage.setItem('token', res.token);
-      localStorage.setItem('user', JSON.stringify(res.user));
-
-      // Role-based routing
       const roleRoutes: Record<string, string> = {
         ADMIN: "/admin/dashboard",
         AGENT: "/Agent/dashboard",
@@ -116,11 +63,68 @@ export default function Login() {
         FARMER: "/farmer",
       };
 
-      router.push(roleRoutes[res.user.role] || "/");
-    } catch (error) {
-      console.error("Google login failed", error);
+      router.push(roleRoutes[user.role] || "/");
     }
-  };
+
+  } catch (error: any) {
+    setNeedsVerification(false);
+
+    const msg = (error?.message || "").toLowerCase();
+    const isUnverified = msg.includes("verif") || msg.includes("unverified");
+
+    if (isUnverified) {
+      toast.warning(error.message || "Account not verified");
+      setNeedsVerification(true);
+
+    } else if (error.status === 401) {
+      toast.error("Invalid email/phone or password");
+
+    } else if (error.status === 504) {
+      toast.error("Server timeout. Try again");
+
+    } else if (error.status === 400) {
+      toast.error(error.message || "Invalid input");
+
+    } else {
+      toast.error(error.message || "Login failed");
+    }
+
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+  const handleGoogleLogin = async () => {
+  try {
+    const res = await googleSignin();
+
+    setUser({
+      id: res.user.id,
+      role: res.user.role,
+      email: res.user.email ?? '',
+      phone: res.user.phone ?? '',
+    });
+
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('user', JSON.stringify(res.user));
+
+    toast.success("Google login successful ");
+
+    const roleRoutes: Record<string, string> = {
+      ADMIN: "/admin/dashboard",
+      AGENT: "/Agent/dashboard",
+      BUYER: "/buyer",
+      FARMER: "/farmer",
+    };
+
+    router.push(roleRoutes[res.user.role] || "/");
+
+  } catch (error: any) {
+    console.error("Google login failed", error);
+    toast.error("Google login failed. Try again.");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">

@@ -116,24 +116,16 @@ export const createProfile = async (data: {
   }
 }
 
-export const updateProfile = async (data: FormData) => {
-  try {
+export const updateProfile = async (formData: FormData) => {
+  const res = await instance.patch("/profile", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
-    for (const pair of data.entries()) {
-      console.log(pair[0], pair[1])
-    }
+  console.log("AXIOS RAW RESPONSE:", res); 
 
-    const res = await instance.patch("/profile", data)
-
-    return res.data
-
-  } catch (error) {
-    console.log("ERROR DATA:", error.response?.data)
-    console.log("STATUS:", error.response?.status)
-  } 
-
-  
-}
-  
+  return res.data;
+};
 
 

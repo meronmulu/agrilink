@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 
 import { Kebele, Region, Woreda, Zone } from '@/types/profile'
+import { toast } from 'sonner'
 
 export default function Page() {
 
@@ -171,34 +172,71 @@ export default function Page() {
 
 
   const handleUpdate = async () => {
-
   if (!form.kebeleId) {
-    alert("Please select kebele")
-    return
+    toast.error("Please select kebele");
+    return;
   }
 
   try {
+    setUpdating(true);
 
-    setUpdating(true)
-
-    const formData = new FormData()
-
-    formData.append("fullName", form.fullName)
-    formData.append("kebeleId", form.kebeleId)
+    const formData = new FormData();
+    formData.append("fullName", form.fullName);
+    formData.append("kebeleId", form.kebeleId);
 
     if (form.image) {
-      formData.append("image", form.image)
+      formData.append("image", form.image);
     }
 
-    const res =  await updateProfile(formData)
-      console.log(res)
-  } catch (error) {
-    console.error(error)
-  } finally {
-    setUpdating(false)
-  }
+    console.log("SENDING:", {
+      fullName: form.fullName,
+      kebeleId: form.kebeleId,
+      image: form.image,
+    });
 
-}
+    const res = await updateProfile(formData);
+
+    console.log("UPDATE RESPONSE:", res);
+
+    // ✅ handle empty backend response safely
+    setUser((prev) =>
+      prev
+        ? {
+            ...prev,
+            profile: {
+              ...prev.profile!,
+              fullName: form.fullName,
+              kebeleId: form.kebeleId,
+              imageUrl: preview || prev.profile?.imageUrl,
+            },
+          }
+        : prev
+    );
+
+    // ✅ optional: refresh from backend (recommended)
+    try {
+      const freshUser = await getUserById(id);
+      setUser(freshUser);
+    } catch (e) {
+      console.log("Refetch failed, using local update");
+    }
+
+    setPreview(null);
+
+    toast.success("Profile updated successfully 🎉");
+
+  } catch (error: any) {
+    console.log("UPDATE ERROR:", error);
+
+    toast.error(
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to update profile"
+    );
+  } finally {
+    setUpdating(false);
+  }
+};
 
 
   const getInitials = (name?: string) => {

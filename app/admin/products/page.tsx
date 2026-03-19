@@ -113,24 +113,20 @@ export default function AdminProductsPage() {
 
       {/* PRODUCTS TABLE */}
 
-      <Card className="shadow-sm border p-5">
+      <Card className="shadow-sm border rounded-2xl">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
 
-        <CardHeader>
-          <CardTitle>All Products</CardTitle>
-        </CardHeader>
-
-        <CardContent>
 
           
 
-            <div className="rounded-lg border overflow-hidden">
 
               <Table>
 
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
+                  <TableRow className="">
                     <TableHead>Product</TableHead>
-                    <TableHead>Category</TableHead>
+                    {/* <TableHead>Category</TableHead> */}
                     <TableHead>SubCategory</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Sold</TableHead>
@@ -174,11 +170,11 @@ export default function AdminProductsPage() {
 
                       {/* CATEGORY */}
 
-                      <TableCell>
+                      {/* <TableCell>
                         <Badge variant="secondary">
                           {product.subCategory?.category?.name}
                         </Badge>
-                      </TableCell>
+                      </TableCell> */}
 
 
                       {/* SUBCATEGORY */}
@@ -246,8 +242,7 @@ export default function AdminProductsPage() {
 
               </Table>
 
-            </div>
-
+</div>
         
 
         </CardContent>

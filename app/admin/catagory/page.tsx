@@ -52,6 +52,7 @@ import {
   Grid3x3,
   List,
 } from 'lucide-react'
+import { toast } from 'sonner'
 
 
 
@@ -117,82 +118,93 @@ export default function CategoriesPage() {
     )
   }
 
-const handleCreateCategory = async (e: React.FormEvent) => {
-  e.preventDefault()
-  if (!newCategoryName.trim()) return
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newCategoryName.trim()) return
 
-  setSubmitting(true)
+    setSubmitting(true)
 
-  try {
-    const created = await addCategory({ name: newCategoryName })
+    try {
+      const created = await addCategory({ name: newCategoryName })
 
-    setCategories((prev) => [...prev, created])
+      setCategories((prev) => [...prev, created])
+      toast.success("Category created successfully ")
 
-    setNewCategoryName('')
-    setDetailDialogOpen(false)
-  } catch (err) {
-    console.error(err)
-  } finally {
-    setSubmitting(false)
+      setNewCategoryName('')
+      setDetailDialogOpen(false)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to create category")
+    } finally {
+      setSubmitting(false)
+    }
   }
-}
 
- const handleCreateSubCategory = async (e: React.FormEvent) => {
-  e.preventDefault()
+  const handleCreateSubCategory = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  if (!newSubName.trim() || !parentCategoryId) return
+    if (!newSubName.trim() || !parentCategoryId) return
 
-  setSubmitting(true)
+    setSubmitting(true)
 
-  try {
-    const created = await addSubCategory({
-      name: newSubName,
-      categoryId: parentCategoryId,
-    })
+    try {
+      const created = await addSubCategory({
+        name: newSubName,
+        categoryId: parentCategoryId,
+      })
 
-    setSubcategories((prev) => [...prev, created])
+      setSubcategories((prev) => [...prev, created])
+
+     toast.success("Subcategory created successfully")
 
     setNewSubName('')
     setParentCategoryId('')
     setSubDialogOpen(false)
   } catch (err) {
     console.error(err)
-  } finally {
-    setSubmitting(false)
+    toast.error("Failed to create subcategory ")
+    } finally {
+      setSubmitting(false)
+    }
   }
-}
 
-const handleDelete = async () => {
+  const handleDelete = async () => {
   if (!itemToDelete) return;
 
   setSubmitting(true);
+
   try {
     if (itemToDelete.type === 'category') {
-      // Check if category has subcategories
       const hasSubcategories = subcategories.some(
         (s) => s.categoryId === itemToDelete.id
       );
 
       if (hasSubcategories) {
-        alert(
-          'Cannot delete category with existing subcategories. Please delete the subcategories first.'
+        toast.warning(
+          "Cannot delete category with subcategories. Delete them first."
         );
-        return; 
+        return;
       }
 
-      // Safe to delete category
       await deleteCategory(itemToDelete.id);
-      setCategories((prev) => prev.filter((c) => c.id !== itemToDelete.id));
+      setCategories((prev) =>
+        prev.filter((c) => c.id !== itemToDelete.id)
+      );
+
+      toast.success("Category deleted successfully ");
+
     } else {
-      // Delete subcategory
       await deleteSubCategory(itemToDelete.id);
       setSubcategories((prev) =>
         prev.filter((s) => s.id !== itemToDelete.id)
       );
+
+      toast.success("Subcategory deleted successfully");
     }
+
   } catch (err) {
-    console.error('Failed to delete:', err);
-    alert('Failed to delete. Please try again.');
+    console.error(err);
+    toast.error("Failed to delete ");
   } finally {
     setDeleteDialogOpen(false);
     setItemToDelete(null);
@@ -201,64 +213,75 @@ const handleDelete = async () => {
 };
 
   const handleEditCategory = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!editingCategoryId || !editValue.trim()) return
+  e.preventDefault()
+  if (!editingCategoryId || !editValue.trim()) return
 
-    setSubmitting(true)
-    try {
-      const updated = await updateCategory(editingCategoryId, { name: editValue })
+  setSubmitting(true)
 
-      if (!updated || !updated.name) {
-        throw new Error('No data returned from updateCategory')
-      }
+  try {
+    const updated = await updateCategory(editingCategoryId, { name: editValue })
 
-      setCategories(prev =>
-        prev.map(cat =>
-          cat.id === editingCategoryId ? { ...cat, name: updated.name } : cat
-        )
+    setCategories(prev =>
+      prev.map(cat =>
+        cat.id === editingCategoryId ? { ...cat, name: updated.name } : cat
       )
-      setEditCategoryDialogOpen(false)
-      setEditValue('')
-      setEditingCategoryId(null)
-    } catch (err) {
-      console.error('Edit category failed:', err)
-    } finally {
-      setSubmitting(false)
-    }
-  }
+    )
 
-  const handleEditSubCategory = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!editingSubId || !editValue.trim()) return
-    setSubmitting(true)
-    try {
-      const updated = await updateSubCategory(editingSubId, { name: editValue })
-      setSubcategories(prev =>
-        prev.map(sub =>
-          sub.id === editingSubId ? { ...sub, name: updated.name } : sub
-        )
-      )
-      setEditSubDialogOpen(false)
-      setEditValue('')
-      setEditingSubId(null)
-    } catch (err) {
-      console.error(err)
-    }
+    toast.success("Category updated successfully ")
+
+    setEditCategoryDialogOpen(false)
+    setEditValue('')
+    setEditingCategoryId(null)
+
+  } catch (err) {
+    console.error(err)
+    toast.error("Failed to update category")
+  } finally {
     setSubmitting(false)
   }
+}
+
+ const handleEditSubCategory = async (e: React.FormEvent) => {
+  e.preventDefault()
+  if (!editingSubId || !editValue.trim()) return
+
+  setSubmitting(true)
+
+  try {
+    const updated = await updateSubCategory(editingSubId, { name: editValue })
+
+    setSubcategories(prev =>
+      prev.map(sub =>
+        sub.id === editingSubId ? { ...sub, name: updated.name } : sub
+      )
+    )
+
+    toast.success("Subcategory updated successfully ")
+
+    setEditSubDialogOpen(false)
+    setEditValue('')
+    setEditingSubId(null)
+
+  } catch (err) {
+    console.error(err)
+    toast.error("Failed to update subcategory ")
+  } finally {
+    setSubmitting(false)
+  }
+}
 
   const grouped = useMemo(() => {
-  return categories
-    .filter((cat) =>
-      cat.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .map((cat) => ({
-      ...cat,
-      subs: subcategories.filter((s) => s.categoryId === cat.id),
-    }))
-}, [categories, subcategories, searchTerm])
-  
- if (loading) {
+    return categories
+      .filter((cat) =>
+        cat.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .map((cat) => ({
+        ...cat,
+        subs: subcategories.filter((s) => s.categoryId === cat.id),
+      }))
+  }, [categories, subcategories, searchTerm])
+
+  if (loading) {
     return (
       <div className="h-[70vh] flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-500" size={32} />
@@ -530,7 +553,7 @@ const handleDelete = async () => {
               />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={submitting} className=' bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:text-white text-white'>
+              <Button type="submit" disabled={submitting} className=' bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 hover:text-white text-white'>
                 {submitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />

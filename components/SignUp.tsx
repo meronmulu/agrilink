@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useLanguage } from '@/context/LanguageContext'
 import Link from 'next/link'
 import { register } from '@/services/authService'
+import { toast } from 'sonner'
 
 export default function SignUp() {
   const { t } = useLanguage()
@@ -21,54 +22,74 @@ export default function SignUp() {
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsLoading(true)
+  e.preventDefault()
+  setIsLoading(true)
 
-    // Basic validation
+  try {
+    //  Validation
     if (!email && !phone) {
-      setError("Please provide either email or phone number.")
-      setIsLoading(false)
+      toast.error("Please provide either email or phone number.")
       return
     }
+
     if (!password) {
-      setError("Password is required.")
-      setIsLoading(false)
+      toast.error("Password is required.")
       return
     }
+
     if (password !== confirmPassword) {
-      setError("Passwords do not match.")
-      setIsLoading(false)
+      toast.error("Passwords do not match.")
       return
     }
 
-    try {
-      const user = await register({ email, phone, password, confirmPassword, role })
+    //  API Call
+    const user = await register({
+      email,
+      phone,
+      password,
+      confirmPassword,
+      role
+    })
 
-      if (user) {
-        console.log("User registered successfully", user)
+    if (user) {
+      toast.success("Account created successfully 🎉")
 
-        // Redirect to OTP verification page
-        const identifier = email || phone
-        router.push(`/verify-otp?identifier=${encodeURIComponent(identifier)}&purpose=SIGNUP&role=${role}`)
-      }
-    } catch (error: any) {
-      console.log("Registration error:", error)
+      console.log("User registered successfully", user)
 
-      // Handle different error types
-      if (error.status === 504) {
-        setError("Server timed out. OTP may still be sent. Try again or check your email/phone.")
-      } else if (error.status === 409) {
-        setError("This email or phone number is already registered.")
-      } else if (error.status === 400) {
-        setError(error.message || "Invalid input. Please check your details.")
-      } else {
-        setError(error.message || "Registration failed. Please try again.")
-      }
-    } finally {
-      setIsLoading(false)
+      const identifier = email || phone
+
+      //  Redirect
+      router.push(
+        `/verify-otp?identifier=${encodeURIComponent(identifier)}&purpose=SIGNUP&role=${role}`
+      )
     }
+
+  } catch (error: any) {
+    console.log("Registration error:", error)
+
+    if (error?.response?.status === 504) {
+      toast.warning(
+        "Server timeout. OTP may still be sent. Check your email/phone."
+      )
+    } else if (error?.response?.status === 409) {
+      toast.error("This email or phone number is already registered.")
+    } else if (error?.response?.status === 400) {
+      toast.error(
+        error?.response?.data?.message ||
+        "Invalid input. Please check your details."
+      )
+    } else {
+      toast.error(
+        error?.response?.data?.message ||
+        error.message ||
+        "Registration failed. Please try again."
+      )
+    }
+
+  } finally {
+    setIsLoading(false)
   }
+}
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2">

@@ -15,6 +15,7 @@ import { addProducts } from '@/services/productService'
 import { SubCategory } from '@/types/category'
 import { getSubCategories } from '@/services/categoryService'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 export default function AddCrop() {
     // Image Cropping State
@@ -100,38 +101,52 @@ export default function AddCrop() {
 
 
     const handleSaveCrop = async () => {
-        try {
-
-            if (!name || !category || !amount || !price) {
-                alert("Please fill all required fields")
-                return
-            }
-
-            const imageBlob = await getCroppedImageBlob()
-
-            if (!imageBlob) {
-                alert("Please upload and crop an image")
-                return
-            }
-
-            await addProducts({
-                name,
-                subCategoryId: category,
-                amount: Number(amount),
-                price: Number(price),
-                description,
-                image: imageBlob
-            })
-
-            alert("Product uploaded successfully!")
-        router.push("/farmer/crops");
-
-
-        } catch (error) {
-            console.error(error)
-            alert("Something went wrong.")
-        }
+  try {
+    // 🔍 Validation
+    if (!name || !category || !amount || !price) {
+      toast.error("Please fill all required fields")
+      return
     }
+
+    const imageBlob = await getCroppedImageBlob()
+
+    if (!imageBlob) {
+      toast.error("Please upload and crop an image")
+      return
+    }
+
+    // ⏳ Optional loading toast
+    const loadingToast = toast.loading("Uploading product...")
+
+    // 🚀 API call
+    await addProducts({
+      name,
+      subCategoryId: category,
+      amount: Number(amount),
+      price: Number(price),
+      description,
+      image: imageBlob
+    })
+
+    // ✅ Success
+    toast.dismiss(loadingToast)
+    toast.success("Product uploaded successfully ")
+
+    // 🔁 Redirect
+    setTimeout(() => {
+      router.push("/farmer/crops")
+    }, 1000)
+
+  } catch (error: any) {
+    console.error(error)
+
+    toast.error(
+      error?.response?.data?.message ||
+      error?.message ||
+      "Something went wrong."
+    )
+  }
+}
 
     return (
         <div className="flex flex-col min-h-screen bg-[#F8FAFC] font-sans text-slate-800">

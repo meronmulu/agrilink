@@ -19,6 +19,7 @@ import Image from 'next/image'
 import { getSubCategories } from '@/services/categoryService'
 import { getProductById, updateProduct } from '@/services/productService'
 import { SubCategory } from '@/types/category'
+import { toast } from 'sonner'
 
 export default function EditCrop() {
     const router = useRouter()
@@ -120,18 +121,21 @@ export default function EditCrop() {
 
     const handleUpdate = async () => {
         if (!name || !category || !amount || !price) {
-            alert('Please fill required fields')
+            toast.error("Please fill all required fields")
             return
         }
 
         setIsSaving(true)
+
         try {
             let imageBlob
 
+            //  Handle cropped image
             if (newImageSrc && croppedAreaPixels) {
                 imageBlob = await getCroppedImageBlob()
             }
 
+            // API call
             await updateProduct(id, {
                 name,
                 subCategoryId: category,
@@ -141,10 +145,22 @@ export default function EditCrop() {
                 ...(imageBlob ? { image: imageBlob } : {})
             })
 
-            router.push('/farmer/crops')
-        } catch (err) {
+            toast.success("Product updated successfully ")
+
+            // 🔁 redirect after success
+            setTimeout(() => {
+                router.push('/farmer/crops')
+            }, 1000)
+
+        } catch (err: any) {
             console.error(err)
-            alert('Update failed')
+
+            toast.error(
+                err?.response?.data?.message ||
+                err?.message ||
+                "Update failed"
+            )
+
         } finally {
             setIsSaving(false)
         }
