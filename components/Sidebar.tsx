@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ShoppingBag, MessageSquare, BrainCircuit, Settings, Sprout, DollarSign, BookOpen, Users } from 'lucide-react'
+import { LayoutDashboard, ShoppingBag, MessageSquare, BrainCircuit, Settings, Sprout, DollarSign, BookOpen, Users, ShoppingCart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 
@@ -28,6 +28,8 @@ const roleNav: Record<string, NavItem[]> = {
     { name: 'Overview', href: '/buyer/overview', icon: LayoutDashboard },
     { name: 'Orders', href: '/buyer/order', icon: ShoppingBag },
     { name: 'Messages', href: '/message', icon: MessageSquare, badge: 3 },
+     { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart },
+
     { name: 'AI Insights', href: '/buyer/insights', icon: BrainCircuit },
   ],
 

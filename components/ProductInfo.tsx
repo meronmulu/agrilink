@@ -20,6 +20,10 @@ import { Button } from '@/components/ui/button'
 
 import { getProductById } from '@/services/productService'
 import { Product } from '@/types/product'
+import { getConversations } from '@/services/chatService'
+import { toast } from 'sonner'
+import { checkoutOrder } from '@/services/orderService'
+import { addToCart } from '@/services/cartService'
 
 export default function ProductDetailPage() {
 
@@ -32,6 +36,9 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [showPhone, setShowPhone] = useState(false)
 
+  const [cartLoading, setCartLoading] = useState(false)
+  const [buyLoading, setBuyLoading] = useState(false)
+
   useEffect(() => {
 
     if (!id) return
@@ -41,7 +48,7 @@ export default function ProductDetailPage() {
         const data = await getProductById(id)
         setProduct(data)
         setSelectedImage(data.image)
-        
+
       } catch (error) {
         console.error("Failed to fetch product:", error)
       } finally {
@@ -53,6 +60,75 @@ export default function ProductDetailPage() {
 
   }, [id])
 
+  const handleSend = async () => {
+    try {
+      const conversations = await getConversations()
+
+      const farmerId = product?.farmer?.id
+
+      const userData = localStorage.getItem("user")
+      const currentUserId = userData ? JSON.parse(userData).id : null
+
+      if (!farmerId || !currentUserId) return
+
+      const existing = conversations.find((conv: any) =>
+        (conv.userOneId === currentUserId && conv.userTwoId === farmerId) ||
+        (conv.userTwoId === currentUserId && conv.userOneId === farmerId)
+      )
+
+      if (existing) {
+        router.push(`/message/${existing.id}`)
+      } else {
+        router.push(`/message/${farmerId}`)
+      }
+
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleAddToCart = async () => {
+    if (!product) return
+
+    try {
+      setCartLoading(true)
+
+      await addToCart({
+        productId: product.id,
+        amount: 1
+      })
+
+      toast.success("Added to cart")
+
+    } catch (error: any) {
+      console.error(error)
+      toast.error("Failed to add to cart")
+    } finally {
+      setCartLoading(false)
+    }
+  }
+
+  const handleBuyNow = async () => {
+    try {
+      setBuyLoading(true)
+
+      const user = JSON.parse(localStorage.getItem("user") || "{}")
+
+      const res = await checkoutOrder(user.id)
+
+      if (res?.checkout_url) {
+        window.location.href = res.checkout_url
+      } else {
+        toast.error("Payment failed")
+      }
+
+    } catch (error) {
+      console.error(error)
+      toast.error("Checkout failed")
+    } finally {
+      setBuyLoading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -261,6 +337,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 <Button
+                  onClick={handleSend}
                   variant="outline"
                   className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg text-sm h-9"
                 >
@@ -278,19 +355,21 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
 
               <Button
-                disabled={product.amount <= 0}
+                onClick={handleAddToCart}
+                disabled={product.amount <= 0 || cartLoading}
                 className="h-12 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium"
               >
                 <ShoppingCart size={18} className="mr-2" />
-                {product.amount > 0 ? 'Add to Cart' : 'Out of Stock'}
+                {cartLoading ? "Adding..." : (product.amount > 0 ? 'Add to Cart' : 'Out of Stock')}
               </Button>
 
               <Button
-                disabled={product.amount <= 0}
+                onClick={handleBuyNow}
+                disabled={product.amount <= 0 || buyLoading}
                 variant="outline"
                 className="h-12 rounded-lg border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 text-sm font-medium"
               >
-                Buy Now
+                {buyLoading ? "Processing..." : "Buy Now"}
               </Button>
 
             </div>
