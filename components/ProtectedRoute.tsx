@@ -1,40 +1,42 @@
-// 'use client'
+'use client'
 
-// import { useEffect } from "react"
-// import { useRouter } from "next/navigation"
-// import { useAuth } from "@/context/AuthContext"
+import { useEffect } from "react"
+import { useAuth } from "@/context/AuthContext"
+import { Loader2 } from "lucide-react"
 
-// export default function ProtectedRoute({
-//   children,
-//   role
-// }: {
-//   children: React.ReactNode
-//   role?: string
-// }) {
+type Role = 'ADMIN' | 'AGENT' | 'BUYER' | 'FARMER'
 
-//   const { user } = useAuth()
-//   const router = useRouter()
+export default function ProtectedRoute({
+  children,
+  roles
+}: {
+  children: React.ReactNode
+  roles?: Role[]
+}) {
 
-//   useEffect(() => {
+  const { user } = useAuth()
 
-//     if (!user) {
-//       router.push("/login")
-//       return
-//     }
+  useEffect(() => {
 
-//     if (role && user.role !== role) {
-//       router.push("/")
-//     }
+    if (!user) {
+      window.location.href = "/"
+      return
+    }
 
-//   }, [user, role, router])
+    if (roles && !roles.includes(user.role as Role)) {
+      window.location.href = "/unauthorized"
+    }
 
-//   if (!user) {
-//     return (
-//       <div className="flex items-center justify-center h-screen">
-    
-//       </div>
-//     )
-//   }
+  }, [user, roles])
 
-//   return <>{children}</>
-// }
+  
+  if (!user) {
+    return (
+     <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
+      </div>
+    )
+  }
+
+  return <>{children}</>
+}
