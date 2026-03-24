@@ -193,12 +193,7 @@ export default function CartPage() {
             <ShoppingCart className="mx-auto mb-4 text-gray-400" size={50} />
             <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
 
-            <Link href="/products">
-              <Button className="mt-4 shadow hover:shadow-lg transition">
-                <ShoppingBag className="mr-2" />
-                Start Shopping
-              </Button>
-            </Link>
+            
           </div>
         ) : (
           <div className="grid lg:grid-cols-12 gap-8">

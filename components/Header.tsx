@@ -18,6 +18,7 @@ import {
   DollarSign,
   BookOpen,
   Users,
+  ShoppingCart,
 } from "lucide-react"
 
 import LanguageDropdown from "./LanguageDropdown"
@@ -71,6 +72,7 @@ export default function Header() {
     BUYER: [
       { name: "Overview", href: "/buyer/overview", icon: LayoutDashboard },
       { name: "Orders", href: "/buyer/order", icon: ShoppingBag },
+      { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart },
       { name: "Messages", href: "/message", icon: MessageSquare, badge: 3 },
       { name: "AI Insights", href: "/buyer/insights", icon: BrainCircuit },
     ],
@@ -85,7 +87,7 @@ export default function Header() {
     AGENT: [
       { name: "Overview", href: "/agent/dashboard", icon: LayoutDashboard },
       { name: "Register Farmer", href: "/agent/register-farmer", icon: Users },
-      { name: "Training Modules", href: "/agent/training", icon: BookOpen },
+      // { name: "Training Modules", href: "/agent/training", icon: BookOpen },
     ],
 
     ADMIN: [

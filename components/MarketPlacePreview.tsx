@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent } from './ui/card'
-import { ArrowRight, Package } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { getProducts } from '@/services/productService'
 import { Product } from '@/types/product'
@@ -74,7 +74,7 @@ export default function MarketPlacePreview() {
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   
-                  {/* "New" Badge */}
+                  {/* New Badge */}
                   <span className="absolute top-3 left-3 bg-emerald-500/95 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
                     New Arrival
                   </span>

@@ -27,9 +27,8 @@ const roleNav: Record<string, NavItem[]> = {
   BUYER: [
     { name: 'Overview', href: '/buyer/overview', icon: LayoutDashboard },
     { name: 'Orders', href: '/buyer/order', icon: ShoppingBag },
+    { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart },
     { name: 'Messages', href: '/message', icon: MessageSquare, badge: 3 },
-     { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart },
-
     { name: 'AI Insights', href: '/buyer/insights', icon: BrainCircuit },
   ],
 
@@ -41,9 +40,10 @@ const roleNav: Record<string, NavItem[]> = {
   ],
 
   AGENT: [
-    { name: 'Overview', href: '/Agent/dashboard', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/Agent/dashboard', icon: LayoutDashboard },
+    { name: 'Farmers', href: '/Agent/farmer', icon: Users },
     { name: 'Register Farmer', href: '/Agent/register-farmer', icon: Users },
-    { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
+    // { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
   ],
 
   ADMIN: [
