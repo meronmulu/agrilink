@@ -22,6 +22,7 @@ import { getProductById } from '@/services/productService'
 import { Product } from '@/types/product'
 import { toast } from 'sonner'
 import { addToCart } from '@/services/cartService'
+import { checkoutOrder } from '@/services/orderService'
 
 export default function ProductDetailPage() {
 
@@ -36,6 +37,8 @@ export default function ProductDetailPage() {
 
   const [cartLoading, setCartLoading] = useState(false)
   const [buyLoading, setBuyLoading] = useState(false)
+  const [checkingOut, setCheckingOut] = useState(false)
+
 
   useEffect(() => {
 
@@ -91,11 +94,12 @@ export default function ProductDetailPage() {
     try {
       setCartLoading(true)
 
-    const res =   await addToCart({
+      const res = await addToCart({
         productId: product.id,
         amount: 1
       })
-     console.log(res)
+
+      console.log(res)
       toast.success("Added to cart")
 
     } catch (error) {
@@ -106,25 +110,38 @@ export default function ProductDetailPage() {
     }
   }
 
-//   const handleBuyNow = async () => {
-//   try {
-//     setBuyLoading(true)
+  const handleCheckout = async () => {
+    if (!product) return
 
-//     const res = await checkoutOrder()
+    try {
+      setBuyLoading(true)
 
-//     if (res?.checkout_url) {
-//       window.location.href = res.checkout_url
-//     } else {
-//       toast.error("Payment failed")
-//     }
+      const checkoutData = {
+        items: [
+          {
+            productId: product.id,
+            amount: 1
+          }
+        ]
+      }
 
-//   } catch (error) {
-//     console.error(error)
-//     toast.error("Checkout failed")
-//   } finally {
-//     setBuyLoading(false)
-//   }
-// }
+      const res = await checkoutOrder(checkoutData)
+
+      toast.success("Order created. Redirecting to payment...")
+
+      if (res?.paymentUrl) {
+        window.location.href = res.paymentUrl
+      } else {
+        toast.error("Checkout failed")
+      }
+
+    } catch (error) {
+      console.log(error)
+      toast.error("Checkout error")
+    } finally {
+      setBuyLoading(false)
+    }
+  }
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
@@ -359,7 +376,7 @@ export default function ProductDetailPage() {
               </Button>
 
               <Button
-                // onClick={handleBuyNow}
+                onClick={handleCheckout}
                 disabled={product.amount <= 0 || buyLoading}
                 variant="outline"
                 className="h-12 rounded-lg border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 text-sm font-medium"

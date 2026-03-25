@@ -23,17 +23,21 @@ import { Category, SubCategory } from '@/types/category'
 import Image from 'next/image'
 import { Product } from '@/types/product'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { addToCart } from '@/services/cartService'
+import { useCart } from '@/context/CartContext'
 
 export default function MarketPlace() {
 
   const { t } = useLanguage()
-
+  const { incrementCart } = useCart()
   const [search, setSearch] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<SubCategory[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+
 
   useEffect(() => {
 
@@ -63,21 +67,40 @@ export default function MarketPlace() {
 
   }, [])
 
+  const handleAddToCart = async (productId: string) => {
+    try {
+
+      const res = await addToCart({
+        productId,
+        amount: 1
+      })
+     
+      incrementCart()
+      console.log(res)
+      toast.success("Added to cart")
+
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to add to cart")
+    }
+  }
+
+
   // Search + SubCategory Filter
   const filteredProducts = products
-  .filter((product) => {
-    const matchesName =
-      product.name?.toLowerCase().includes(search.toLowerCase())
+    .filter((product) => {
+      const matchesName =
+        product.name?.toLowerCase().includes(search.toLowerCase())
 
-    const matchesSubCategory =
-      !selectedSubCategory ||
-      product.subCategoryId === selectedSubCategory
+      const matchesSubCategory =
+        !selectedSubCategory ||
+        product.subCategoryId === selectedSubCategory
 
-    return matchesName && matchesSubCategory
-  })
-  .sort((a, b) =>
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
+      return matchesName && matchesSubCategory
+    })
+    .sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
 
   if (loading) {
     return (
@@ -238,7 +261,7 @@ export default function MarketPlace() {
                 />
 
                 {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent" />
 
                 {/* Subcategory badge */}
                 {product.subCategory?.name && (
@@ -287,6 +310,7 @@ export default function MarketPlace() {
                   <div className="flex items-center gap-2 pt-2">
 
                     <Button
+                      onClick={() => handleAddToCart(product.id)}
                       className="flex-1 bg-emerald-500 hover:bg-emerald-600"
                     >
                       {t("market_add_cart")}

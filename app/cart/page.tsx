@@ -30,7 +30,6 @@ export default function CartPage() {
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
   const [checkingOut, setCheckingOut] = useState(false)
 
-
   // =========================
   // FETCH CART
   // =========================
@@ -40,9 +39,7 @@ export default function CartPage() {
       setCart(data)
     } catch (err) {
       console.error(err)
-      toast.error(
-         "Failed to load cart"
-)
+      toast.error("Failed to load cart")
     } finally {
       setLoading(false)
     }
@@ -63,9 +60,7 @@ export default function CartPage() {
     try {
       await updateCart({ productId, amount })
       await fetchCart()
-
-      toast.success( "Quantity updated successfully")
-
+      toast.success("Quantity updated successfully")
     } catch (err) {
       console.error(err)
       toast.error("Update failed")
@@ -91,13 +86,11 @@ export default function CartPage() {
         prev.filter(item => item.product.id !== productId)
       )
 
-      toast.success( "Product removed from cart")
-
+      toast.success("Product removed from cart")
     } catch (err) {
       console.error(err)
       fetchCart()
-
-      toast.error( "Remove failed")
+      toast.error("Remove failed")
     } finally {
       setUpdatingItems(prev => {
         const newSet = new Set(prev)
@@ -116,14 +109,10 @@ export default function CartPage() {
     try {
       await clearCart()
       setCart([])
-
-      toast.success( "Cart cleared",
-      )
-
+      toast.success("Cart cleared")
     } catch (err) {
       console.error(err)
-      toast.error("Failed to clear cart",
-      )
+      toast.error("Failed to clear cart")
     }
   }
 
@@ -138,19 +127,16 @@ export default function CartPage() {
 
       const res = await checkoutOrder(checkoutData)
 
-      toast.success( "Order created Redirecting to payment...",
-      )
+      toast.success("Order created. Redirecting to payment...")
 
       if (res?.paymentUrl) {
         window.location.href = res.paymentUrl
       } else {
-        toast.error("Checkout failed",
-          )
+        toast.error("Checkout failed")
       }
 
     } catch (error) {
       console.log(error)
-
       toast.error("Checkout error")
     } finally {
       setCheckingOut(false)
@@ -168,6 +154,19 @@ export default function CartPage() {
   const total = subtotal
 
   // =========================
+  // SORT (NEWEST FIRST)
+  // =========================
+  const orderedCart = [...cart].sort((a, b) => {
+    if (a.createdAt && b.createdAt) {
+      return (
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
+      )
+    }
+    return b.id.localeCompare(a.id)
+  })
+
+  // =========================
   // LOADING UI
   // =========================
   if (loading) {
@@ -182,7 +181,7 @@ export default function CartPage() {
   // MAIN UI
   // =========================
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 ">
       <div className="max-w-7xl mx-auto px-4">
 
         {/* HEADER */}
@@ -192,15 +191,13 @@ export default function CartPage() {
           <div className="bg-white rounded-2xl shadow p-12 text-center">
             <ShoppingCart className="mx-auto mb-4 text-gray-400" size={50} />
             <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-
-            
           </div>
         ) : (
           <div className="grid lg:grid-cols-12 gap-8">
 
             {/* CART ITEMS */}
             <div className="lg:col-span-8 bg-white rounded-2xl shadow overflow-hidden">
-              {cart.map(item => (
+              {orderedCart.map(item => (
                 <div
                   key={item.id}
                   className="p-6 border-b hover:bg-gray-50 transition"
@@ -263,6 +260,7 @@ export default function CartPage() {
                         <Trash2 size={16} />
                       </Button>
                     </div>
+
                   </div>
                 </div>
               ))}
@@ -271,7 +269,11 @@ export default function CartPage() {
             {/* SUMMARY */}
             <div className="lg:col-span-4 bg-white rounded-2xl shadow p-6 h-fit">
               <h2 className="font-semibold mb-4">Order Summary</h2>
-
+              
+               <div className="flex justify-between text-sm text-gray-600">
+                <span>Items</span>
+                <span>{cart.length}</span>
+              </div>
               <div className="flex justify-between mb-2">
                 <span>Subtotal</span>
                 <span>ETB {subtotal.toLocaleString()}</span>
@@ -285,7 +287,7 @@ export default function CartPage() {
               </div>
 
               <Button
-                className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 shadow-md hover:shadow-lg transition"
+                className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700"
                 onClick={handleCheckout}
                 disabled={checkingOut}
               >

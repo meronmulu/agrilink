@@ -45,7 +45,7 @@ export default function Header() {
     user?.role === "FARMER"
       ? "/farmer/crops"
       : user?.role === "BUYER"
-      ? "/buyer/overview"
+      ? "/buyer/order"
       : "/"
 
  const handleRoleRequest = async () => {
@@ -54,10 +54,12 @@ export default function Header() {
 
     toast.success("Role request submitted successfully ");
 
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
 
-    toast.error(error?.message || "Failed to send request");
+    toast.error(
+      // error?.message || 
+      "Failed to send request");
   }
 };
 
@@ -70,22 +72,21 @@ export default function Header() {
 
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
-      { name: "Overview", href: "/buyer/overview", icon: LayoutDashboard },
       { name: "Orders", href: "/buyer/order", icon: ShoppingBag },
       { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart },
       { name: "Messages", href: "/message", icon: MessageSquare, badge: 3 },
-      { name: "AI Insights", href: "/buyer/insights", icon: BrainCircuit },
+      { name: "Market Insights", href: "/buyer/insights", icon: BrainCircuit },
     ],
 
     FARMER: [
       { name: "My Crops", href: "/farmer/crops", icon: Sprout },
       { name: "Sales", href: "/farmer/sales", icon: DollarSign },
       { name: "Messages", href: "/message", icon: MessageSquare, badge: 5 },
-      { name: "AI Insights", href: "/farmer/insights", icon: BrainCircuit },
+      { name: "Market Insights", href: "/farmer/insights", icon: BrainCircuit },
     ],
 
     AGENT: [
-      { name: "Overview", href: "/agent/dashboard", icon: LayoutDashboard },
+      { name: "Dashboard", href: "/agent/dashboard", icon: LayoutDashboard },
       { name: "Register Farmer", href: "/agent/register-farmer", icon: Users },
       // { name: "Training Modules", href: "/agent/training", icon: BookOpen },
     ],
@@ -212,7 +213,7 @@ export default function Header() {
         {user && (
           <div className="flex items-center gap-4">
 
-            {user.role === "BUYER" && (
+            {(user.role === "BUYER" || user.role === "FARMER") && (
               <Button
                 onClick={handleRoleRequest}
                 className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 rounded-lg"

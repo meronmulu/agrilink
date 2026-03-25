@@ -50,13 +50,7 @@ export default function MarketPlacePreview() {
             </p>
           </div>
           
-          <Link 
-            href="/market" 
-            className="group flex items-center text-emerald-600 font-semibold hover:text-emerald-700 transition-colors"
-          >
-            View all products
-            <ArrowRight size={18} className="ml-2 transition-transform group-hover:translate-x-1" />
-          </Link>
+         
         </div>
 
         {/* Products Grid */}

@@ -104,7 +104,7 @@ export default function OtherSignUpPage() {
     woredaId
   })
 
-  // 🔍 Validation
+  // Validation
   if (!fullName || !kebeleId) {
     toast.error("Please fill all fields")
     return
@@ -113,7 +113,7 @@ export default function OtherSignUpPage() {
   try {
     setIsLoading(true)
 
-    // ⏳ Loading toast
+    //  Loading toast
     const loadingToast = toast.loading("Creating profile...")
 
     const res = await createProfile({
@@ -124,11 +124,11 @@ export default function OtherSignUpPage() {
     console.log("Profile created:", res)
     console.log("Role selected:", role)
 
-    // ✅ Success
+    //  Success
     toast.dismiss(loadingToast)
-    toast.success("Profile created successfully 🎉")
+    toast.success("Profile created successfully ")
 
-    // 🔁 Redirect based on role
+    //  Redirect based on role
     setTimeout(() => {
       if (role === "BUYER") {
         router.push("/buyer")
@@ -139,12 +139,12 @@ export default function OtherSignUpPage() {
       }
     }, 1000)
 
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
 
     toast.error(
-      error?.response?.data?.message ||
-      error?.message ||
+      // error?.response?.data?.message ||
+      // error?.message ||
       "Failed to create profile"
     )
   } finally {

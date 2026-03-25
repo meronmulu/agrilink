@@ -98,8 +98,8 @@ export default function MyCropsPage() {
     console.error("Delete failed:", error)
 
     toast.error(
-      error?.response?.data?.message ||
-      error?.message ||
+      // error?.response?.data?.message ||
+      // error?.message ||
       "Something went wrong."
     )
   }
@@ -149,11 +149,11 @@ export default function MyCropsPage() {
       {/* Filters */}
       <div className="bg-white p-4 rounded-2xl border flex gap-4 flex-wrap">
 
-        <div className="relative flex-1 min-w-62.5">
+        <div className="relative flex-1 min-w-62.5 py-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <Input
             placeholder="Search..."
-            className="pl-10"
+            className="pl-10 "
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
