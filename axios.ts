@@ -11,7 +11,11 @@ instance.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token && !config.url?.includes("google-signin")) {
       // Only attach token for requests other than Google login
-      config.headers.Authorization = `Bearer ${token}`;
+      if (typeof config.headers.set === 'function') {
+        config.headers.set("Authorization", `Bearer ${token}`);
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },

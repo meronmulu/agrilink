@@ -20,11 +20,7 @@ export const addProducts = async (data: CreateProductPayload) => {
       formData.append("image", data.image, "image.jpg")
     }
 
-    const res = await instance.post("/product", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
+    const res = await instance.post("/product", formData)
 
     return res.data
 
@@ -83,11 +79,7 @@ export const updateProduct = async (
       formData.append("image", data.image)
     }
 
-    const res = await instance.patch(`/product/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
+    const res = await instance.patch(`/product/${id}`, formData)
 
     return res.data
   } catch (error) {

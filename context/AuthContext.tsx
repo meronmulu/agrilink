@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import * as AuthService from '@/services/authService'
 import { User } from '@/types/auth'
@@ -18,21 +18,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const router = useRouter()
 
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === "undefined") return null
+  const [user, setUser] = useState<User | null>(null)
 
-    const userString = localStorage.getItem("user")
-    if (!userString) return null
-
-    const parsedUser = JSON.parse(userString)
-
-    return {
-      id: parsedUser.id,
-      role: parsedUser.role,
-      email: parsedUser.email ?? '',
-      phone: parsedUser.phone ?? '',
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userString = localStorage.getItem("user")
+      if (userString) {
+        try {
+          const parsedUser = JSON.parse(userString)
+          setUser({
+            id: parsedUser.id,
+            role: parsedUser.role,
+            email: parsedUser.email ?? '',
+            phone: parsedUser.phone ?? '',
+          })
+        } catch (error) {
+          console.error("Failed to parse user data from local storage", error)
+        }
+      }
     }
-  })
+  }, [])
 
   const login = async (credentials: { email?: string; phone?: string; password: string }) => {
     const res = await AuthService.login(credentials)
