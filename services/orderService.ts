@@ -1,19 +1,36 @@
 import instance from "@/axios"
 
-// ✅ Checkout (create order)
-export const checkoutOrder = async () => {
-  const res = await instance.post("/orders/checkout")
-  return res.data
+export const checkoutOrder = async (data: any) => {
+  try {
+    const res = await instance.post("/orders/checkout", data)
+    console.log("Data:", res.data)
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
 }
 
-// ✅ My orders
+
 export const getMyOrders = async () => {
-  const res = await instance.get("/orders/my-orders")
-  return res.data
+  try {
+    const res = await instance.get("/orders/my-orders")
+    console.log(res)
+    return res.data
+  } catch (error) {
+     console.log(error)
+  }
+  
 }
 
-// ✅ Cart checkout with buyerId (if required)
-export const checkoutCart = async (buyerId: string) => {
-  const res = await instance.post(`/cart/checkout/${buyerId}`)
-  return res.data
+export const getFarmerOrders = async () => {
+  try {
+    const res = await instance.get("/orders/farmer-orders")
+    console.log(res.data)
+    return res.data
+  } catch (error) {
+     console.log(error)
+  }
+  
 }
+

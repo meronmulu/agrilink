@@ -3,57 +3,58 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ShoppingBag, MessageSquare, BrainCircuit, Settings, Sprout, DollarSign, BookOpen, Users, ShoppingCart } from 'lucide-react'
+import { LayoutDashboard, ShoppingBag, MessageSquare, BrainCircuit, Settings, Sprout, DollarSign, BookOpen, Users, ShoppingCart, ListOrdered } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
+import { useCart } from '@/context/CartContext'
 
 export default function Sidebar() {
   const pathname = usePathname()
-  
+  const { cartCount } = useCart()
   const { user } = useAuth()
-console.log("USER ROLE:", user?.role)
+  console.log("USER ROLE:", user?.role)
 
 
 
 
   type NavItem = {
-  name: string
-  href: string
-  icon: React.ElementType
-  badge?: number
-}
+    name: string
+    href: string
+    icon: React.ElementType
+    badge?: number
+  }
 
-const roleNav: Record<string, NavItem[]> = {
-  BUYER: [
-    { name: 'Overview', href: '/buyer/overview', icon: LayoutDashboard },
-    { name: 'Orders', href: '/buyer/order', icon: ShoppingBag },
-    { name: 'Messages', href: '/message', icon: MessageSquare, badge: 3 },
-     { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart },
+  const roleNav: Record<string, NavItem[]> = {
+    BUYER: [
+      { name: 'Orders', href: '/buyer/order', icon: ListOrdered },
+      { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
+      { name: 'Messages', href: '/message', icon: MessageSquare, badge: 3 },
+      { name: 'Market Insights', href: '/buyer/insights', icon: BrainCircuit },
+    ],
 
-    { name: 'AI Insights', href: '/buyer/insights', icon: BrainCircuit },
-  ],
+    FARMER: [
+      { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
+      { name: 'My Orders', href: '/farmer/orders', icon: ListOrdered },
+      { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
+      { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
+      { name: 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
+    ],
 
-  FARMER: [
-    { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
-    { name: 'Sales', href: '/farmer/sales', icon: DollarSign },
-    { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
-    { name: 'AI Insights', href: '/farmer/insights', icon: BrainCircuit },
-  ],
+    AGENT: [
+      { name: 'Dashboard', href: '/Agent/dashboard', icon: LayoutDashboard },
+      { name: 'Farmers', href: '/Agent/farmer', icon: Users },
+      { name: 'Register Farmer', href: '/Agent/register-farmer', icon: Users },
+      // { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
+    ],
 
-  AGENT: [
-    { name: 'Overview', href: '/Agent/dashboard', icon: LayoutDashboard },
-    { name: 'Register Farmer', href: '/Agent/register-farmer', icon: Users },
-    { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
-  ],
-
-  ADMIN: [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'User Managment', href: '/admin/user', icon: Users },
-    { name: 'Products', href: '/admin/products', icon: BookOpen },
-    { name: 'Agent Approval', href: '/admin/agent-approval', icon: Settings },
-    { name: 'Catagories', href: '/admin/catagory', icon: Settings },
-  ],
-}
+    ADMIN: [
+      { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+      { name: 'User Managment', href: '/admin/user', icon: Users },
+      { name: 'Products', href: '/admin/products', icon: BookOpen },
+      { name: 'Agent Approval', href: '/admin/agent-approval', icon: Settings },
+      { name: 'Catagories', href: '/admin/catagory', icon: Settings },
+    ],
+  }
 
   const navItems = roleNav[user?.role as keyof typeof roleNav] || []
 
@@ -86,8 +87,8 @@ const roleNav: Record<string, NavItem[]> = {
 
               <span className="flex-1">{item.name}</span>
 
-              {item.badge && (
-                <span className="bg-emerald-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+              {item.badge !== undefined && item.badge > 0 && (
+                <span className="bg-emerald-500 text-white text-xs font-bold min-w-5 h-5 px-1 flex items-center justify-center rounded-full">
                   {item.badge}
                 </span>
               )}

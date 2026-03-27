@@ -1,176 +1,181 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { User, Phone, MapPin, Map, Sprout, CheckCircle2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Input } from './ui/input'
+import { useLanguage } from '@/context/LanguageContext'
+import { register } from '@/services/authService'
+import { toast } from 'sonner'
 
 export default function AgentFarmerRegistration() {
-    const [isLoading, setIsLoading] = useState(false)
-    const [isSuccess, setIsSuccess] = useState(false)
-    const [formData, setFormData] = useState({
-        fullName: '',
-        phoneNumber: '',
-        region: '',
-        farmSize: '',
-        primaryCrops: ''
-    })
+  const { t } = useLanguage()
+  const router = useRouter()
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target
-        setFormData(prev => ({ ...prev, [name]: value }))
-    }
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
+  //  Fixed role
+  const role = "FARMER"
 
-        // Simulate API call for registration
-        await new Promise(resolve => setTimeout(resolve, 1500))
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
 
+    try {
+      //  Validation: at least email OR phone
+      if (!email.trim() && !phone.trim()) {
+        toast.error("Please provide at least email or phone.")
         setIsLoading(false)
-        setIsSuccess(true)
+        return
+      }
 
-        // Reset form after showing success message
-        setTimeout(() => {
-            setIsSuccess(false)
-            setFormData({ fullName: '', phoneNumber: '', region: '', farmSize: '', primaryCrops: '' })
-        }, 3000)
-    }
+      if (!password) {
+        toast.error("Password is required.")
+        setIsLoading(false)
+        return
+      }
 
-    if (isSuccess) {
-        return (
-            <Card className="max-w-2xl mx-auto shadow-sm border-gray-100">
-                <CardContent className="p-12 flex flex-col items-center justify-center text-center space-y-4">
-                    <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
-                        <CheckCircle2 size={32} />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">Registration Successful!</h2>
-                    <p className="text-gray-500 max-w-sm">
-                        The farmer has been successfully registered in the system. They will receive an SMS confirmation shortly.
-                    </p>
-                    <button
-                        onClick={() => { setIsSuccess(false); setFormData({ fullName: '', phoneNumber: '', region: '', farmSize: '', primaryCrops: '' }) }}
-                        className="mt-6 px-6 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                        Register Another Farmer
-                    </button>
-                </CardContent>
-            </Card>
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match.")
+        setIsLoading(false)
+        return
+      }
+
+      //  API Call
+      const user = await register({
+        email,
+        phone,
+        password,
+        confirmPassword,
+        role
+      })
+
+      if (user) {
+        toast.success("Account created successfully ")
+
+        const identifier = email || phone
+
+        // Redirect to OTP
+        router.push(
+          `/verify-otp?identifier=${encodeURIComponent(identifier)}&purpose=SIGNUP&role=${role}`
         )
+      }
+
+    } catch (error: any) {
+      console.log("Registration error:", error)
+
+      if (error?.response?.status === 504) {
+        toast.warning("Server timeout. OTP may still be sent.")
+      } else if (error?.response?.status === 409) {
+        toast.error("This email or phone number is already registered.")
+      } else if (error?.response?.status === 400) {
+        toast.error(
+          error?.response?.data?.message ||
+          "Invalid input. Please check your details."
+        )
+      } else {
+        toast.error(
+          error?.response?.data?.message ||
+          error.message ||
+          "Registration failed. Please try again."
+        )
+      }
+
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    return (
-        <Card className="max-w-2xl mx-auto shadow-sm border-gray-100">
-            <CardHeader>
-                <CardTitle className="text-2xl font-bold text-gray-900">Register New Farmer</CardTitle>
-                <CardDescription>Enter the farmer's details below to enroll them in the system.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Full Name */}
-                        <div className="space-y-2">
-                            <label htmlFor="fullName" className="text-sm font-medium text-gray-700">Full Name</label>
-                            <div className="relative group">
-                                <Input
-                                    id="fullName"
-                                    name="fullName"
-                                    required
-                                    value={formData.fullName}
-                                    onChange={handleChange}
-                                    placeholder="Enter farmer's full name"
-                                    className="pl-10"
-                                />
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={16} />
-                            </div>
-                        </div>
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
 
-                        {/* Phone Number */}
-                        <div className="space-y-2">
-                            <label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700">Phone Number</label>
-                            <div className="relative group">
-                                <Input
-                                    id="phoneNumber"
-                                    name="phoneNumber"
-                                    type="tel"
-                                    required
-                                    value={formData.phoneNumber}
-                                    onChange={handleChange}
-                                    placeholder="+251 9..."
-                                    className="pl-10"
-                                />
-                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={16} />
-                            </div>
-                        </div>
+      {/* Role (Fixed) */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700">Role</label>
+        <div className="h-11 flex items-center px-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600">
+          Farmer
+        </div>
+      </div>
 
-                        {/* Region/Location */}
-                        <div className="space-y-2">
-                            <label htmlFor="region" className="text-sm font-medium text-gray-700">Region / Zone</label>
-                            <div className="relative group">
-                                <Input
-                                    id="region"
-                                    name="region"
-                                    required
-                                    value={formData.region}
-                                    onChange={handleChange}
-                                    placeholder="e.g., Oromia, Jimma"
-                                    className="pl-10"
-                                />
-                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={16} />
-                            </div>
-                        </div>
+      {/* Email */}
+      <div className="space-y-2">
+        <label htmlFor="email" className="text-sm font-medium text-gray-700">
+          Email (Optional)
+        </label>
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com (optional)"
+          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+        />
+      </div>
 
-                        {/* Farm Size */}
-                        <div className="space-y-2">
-                            <label htmlFor="farmSize" className="text-sm font-medium text-gray-700">Farm Size (Hectares)</label>
-                            <div className="relative group">
-                                <Input
-                                    id="farmSize"
-                                    name="farmSize"
-                                    type="number"
-                                    step="0.1"
-                                    required
-                                    value={formData.farmSize}
-                                    onChange={handleChange}
-                                    placeholder="e.g., 2.5"
-                                    className="pl-10"
-                                />
-                                <Map className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={16} />
-                            </div>
-                        </div>
-                    </div>
+      {/* Phone */}
+      <div className="space-y-2">
+        <label htmlFor="phone" className="text-sm font-medium text-gray-700">
+          Phone
+        </label>
+        <Input
+          id="phone"
+          type="text"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+251... "
+          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+        />
+      </div>
 
-                    {/* Primary Crops */}
-                    <div className="space-y-2">
-                        <label htmlFor="primaryCrops" className="text-sm font-medium text-gray-700">Primary Crops</label>
-                        <div className="relative group">
-                            <Input
-                                id="primaryCrops"
-                                name="primaryCrops"
-                                required
-                                value={formData.primaryCrops}
-                                onChange={handleChange}
-                                placeholder="e.g., Coffee, Teff, Wheat (comma separated)"
-                                className="pl-10"
-                            />
-                            <Sprout className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" size={16} />
-                        </div>
-                    </div>
+      {/* Password */}
+      <div className="space-y-2">
+        <label htmlFor="password" className="text-sm font-medium text-gray-700">
+          Password
+        </label>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+        />
+      </div>
 
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors disabled:opacity-50 flex items-center justify-center"
-                    >
-                        {isLoading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                            'Complete Registration'
-                        )}
-                    </button>
-                </form>
-            </CardContent>
-        </Card>
-    )
+      {/* Confirm Password */}
+      <div className="space-y-2">
+        <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+          Confirm Password
+        </label>
+        <Input
+          id="confirmPassword"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="••••••••"
+          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+        />
+      </div>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full h-11 mt-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium flex items-center justify-center disabled:opacity-50"
+      >
+        {isLoading ? (
+          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : (
+          "Create Farmer Account"
+        )}
+      </button>
+
+    </form>
+  )
 }

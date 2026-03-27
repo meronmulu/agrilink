@@ -20,10 +20,9 @@ import { Button } from '@/components/ui/button'
 
 import { getProductById } from '@/services/productService'
 import { Product } from '@/types/product'
-import { getConversations } from '@/services/chatService'
 import { toast } from 'sonner'
-import { checkoutOrder } from '@/services/orderService'
 import { addToCart } from '@/services/cartService'
+import { checkoutOrder } from '@/services/orderService'
 
 export default function ProductDetailPage() {
 
@@ -38,6 +37,8 @@ export default function ProductDetailPage() {
 
   const [cartLoading, setCartLoading] = useState(false)
   const [buyLoading, setBuyLoading] = useState(false)
+  const [checkingOut, setCheckingOut] = useState(false)
+
 
   useEffect(() => {
 
@@ -60,32 +61,32 @@ export default function ProductDetailPage() {
 
   }, [id])
 
-  const handleSend = async () => {
-    try {
-      const conversations = await getConversations()
+  // const handleSend = async () => {
+  //   try {
+  //     const conversations = await getConversations()
 
-      const farmerId = product?.farmer?.id
+  //     const farmerId = product?.farmer?.id
 
-      const userData = localStorage.getItem("user")
-      const currentUserId = userData ? JSON.parse(userData).id : null
+  //     const userData = localStorage.getItem("user")
+  //     const currentUserId = userData ? JSON.parse(userData).id : null
 
-      if (!farmerId || !currentUserId) return
+  //     if (!farmerId || !currentUserId) return
 
-      const existing = conversations.find((conv: any) =>
-        (conv.userOneId === currentUserId && conv.userTwoId === farmerId) ||
-        (conv.userTwoId === currentUserId && conv.userOneId === farmerId)
-      )
+  //     const existing = conversations.find((conv: any) =>
+  //       (conv.userOneId === currentUserId && conv.userTwoId === farmerId) ||
+  //       (conv.userTwoId === currentUserId && conv.userOneId === farmerId)
+  //     )
 
-      if (existing) {
-        router.push(`/message/${existing.id}`)
-      } else {
-        router.push(`/message/${farmerId}`)
-      }
+  //     if (existing) {
+  //       router.push(`/message/${existing.id}`)
+  //     } else {
+  //       router.push(`/message/${farmerId}`)
+  //     }
 
-    } catch (err) {
-      console.error(err)
-    }
-  }
+  //   } catch (err) {
+  //     console.error(err)
+  //   }
+  // }
 
   const handleAddToCart = async () => {
     if (!product) return
@@ -93,14 +94,15 @@ export default function ProductDetailPage() {
     try {
       setCartLoading(true)
 
-      await addToCart({
+      const res = await addToCart({
         productId: product.id,
         amount: 1
       })
 
+      console.log(res)
       toast.success("Added to cart")
 
-    } catch (error: any) {
+    } catch (error) {
       console.error(error)
       toast.error("Failed to add to cart")
     } finally {
@@ -108,28 +110,38 @@ export default function ProductDetailPage() {
     }
   }
 
-  const handleBuyNow = async () => {
+  const handleCheckout = async () => {
+    if (!product) return
+
     try {
       setBuyLoading(true)
 
-      const user = JSON.parse(localStorage.getItem("user") || "{}")
+      const checkoutData = {
+        items: [
+          {
+            productId: product.id,
+            amount: 1
+          }
+        ]
+      }
 
-      const res = await checkoutOrder(user.id)
+      const res = await checkoutOrder(checkoutData)
 
-      if (res?.checkout_url) {
-        window.location.href = res.checkout_url
+      toast.success("Order created. Redirecting to payment...")
+
+      if (res?.paymentUrl) {
+        window.location.href = res.paymentUrl
       } else {
-        toast.error("Payment failed")
+        toast.error("Checkout failed")
       }
 
     } catch (error) {
-      console.error(error)
-      toast.error("Checkout failed")
+      console.log(error)
+      toast.error("Checkout error")
     } finally {
       setBuyLoading(false)
     }
   }
-
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
@@ -337,7 +349,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 <Button
-                  onClick={handleSend}
+                  // onClick={handleSend}
                   variant="outline"
                   className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg text-sm h-9"
                 >
@@ -364,7 +376,7 @@ export default function ProductDetailPage() {
               </Button>
 
               <Button
-                onClick={handleBuyNow}
+                onClick={handleCheckout}
                 disabled={product.amount <= 0 || buyLoading}
                 variant="outline"
                 className="h-12 rounded-lg border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 text-sm font-medium"

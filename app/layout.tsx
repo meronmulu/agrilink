@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
 import { Toaster } from "@/components/ui/sonner";
+import { CartProvider } from "@/context/CartContext";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -27,7 +28,9 @@ export default function RootLayout({
         className={`${outfit.variable} antialiased bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100`}
       >
         <ClientProviders>
-          {children}
+          <CartProvider>
+            {children}
+          </CartProvider>
           <Toaster position="top-center" richColors />
         </ClientProviders>
       </body>

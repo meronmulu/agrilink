@@ -113,8 +113,8 @@ export default function OtherSignUpPage() {
     try {
       setIsLoading(true)
 
-      // ⏳ Loading toast
-      const loadingToast = toast.loading("Creating profile...")
+    // ⏳ Loading toast
+    const loadingToast = toast.loading("Creating profile...")
 
       const res = await createProfile({
         fullName,
@@ -124,33 +124,33 @@ export default function OtherSignUpPage() {
       console.log("Profile created:", res)
       console.log("Role selected:", role)
 
-      // ✅ Success
-      toast.dismiss(loadingToast)
-      toast.success("Profile created successfully 🎉")
+    // ✅ Success
+    toast.dismiss(loadingToast)
+    toast.success("Profile created successfully 🎉")
 
-      // 🔁 Redirect based on role
-      setTimeout(() => {
-        if (role === "BUYER") {
-          router.push("/buyer")
-        } else if (role === "FARMER") {
-          router.push("/farmer")
-        } else if (role === "AGENT") {
-          router.push("/agent/dashboard")
-        }
-      }, 1000)
+    // 🔁 Redirect based on role
+    setTimeout(() => {
+      if (role === "BUYER") {
+        router.push("/buyer")
+      } else if (role === "FARMER") {
+        router.push("/farmer")
+      } else if (role === "AGENT") {
+        router.push("/agent/dashboard")
+      }
+    }, 1000)
 
-    } catch (error: any) {
-      console.log(error)
+  } catch (error: any) {
+    console.log(error)
 
-      toast.error(
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to create profile"
-      )
-    } finally {
-      setIsLoading(false)
-    }
+    toast.error(
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to create profile"
+    )
+  } finally {
+    setIsLoading(false)
   }
+}
 
 
   return (

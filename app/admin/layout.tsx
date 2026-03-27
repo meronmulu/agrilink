@@ -1,6 +1,7 @@
 import React from "react"
 import Header from "@/components/Header"
 import Sidebar from "@/components/Sidebar"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
 export default function AdminLayout({
     children,
@@ -8,6 +9,8 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     return (
+            <ProtectedRoute roles={ ["ADMIN"]}>
+
             <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
                 {/* Top Navbar */}
                 <div className="flex items-center h-16 shrink-0 border-b border-gray-200 bg-white">
@@ -28,7 +31,7 @@ export default function AdminLayout({
                     </main>
                 </div>
             </div>
-
+           </ProtectedRoute>
 
     )
 }

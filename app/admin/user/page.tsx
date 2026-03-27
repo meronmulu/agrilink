@@ -129,7 +129,7 @@ export default function AdminUsersPage() {
 }
   }
 
-  // ✅ FILTER + SORT (NEWEST FIRST)
+  //  FILTER + SORT (NEWEST FIRST)
   const filteredUsers = users
     .slice()
     .sort((a, b) =>
@@ -191,7 +191,7 @@ export default function AdminUsersPage() {
               }}
               className="pl-9 w-72"
             />
-            <Search className="absolute left-2 top-2.5 h-4 w-4 " />
+            <Search className="absolute left-2 top-2 h-4 w-4 " />
           </div>
 
           {/* ROLE FILTER */}
@@ -202,7 +202,7 @@ export default function AdminUsersPage() {
               setCurrentPage(1)
             }}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40 bg-white">
               <SelectValue placeholder="Role" />
             </SelectTrigger>
             <SelectContent>
@@ -222,7 +222,7 @@ export default function AdminUsersPage() {
               setCurrentPage(1)
             }}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40 bg-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -236,12 +236,12 @@ export default function AdminUsersPage() {
       </div>
 
       {/* TABLE */}
-      <Card className="shadow-sm border rounded-2xl">
+     <Card className=" ">
         <CardContent className="p-4">
           <div className="overflow-x-auto">
 
             <Table>
-              <TableHeader>
+              <TableHeader className="">
                 <TableRow className="">
                   <TableHead className="pl-6">User</TableHead>
                   <TableHead>Email</TableHead>
@@ -331,7 +331,8 @@ export default function AdminUsersPage() {
 
           </div>
         </CardContent>
-      </Card>
+      </Card> 
+       
 
       {/* PAGINATION */}
       <div className="flex justify-between items-center">

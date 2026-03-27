@@ -30,6 +30,7 @@ import {
 
 import { Kebele, Region, Woreda, Zone } from '@/types/profile'
 import { toast } from 'sonner'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function Page() {
 
@@ -118,7 +119,6 @@ export default function Page() {
   }, [])
 
 
-  /* ================= HANDLERS ================= */
 
   const handleRegionChange = async (value: string) => {
 
@@ -198,7 +198,6 @@ export default function Page() {
 
     console.log("UPDATE RESPONSE:", res);
 
-    // ✅ handle empty backend response safely
     setUser((prev) =>
       prev
         ? {
@@ -213,7 +212,6 @@ export default function Page() {
         : prev
     );
 
-    // ✅ optional: refresh from backend (recommended)
     try {
       const freshUser = await getUserById(id);
       setUser(freshUser);
@@ -223,14 +221,14 @@ export default function Page() {
 
     setPreview(null);
 
-    toast.success("Profile updated successfully 🎉");
+    toast.success("Profile updated successfully ");
 
-  } catch (error: any) {
+  } catch (error) {
     console.log("UPDATE ERROR:", error);
 
     toast.error(
-      error?.response?.data?.message ||
-      error?.message ||
+      // error?.response?.data?.message ||
+      // error?.message ||
       "Failed to update profile"
     );
   } finally {
@@ -252,7 +250,6 @@ export default function Page() {
   }
 
 
-  /* ================= LOADING ================= */
 
   if (loading) {
     return (
@@ -263,10 +260,10 @@ export default function Page() {
   }
 
 
-  /* ================= UI ================= */
 
   return (
-
+    <ProtectedRoute roles={["ADMIN","AGENT" ,"BUYER", "FARMER"]}>
+     
     <div className="min-h-screen bg-gray-50 ">
 
       <Header />
@@ -287,7 +284,7 @@ export default function Page() {
 
                   <Avatar className="w-32 h-32">
 
-                    <AvatarImage src={preview || user.profile?.imageUrl} />
+                    <AvatarImage src={preview || user?.profile?.imageUrl} />
 
                     <AvatarFallback>
                       {getInitials(form.fullName)}
@@ -316,7 +313,7 @@ export default function Page() {
 
 
                 <Badge className="mt-2 bg-emerald-500">
-                  {user.role}
+                  {user?.role}
                 </Badge>
 
 
@@ -324,18 +321,18 @@ export default function Page() {
 
                   <div className="flex gap-3 items-center">
                     <Mail className="w-4 h-4 text-muted-foreground" />
-                    <span>{user.email}</span>
+                    <span>{user?.email}</span>
                   </div>
 
                   <div className="flex gap-3 items-center">
                     <Phone className="w-4 h-4 text-muted-foreground" />
-                    <span>{form.phone}</span>
+                    <span>{user?.phone}</span>
                   </div>
 
                   <div className="flex gap-3 items-center">
                     <MapPin className="w-4 h-4 text-muted-foreground" />
                     <span>
-                      {user.profile?.kebele?.woreda?.zone?.region?.name} • {user.profile?.kebele?.woreda?.zone?.name} • {user.profile?.kebele?.woreda?.name} • {user.profile?.kebele?.name}
+                      {user?.profile?.kebele?.woreda?.zone?.region?.name} • {user?.profile?.kebele?.woreda?.zone?.name} • {user?.profile?.kebele?.woreda?.name} • {user?.profile?.kebele?.name}
                     </span>
                   </div>
 
@@ -540,6 +537,8 @@ export default function Page() {
       </div>
 
     </div>
+
+    </ProtectedRoute>
 
   )
 }

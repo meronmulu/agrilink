@@ -52,7 +52,7 @@ export default function SignUp() {
     })
 
     if (user) {
-      toast.success("Account created successfully 🎉")
+      toast.success("Account created successfully ")
 
       console.log("User registered successfully", user)
 
