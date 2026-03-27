@@ -15,5 +15,10 @@ export interface Order {
   createdAt: string
   currency: string
   paymentUrl?: string
+
+  buyer?: {
+    email: string
+  }
+
   items: OrderItem[]
 }

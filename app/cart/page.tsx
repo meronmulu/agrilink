@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -30,7 +29,7 @@ export default function CartPage() {
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
   const [checkingOut, setCheckingOut] = useState(false)
 
- 
+
   const fetchCart = async () => {
     try {
       const data = await getCart()
@@ -47,7 +46,7 @@ export default function CartPage() {
     fetchCart()
   }, [])
 
-  
+
   const handleUpdate = async (productId: string, amount: number) => {
     if (amount < 1) return
 
@@ -69,7 +68,7 @@ export default function CartPage() {
     }
   }
 
-  
+
   const handleRemove = async (productId: string) => {
     setUpdatingItems(prev => new Set(prev).add(productId))
 
@@ -94,7 +93,7 @@ export default function CartPage() {
     }
   }
 
- 
+
   const handleClear = async () => {
     if (!confirm('Are you sure you want to clear your cart?')) return
 
@@ -110,30 +109,33 @@ export default function CartPage() {
 
 
   const handleCheckout = async () => {
-    try {
-      setCheckingOut(true)
+  try {
+    setCheckingOut(true)
 
-      const checkoutData = { cart, total }
-
-      const res = await checkoutOrder(checkoutData)
-
-      toast.success("Order created. Redirecting to payment...")
-
-      if (res?.paymentUrl) {
-        window.location.href = res.paymentUrl
-      } else {
-        toast.error("Checkout failed")
-      }
-
-    } catch (error) {
-      console.log(error)
-      toast.error("Checkout error")
-    } finally {
-      setCheckingOut(false)
+    const checkoutData = {
+      items: cart.map(item => ({
+        productId: item.product.id,
+        amount: item.amount
+      }))
     }
-  }
 
- 
+    const res = await checkoutOrder(checkoutData)
+
+    toast.success("Order created. Redirecting to payment...")
+
+    if (res?.paymentUrl) {
+      window.location.href = res.paymentUrl
+    }
+
+  } catch (error) {
+    console.log(error)
+    toast.error("Checkout error")
+  } finally {
+    setCheckingOut(false)
+  }
+}
+
+
   const subtotal = cart.reduce(
     (sum, item) => sum + item.product.price * item.amount,
     0
@@ -152,7 +154,7 @@ export default function CartPage() {
     return b.id.localeCompare(a.id)
   })
 
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -161,7 +163,7 @@ export default function CartPage() {
     )
   }
 
- 
+
   return (
     <div className="min-h-screen bg-gray-50 ">
       <div className="max-w-7xl mx-auto px-4">
@@ -178,7 +180,7 @@ export default function CartPage() {
           <div className="grid lg:grid-cols-12 gap-8">
 
             {/* CART ITEMS */}
-            <div className="lg:col-span-8 bg-white rounded-2xl shadow overflow-hidden">
+            <div className="lg:col-span-8 bg-white rounded-2xl shadow overflow-hidden self-start">
               {orderedCart.map(item => (
                 <div
                   key={item.id}
@@ -251,8 +253,8 @@ export default function CartPage() {
             {/* SUMMARY */}
             <div className="lg:col-span-4 bg-white rounded-2xl shadow p-6 h-fit">
               <h2 className="font-semibold mb-4">Order Summary</h2>
-              
-               <div className="flex justify-between text-sm text-gray-600">
+
+              <div className="flex justify-between text-sm text-gray-600">
                 <span>Items</span>
                 <span>{cart.length}</span>
               </div>

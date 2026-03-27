@@ -1,24 +1,15 @@
 'use client'
 
-import { Search, Plus, Sprout, Pencil, Trash2, Layers, XCircle, ChevronDown } from 'lucide-react'
+import { Search, Plus, Sprout, Pencil, Trash2, Layers, XCircle, ChevronDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
-import { getProducts, deleteProducts } from '@/services/productService'
+import { getMyProducts, deleteProducts } from '@/services/productService'
 import { Product } from '@/types/product'
 import Image from 'next/image'
 import { Category, SubCategory } from '@/types/category'
 import { getCategories, getSubCategories } from '@/services/categoryService'
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-
 import {
   Dialog,
   DialogContent,
@@ -49,7 +40,7 @@ export default function MyCropsPage() {
   useEffect(() => {
     const fetchCrops = async () => {
       try {
-        const data = await getProducts()
+        const data = await getMyProducts()
         setCrops(data)
       } catch (error) {
         console.error(error)
@@ -80,30 +71,30 @@ export default function MyCropsPage() {
     : []
 
   //  DELETE FUNCTION
- const handleDelete = async () => {
-  if (!deleteId) return
+  const handleDelete = async () => {
+    if (!deleteId) return
 
-  try {
-    await deleteProducts(deleteId)
+    try {
+      await deleteProducts(deleteId)
 
-    // remove from UI
-    setCrops((prev) => prev.filter((crop) => crop.id !== deleteId))
+      // remove from UI
+      setCrops((prev) => prev.filter((crop) => crop.id !== deleteId))
 
-               toast.success("Crop deleted successfully. ")
+      toast.success("Crop deleted successfully. ")
 
-    
 
-    setDeleteId(null)
-  } catch (error) {
-    console.error("Delete failed:", error)
 
-    toast.error(
-      // error?.response?.data?.message ||
-      // error?.message ||
-      "Something went wrong."
-    )
+      setDeleteId(null)
+    } catch (error) {
+      console.error("Delete failed:", error)
+
+      toast.error(
+        // error?.response?.data?.message ||
+        // error?.message ||
+        "Something went wrong."
+      )
+    }
   }
-}
 
   const clearFilters = () => {
     setSearch("")
@@ -111,23 +102,28 @@ export default function MyCropsPage() {
     setSelectedSubCategory(null)
   }
 
- const filteredCrops = crops
-  .filter((crop) => {
-    const sub = subcategories.find((s) => s.id === crop.subCategoryId)
+  const filteredCrops = crops
+    .filter((crop) => {
+      const sub = subcategories.find((s) => s.id === crop.subCategoryId)
 
-    const matchSearch = crop.name.toLowerCase().includes(search.toLowerCase())
-    const matchCategory = selectedCategory ? sub?.categoryId === selectedCategory : true
-    const matchSubCategory = selectedSubCategory ? crop.subCategoryId === selectedSubCategory : true
+      const matchSearch = crop.name.toLowerCase().includes(search.toLowerCase())
+      const matchCategory = selectedCategory ? sub?.categoryId === selectedCategory : true
+      const matchSubCategory = selectedSubCategory ? crop.subCategoryId === selectedSubCategory : true
 
-    return matchSearch && matchCategory && matchSubCategory
-  })
-  .sort((a, b) => {
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  })
+      return matchSearch && matchCategory && matchSubCategory
+    })
+    .sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
 
-  const hasActiveFilters =
-    search !== "" || selectedCategory !== null || selectedSubCategory !== null
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-600" size={40} />
+      </div>
+    )
+  }
   return (
     <div className="flex flex-col gap-8 pb-10">
 
@@ -139,7 +135,7 @@ export default function MyCropsPage() {
         </div>
 
         <Link href="/farmer/crops/add-crop">
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-5">
             <Plus className="mr-2" size={18} />
             Post New Crop
           </Button>
@@ -208,91 +204,89 @@ export default function MyCropsPage() {
       </div>
 
       {/* Crops */}
-      {loading ? (
-        <p>Loading...</p>
-      ) : filteredCrops.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-lg font-medium text-gray-600">
-            No products in this category
-          </p>
-          <p className="text-sm text-gray-400 mt-2">
-            Try selecting another category or search again.
-          </p>
+      {
+        filteredCrops.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <p className="text-lg font-medium text-gray-600">
+              No products in this category
+            </p>
+            <p className="text-sm text-gray-400 mt-2">
+              Try selecting another category or search again.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-         
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredCrops.map((crop) => {
+              const sub = subcategories.find((s) => s.id === crop.subCategoryId)
 
-          {filteredCrops.map((crop) => {
-            const sub = subcategories.find((s) => s.id === crop.subCategoryId)
+              return (
+                <div
+                  key={crop.id}
+                  className="bg-white rounded-2xl border overflow-hidden shadow-sm"
+                >
 
-            return (
-              <div
-                key={crop.id}
-                className="bg-white rounded-2xl border overflow-hidden shadow-sm"
-              >
+                  {/* Image */}
+                  <div className="relative aspect-4/3 bg-gray-100">
+                    {crop.image ? (
+                      <Image
+                        src={crop.image}
+                        alt={crop.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-300">
+                        <Sprout size={40} />
+                      </div>
+                    )}
 
-                {/* Image */}
-                <div className="relative aspect-4/3 bg-gray-100">
-                  {crop.image ? (
-                    <Image
-                      src={crop.image}
-                      alt={crop.name}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-300">
-                      <Sprout size={40} />
-                    </div>
-                  )}
+                    {/* Buttons */}
+                    <div className="absolute top-3 right-3 flex gap-2">
 
-                  {/* Buttons */}
-                  <div className="absolute top-3 right-3 flex gap-2">
+                      <Link href={`/farmer/crops/${crop.id}`}>
+                        <button className="p-2 bg-white rounded-full shadow">
+                          <Pencil size={16} />
+                        </button>
+                      </Link>
 
-                    <Link href={`/farmer/crops/${crop.id}`}>
-                      <button className="p-2 bg-white rounded-full">
-                        <Pencil size={16} />
+                      <button
+                        onClick={() => setDeleteId(crop.id)}
+                        className="p-2 bg-white rounded-full text-red-600 shadow"
+                      >
+                        <Trash2 size={16} />
                       </button>
-                    </Link>
 
-                    <button
-                      onClick={() => setDeleteId(crop.id)}
-                      className="p-2 bg-white rounded-full text-red-600"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-
+                    </div>
                   </div>
-                </div>
 
-                {/* Details */}
-                <div className="p-5">
-                  <h3 className="font-semibold">{crop.name}</h3>
+                  {/* Details */}
+                  <div className="p-5">
+                    <h3 className="font-semibold">{crop.name}</h3>
 
-                  <p className="text-xs text-gray-500">
-                    {sub?.name}
-                  </p>
+                    <p className="text-xs text-gray-500">
+                      {sub?.name}
+                    </p>
 
-                  <div className="mt-3 flex justify-between text-sm">
-                    <span className="text-emerald-600 font-bold">
-                      {crop.price} ETB
-                    </span>
+                    <div className="mt-3 flex justify-between text-sm">
+                      <span className="text-emerald-600 font-bold">
+                        {crop.price} ETB
+                      </span>
 
-                    <span className="flex items-center gap-1">
-                      <Layers size={14} />
-                      {crop.amount}
-                    </span>
+                      <span className="flex items-center gap-1">
+                        <Layers size={14} />
+                        {crop.amount}
+                      </span>
+                    </div>
                   </div>
+
                 </div>
+              )
+            })}
 
-              </div>
-            )
-          })}
-
-        </div>
-      )}
+          </div>
+        )
+      }
 
       {/*  DELETE DIALOG */}
       <Dialog open={!!deleteId} onOpenChange={(open) => {

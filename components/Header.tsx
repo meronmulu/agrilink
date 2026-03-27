@@ -19,6 +19,7 @@ import {
   BookOpen,
   Users,
   ShoppingCart,
+  ListOrdered,
 } from "lucide-react"
 
 import LanguageDropdown from "./LanguageDropdown"
@@ -34,12 +35,15 @@ import { useAuth } from "@/context/AuthContext"
 import { createRoleRequest } from "@/services/roleRequestService"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { useCart } from "@/context/CartContext"
 
 export default function Header() {
   const { user, logout } = useAuth()
   const router = useRouter()
   const { t } = useLanguage()
   const pathname = usePathname()
+  const { cartCount } = useCart()
+  
 
   const dashboardRoute =
     user?.role === "FARMER"
@@ -73,16 +77,17 @@ export default function Header() {
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
       { name: "Orders", href: "/buyer/order", icon: ShoppingBag },
-      { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart },
+      { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart ,badge: cartCount},
       { name: "Messages", href: "/message", icon: MessageSquare, badge: 3 },
       { name: "Market Insights", href: "/buyer/insights", icon: BrainCircuit },
     ],
 
-    FARMER: [
-      { name: "My Crops", href: "/farmer/crops", icon: Sprout },
-      { name: "Sales", href: "/farmer/sales", icon: DollarSign },
-      { name: "Messages", href: "/message", icon: MessageSquare, badge: 5 },
-      { name: "Market Insights", href: "/farmer/insights", icon: BrainCircuit },
+   FARMER: [
+      { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
+      { name: 'My Orders', href: '/farmer/orders', icon: ListOrdered },
+      { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
+      { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
+      { name: 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
     ],
 
     AGENT: [

@@ -22,3 +22,15 @@ export const getMyOrders = async () => {
   }
   
 }
+
+export const getFarmerOrders = async () => {
+  try {
+    const res = await instance.get("/orders/farmer-orders")
+    console.log(res.data)
+    return res.data
+  } catch (error) {
+     console.log(error)
+  }
+  
+}
+

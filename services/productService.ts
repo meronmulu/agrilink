@@ -44,6 +44,16 @@ export const getProducts= async (): Promise<Product[]> => {
   }
 }
 
+export const getMyProducts = async (): Promise<Product[]> => {
+  try {
+    const res = await instance.get<Product[]>("/product/my-products")
+    return res.data
+  } catch (error) {
+    console.error("Get products error:", error)
+    return []
+  }
+}
+
 export const getProductById = async (id: string) => {
   try {
     const res = await instance.get(`/product/${id}`)

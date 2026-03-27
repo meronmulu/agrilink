@@ -34,7 +34,7 @@ export default function Sidebar() {
 
     FARMER: [
       { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
-      { name: 'My Orders', href: '/farmer/sales', icon: ListOrdered },
+      { name: 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
       { name: 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
