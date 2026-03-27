@@ -1,205 +1,163 @@
-// 'use client'
+'use client'
 
-// import { useEffect, useState } from 'react'
-// import Link from 'next/link'
-// import { getMyOrders, checkoutOrder } from '@/services/orderService'
-// import { getProductById } from '@/services/productService'
+import { useEffect, useState } from "react"
+import { getMyOrders } from "@/services/orderService"
+import { Order } from "@/types/order"
 
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from '@/components/ui/table'
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table"
 
-// import { Badge } from '@/components/ui/badge'
-// import { Button } from '@/components/ui/button'
-// import { Skeleton } from '@/components/ui/skeleton'
+import { Loader2, Package } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image"
 
-// export default function OrdersPage() {
-//   const [orders, setOrders] = useState<any[]>([])
-//   const [products, setProducts] = useState<any>({})
-//   const [loading, setLoading] = useState(true)
+export default function BuyerOrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
 
-//   const [page, setPage] = useState(1)
-//   const perPage = 5
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const data = await getMyOrders()
+        setOrders(data)
+      } catch (err) {
+        console.error("Failed to fetch orders", err)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-//   // Fetch orders
-//   useEffect(() => {
-//     const fetchOrders = async () => {
-//       try {
-//         const data = await getMyOrders()
-//         setOrders(data)
-//       } catch (err) {
-//         console.error(err)
-//       } finally {
-//         setLoading(false)
-//       }
-//     }
+    fetchOrders()
+  }, [])
 
-//     fetchOrders()
-//   }, [])
+  const getStatusStyle = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "completed":
+        return "bg-green-100 text-green-700"
+      case "pending":
+        return "bg-yellow-100 text-yellow-700"
+      case "cancelled":
+        return "bg-red-100 text-red-700"
+      default:
+        return "bg-gray-100 text-gray-700"
+    }
+  }
 
-//   // Fetch product names
-//   useEffect(() => {
-//     const fetchProducts = async () => {
-//       let map: any = {}
+  if (loading) {
+    return (
+      <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
+      </div>
+    )
+  }
 
-//       for (const order of orders) {
-//         for (const item of order.items) {
-//           if (!map[item.productId]) {
-//             try {
-//               const p = await getProductById(item.productId)
-//               map[item.productId] = p.name
-//             } catch {
-//               map[item.productId] = 'Unknown'
-//             }
-//           }
-//         }
-//       }
+  if (orders.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
+        <Package className="w-10 h-10 mb-3" />
+        <p>No orders yet</p>
+      </div>
+    )
+  }
 
-//       setProducts(map)
-//     }
-
-//     if (orders.length) fetchProducts()
-//   }, [orders])
-
-//   // Pagination
-//   const paginated = orders.slice(
-//     (page - 1) * perPage,
-//     page * perPage
-//   )
-
-//   // Skeleton loading
-//   if (loading) {
-//     return (
-//       <div className="p-6 space-y-3">
-//         <Skeleton className="h-6 w-40" />
-//         <Skeleton className="h-10 w-full" />
-//         <Skeleton className="h-10 w-full" />
-//         <Skeleton className="h-10 w-full" />
-//       </div>
-//     )
-//   }
-
-//   return (
-//     <div className="p-6 max-w-6xl mx-auto">
-//       <h1 className="text-2xl font-bold mb-6">My Orders</h1>
-
-//       <div className="bg-white rounded-xl border shadow-sm">
-//         <Table>
-
-//           <TableHeader>
-//             <TableRow>
-//               <TableHead>Order ID</TableHead>
-//               <TableHead>Date</TableHead>
-//               <TableHead>Items</TableHead>
-//               <TableHead>Total</TableHead>
-//               <TableHead>Status</TableHead>
-//               <TableHead>Action</TableHead>
-//             </TableRow>
-//           </TableHeader>
-
-//           <TableBody>
-//             {paginated.map((order) => (
-//               <TableRow key={order.id}>
-
-//                 {/* ID */}
-//                 <TableCell className="text-xs">
-//                   <Link href={`/orders/${order.id}`}>
-//                     {order.id.slice(0, 8)}...
-//                   </Link>
-//                 </TableCell>
-
-//                 {/* DATE */}
-//                 <TableCell>
-//                   {new Date(order.createdAt).toLocaleDateString()}
-//                 </TableCell>
-
-//                 {/* ITEMS */}
-//                 <TableCell>
-//                   {order.items.map((item: any) => (
-//                     <div key={item.id} className="text-xs">
-//                       • {products[item.productId] || 'Loading...'} (x{item.amount})
-//                     </div>
-//                   ))}
-//                 </TableCell>
-
-//                 {/* TOTAL */}
-//                 <TableCell className="font-semibold">
-//                   ETB {order.totalAmount.toLocaleString()}
-//                 </TableCell>
-
-//                 {/* STATUS */}
-//                 <TableCell>
-//                   <Badge
-//                     variant={
-//                       order.status === 'PAID'
-//                         ? 'default'
-//                         : order.status === 'PENDING'
-//                         ? 'secondary'
-//                         : 'destructive'
-//                     }
-//                   >
-//                     {order.status}
-//                   </Badge>
-//                 </TableCell>
-
-//                 {/* ACTION */}
-//                 <TableCell>
-//                   {order.status === 'PENDING' && (
-//                     <Button
-//                       size="sm"
-//                       onClick={async () => {
-//                         try {
-//                           const res = await checkoutOrder()
-//                           if (res?.checkout_url) {
-//                             window.location.href = res.checkout_url
-//                           }
-//                         } catch (err) {
-//                           console.error(err)
-//                         }
-//                       }}
-//                     >
-//                       Pay Now
-//                     </Button>
-//                   )}
-//                 </TableCell>
-
-//               </TableRow>
-//             ))}
-//           </TableBody>
-
-//         </Table>
-//       </div>
-
-//       {/* PAGINATION */}
-//       <div className="flex gap-2 mt-4">
-//         <Button
-//           variant="outline"
-//           onClick={() => setPage(p => p - 1)}
-//           disabled={page === 1}
-//         >
-//           Prev
-//         </Button>
-
-//         <Button
-//           variant="outline"
-//           onClick={() => setPage(p => p + 1)}
-//           disabled={page * perPage >= orders.length}
-//         >
-//           Next
-//         </Button>
-//       </div>
-//     </div>
-//   )
-// }
-import React from 'react'
-
-export default function page() {
   return (
-    <div>page</div>
+    <div className="p-6 max-w-6xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">My Orders</h1>
+
+      <Card className=" ">
+        <CardContent className="p-4">
+          <div className="overflow-x-auto">        <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Total Price</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Date</TableHead>
+                {/* <TableHead>Payment</TableHead> */}
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {orders.flatMap((order) =>
+                order.items.map((item) => (
+                  <TableRow key={item.id}>
+
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+
+                        <Image
+                          src={item.product?.image }
+                          alt={item.product?.name }
+                          width={50}
+                          height={50}
+                          className="rounded-md object-cover border"
+                        />
+
+                        <span className="font-medium text-gray-800">
+                          {item.product?.name}
+                        </span>
+
+                      </div>
+                    </TableCell>
+
+                    {/* QUANTITY */}
+                    <TableCell>{item.amount}</TableCell>
+
+                    {/* PRICE */}
+                    <TableCell>{item.priceAtOrder} ETB</TableCell>
+
+                    {/* TOTAL PRICE */}
+                    <TableCell className="font-medium">
+                      {item.amount * item.priceAtOrder} ETB
+                    </TableCell>
+
+                    {/* STATUS */}
+                    <TableCell>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs ${getStatusStyle(
+                          order.status
+                        )}`}
+                      >
+                        {order.status}
+                      </span>
+                    </TableCell>
+
+                    {/* DATE */}
+                    <TableCell>
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </TableCell>
+
+                    {/* PAYMENT */}
+                    {/* <TableCell>
+                      {order.status === "PENDING" && order.paymentUrl ? (
+                        <a
+                          href={order.paymentUrl}
+                          target="_blank"
+                          className="text-blue-600 underline text-sm"
+                        >
+                          Pay Now
+                        </a>
+                      ) : (
+                        <span className="text-gray-400 text-sm">—</span>
+                      )}
+                    </TableCell> */}
+
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

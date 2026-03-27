@@ -30,9 +30,7 @@ export default function CartPage() {
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
   const [checkingOut, setCheckingOut] = useState(false)
 
-  // =========================
-  // FETCH CART
-  // =========================
+ 
   const fetchCart = async () => {
     try {
       const data = await getCart()
@@ -49,9 +47,7 @@ export default function CartPage() {
     fetchCart()
   }, [])
 
-  // =========================
-  // UPDATE ITEM
-  // =========================
+  
   const handleUpdate = async (productId: string, amount: number) => {
     if (amount < 1) return
 
@@ -73,9 +69,7 @@ export default function CartPage() {
     }
   }
 
-  // =========================
-  // REMOVE ITEM
-  // =========================
+  
   const handleRemove = async (productId: string) => {
     setUpdatingItems(prev => new Set(prev).add(productId))
 
@@ -100,9 +94,7 @@ export default function CartPage() {
     }
   }
 
-  // =========================
-  // CLEAR CART
-  // =========================
+ 
   const handleClear = async () => {
     if (!confirm('Are you sure you want to clear your cart?')) return
 
@@ -116,9 +108,7 @@ export default function CartPage() {
     }
   }
 
-  // =========================
-  // CHECKOUT
-  // =========================
+
   const handleCheckout = async () => {
     try {
       setCheckingOut(true)
@@ -143,9 +133,7 @@ export default function CartPage() {
     }
   }
 
-  // =========================
-  // TOTALS
-  // =========================
+ 
   const subtotal = cart.reduce(
     (sum, item) => sum + item.product.price * item.amount,
     0
@@ -153,9 +141,7 @@ export default function CartPage() {
 
   const total = subtotal
 
-  // =========================
-  // SORT (NEWEST FIRST)
-  // =========================
+
   const orderedCart = [...cart].sort((a, b) => {
     if (a.createdAt && b.createdAt) {
       return (
@@ -166,9 +152,7 @@ export default function CartPage() {
     return b.id.localeCompare(a.id)
   })
 
-  // =========================
-  // LOADING UI
-  // =========================
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -177,15 +161,13 @@ export default function CartPage() {
     )
   }
 
-  // =========================
-  // MAIN UI
-  // =========================
+ 
   return (
     <div className="min-h-screen bg-gray-50 ">
       <div className="max-w-7xl mx-auto px-4">
 
         {/* HEADER */}
-        <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+        <h1 className="text-2xl font-bold mb-8">Shopping Cart</h1>
 
         {cart.length === 0 ? (
           <div className="bg-white rounded-2xl shadow p-12 text-center">

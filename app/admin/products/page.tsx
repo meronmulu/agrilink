@@ -114,7 +114,7 @@ export default function AdminProductsPage() {
       {/* PRODUCTS TABLE */}
 
       <Card className="shadow-sm border rounded-2xl">
-        <CardContent className="p-0">
+        <CardContent className="p-4">
           <div className="overflow-x-auto">
 
 
