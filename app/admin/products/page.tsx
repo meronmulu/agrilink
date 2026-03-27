@@ -118,132 +118,157 @@ export default function AdminProductsPage() {
           <div className="overflow-x-auto">
 
 
-          
 
 
-              <Table>
 
-                <TableHeader>
-                  <TableRow className="">
-                    <TableHead>Product</TableHead>
-                    {/* <TableHead>Category</TableHead> */}
-                    <TableHead>SubCategory</TableHead>
-                    <TableHead>Stock</TableHead>
-                    <TableHead>Sold</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Farmer</TableHead>
-                  </TableRow>
-                </TableHeader>
+            <Table>
 
-                <TableBody>
+              <TableHeader>
+                <TableRow className="">
+                  <TableHead>Product</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>SubCategory</TableHead>
+                  <TableHead>Stock</TableHead>
+                  <TableHead>Sold</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Farmer</TableHead>
+                </TableRow>
+              </TableHeader>
 
-                  {products.map((product) => (
+              <TableBody>
 
-                    <TableRow
-                      key={product.id}
-                      className="hover:bg-gray-50 transition"
-                    >
+                {products.map((product) => (
 
-                      {/* PRODUCT */}
+                  <TableRow
+                    key={product.id}
+                    className="hover:bg-gray-50 transition"
+                  >
 
-                      <TableCell className="flex items-center gap-3">
+                    {/* PRODUCT */}
 
-                        <div className="relative w-12 h-12 rounded-md overflow-hidden border">
+                    <TableCell className="flex items-center gap-3">
 
+                      <div className="relative w-12 h-12 rounded-md overflow-hidden border">
+
+                        <Image
+                          src={product.image || "/placeholder.png"}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                        />
+
+                      </div>
+
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {product.name}
+                        </p>
+                      </div>
+
+                    </TableCell>
+
+
+                    {/* CATEGORY */}
+
+                    <TableCell>
+                      <Badge variant="secondary">
+                        {product.subCategory?.category?.name}
+                      </Badge>
+                    </TableCell>
+
+
+                    {/* SUBCATEGORY */}
+
+                    <TableCell>
+                      {product.subCategory?.name || "—"}
+                    </TableCell>
+
+
+                    {/* STOCK */}
+
+                    <TableCell>
+
+                      {product.amount > 0 ? (
+
+                        <Badge className="bg-emerald-100 text-emerald-700">
+                          {product.amount} Available
+                        </Badge>
+
+                      ) : (
+
+                        <Badge variant="destructive">
+                          Out of stock
+                        </Badge>
+
+                      )}
+
+                    </TableCell>
+
+
+                    {/* SOLD */}
+
+                    <TableCell>
+                      {product.amountSold || 0}
+                    </TableCell>
+
+
+                    {/* PRICE */}
+
+                    <TableCell className="font-semibold">
+                      ETB {product.price}
+                    </TableCell>
+
+
+
+
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+
+                        {/* Avatar */}
+                        <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
                           <Image
-                            src={product.image || "/placeholder.png"}
-                            alt={product.name}
+                            src={product.farmer?.profile?.imageUrl || "/placeholder.png"}
+                            alt="Farmer"
                             fill
                             className="object-cover"
                           />
-
                         </div>
 
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {product.name}
-                          </p>
-                        </div>
+                        {/* Info */}
+                        <div className="flex flex-col leading-tight">
 
-                      </TableCell>
-
-
-                      {/* CATEGORY */}
-
-                      {/* <TableCell>
-                        <Badge variant="secondary">
-                          {product.subCategory?.category?.name}
-                        </Badge>
-                      </TableCell> */}
-
-
-                      {/* SUBCATEGORY */}
-
-                      <TableCell>
-                        {product.subCategory?.name || "—"}
-                      </TableCell>
-
-
-                      {/* STOCK */}
-
-                      <TableCell>
-
-                        {product.amount > 0 ? (
-
-                          <Badge className="bg-emerald-100 text-emerald-700">
-                            {product.amount} Available
-                          </Badge>
-
-                        ) : (
-
-                          <Badge variant="destructive">
-                            Out of stock
-                          </Badge>
-
-                        )}
-
-                      </TableCell>
-
-
-                      {/* SOLD */}
-
-                      <TableCell>
-                        {product.amountSold || 0}
-                      </TableCell>
-
-
-                      {/* PRICE */}
-
-                      <TableCell className="font-semibold">
-                        ETB {product.price}
-                      </TableCell>
-
-
-                      {/* FARMER */}
-
-                      <TableCell>
-
-                        <div className="flex flex-col text-sm">
-                          <span className="font-medium">
-                            {product.farmer?.email || "Unknown"}
+                          {/* Name */}
+                          <span className="font-semibold text-gray-900 capitalize">
+                            {product.farmer?.profile?.fullName || "Unknown Farmer"}
                           </span>
-                          <span className="text-gray-500">
-                            {product.farmer?.phone}
+
+                          {/* Email */}
+                          <span className="text-xs text-gray-500">
+                            {product.farmer?.email}
                           </span>
+
+                          {/* Phone */}
+                          {product.farmer?.phone && (
+                            <span className="text-xs text-gray-400">
+                              {product.farmer.phone}
+                            </span>
+                          )}
+
                         </div>
 
-                      </TableCell>
+                      </div>
+                    </TableCell>
 
-                    </TableRow>
+                  </TableRow>
 
-                  ))}
+                ))}
 
-                </TableBody>
+              </TableBody>
 
-              </Table>
+            </Table>
 
-</div>
-        
+          </div>
+
 
         </CardContent>
 

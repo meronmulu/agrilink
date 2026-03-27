@@ -1,3 +1,5 @@
+import { Profile } from "./profile"
+
 export interface OrderItem {
   id: string
   amount: number
@@ -18,6 +20,8 @@ export interface Order {
 
   buyer?: {
     email: string
+    profile: Profile
+    phone: string
   }
 
   items: OrderItem[]

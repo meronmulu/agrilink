@@ -1,6 +1,7 @@
 import instance from "@/axios"
+import { Order } from "@/types/order"
 
-export const checkoutOrder = async (data: any) => {
+export const checkoutOrder = async (data: Order) => {
   try {
     const res = await instance.post("/orders/checkout", data)
     console.log("Data:", res.data)

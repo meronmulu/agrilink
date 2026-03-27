@@ -33,7 +33,7 @@ export default function Login() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
- const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setError(null);
 
@@ -53,18 +53,34 @@ export default function Login() {
 
     console.log("USER LOGIN RESPONSE:", user);
 
-    if (user) {
-      toast.success("Login successful ");
-
-      const roleRoutes: Record<string, string> = {
-        ADMIN: "/admin/dashboard",
-        AGENT: "/Agent/dashboard",
-        BUYER: "/buyer",
-        FARMER: "/farmer",
-      };
-
-      router.push(roleRoutes[user.role] || "/");
+    //  ALWAYS check user exists first
+    if (!user) {
+      toast.error("Login failed");
+      return;
     }
+
+    // HANDLE PENDING STATUS
+    if (user.status === "PENDING") {
+      toast.warning("Please verify your account first");
+
+      router.push(
+        `/verify-otp?identifier=${encodeURIComponent(formData.identifier)}&purpose=SIGNUP`
+      );
+
+      return; 
+    }
+
+    //  NORMAL LOGIN
+    toast.success("Login successful");
+
+    const roleRoutes: Record<string, string> = {
+      ADMIN: "/admin/dashboard",
+      AGENT: "/Agent/dashboard",
+      BUYER: "/buyer",
+      FARMER: "/farmer",
+    };
+
+    router.push(roleRoutes[user.role] || "/");
 
   } catch (error: any) {
     setNeedsVerification(false);
@@ -74,9 +90,15 @@ export default function Login() {
 
     if (isUnverified) {
       toast.warning(error.message || "Account not verified");
-      setNeedsVerification(true);
 
-    } else if (error.status === 401) {
+      router.push(
+        `/verify-otp?identifier=${encodeURIComponent(formData.identifier)}&purpose=SIGNUP`
+      );
+
+      return;
+    }
+
+    if (error.status === 401) {
       toast.error("Invalid email/phone or password");
 
     } else if (error.status === 504) {
