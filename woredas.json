@@ -1,0 +1,12 @@
+[
+  {
+    "id": "3ad29a6c-f11a-4041-94fe-0cbd20cd75eb",
+    "name": "Adama",
+    "zoneId": "c37c37a3-3673-495b-81b1-6e2eec2acf13",
+    "zone": {
+      "id": "c37c37a3-3673-495b-81b1-6e2eec2acf13",
+      "name": "East Shewa",
+      "regionId": "2d14dc5b-955c-4fc9-8094-9e7c5db2384b"
+    }
+  }
+]

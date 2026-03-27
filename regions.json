@@ -1,0 +1,79 @@
+[
+  {
+    "id": "2d14dc5b-955c-4fc9-8094-9e7c5db2384b",
+    "name": "Oromia",
+    "zones": [
+      {
+        "id": "c37c37a3-3673-495b-81b1-6e2eec2acf13",
+        "name": "East Shewa",
+        "regionId": "2d14dc5b-955c-4fc9-8094-9e7c5db2384b"
+      }
+    ]
+  },
+  {
+    "id": "dea146ef-7877-4778-9a3e-4b4821480769",
+    "name": "Amhara",
+    "zones": [
+      {
+        "id": "7aba1c6c-1753-4526-8f96-3ef5582d269c",
+        "name": "Wollo",
+        "regionId": "dea146ef-7877-4778-9a3e-4b4821480769"
+      }
+    ]
+  },
+  {
+    "id": "27babf53-f5c5-4306-9321-20d67aba5b72",
+    "name": "Somali",
+    "zones": []
+  },
+  {
+    "id": "ed93b431-188a-4bdd-ad0d-f5d136584707",
+    "name": "Afar",
+    "zones": []
+  },
+  {
+    "id": "c3e4cf65-1a21-451a-8820-99e354d9b40e",
+    "name": "Gambella",
+    "zones": []
+  },
+  {
+    "id": "b2b63071-4ed2-4d31-b6de-1848eaa44ac1",
+    "name": "Benishangul-Gumuz",
+    "zones": []
+  },
+  {
+    "id": "586c0963-937d-412a-bf2d-dfbe4f919037",
+    "name": "Harari",
+    "zones": []
+  },
+  {
+    "id": "4a5dee95-238a-49b8-a141-7cc84c61fb77",
+    "name": "Sidama",
+    "zones": []
+  },
+  {
+    "id": "c908de9c-6516-4df9-95c7-8604e8c1a1d2",
+    "name": "Tigray",
+    "zones": []
+  },
+  {
+    "id": "a7fb9719-8c02-43a4-9db1-3cfc1fa05786",
+    "name": "South West Ethiopia Peoples",
+    "zones": []
+  },
+  {
+    "id": "8043e404-7b33-4a3d-8b01-7dd2d84adf8e",
+    "name": "SNNPR",
+    "zones": []
+  },
+  {
+    "id": "3dee5216-ac8b-4a1c-b8e6-a07035d24ba0",
+    "name": "Addis Ababa City",
+    "zones": []
+  },
+  {
+    "id": "15ce4985-6fb1-4a69-8a84-d1e6cabac104",
+    "name": "Dire Dawa City",
+    "zones": []
+  }
+]

@@ -93,42 +93,42 @@ export default function OtherSignUpPage() {
   }, [woredaId])
 
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  console.log("Submitting profile:", {
-    fullName,
-    kebeleId,
-    regionId,
-    zoneId,
-    woredaId
-  })
-
-  // Validation
-  if (!fullName || !kebeleId) {
-    toast.error("Please fill all fields")
-    return
-  }
-
-  try {
-    setIsLoading(true)
-
-    //  Loading toast
-    const loadingToast = toast.loading("Creating profile...")
-
-    const res = await createProfile({
+    console.log("Submitting profile:", {
       fullName,
-      kebeleId
+      kebeleId,
+      regionId,
+      zoneId,
+      woredaId
     })
 
-    console.log("Profile created:", res)
-    console.log("Role selected:", role)
+    // 🔍 Validation
+    if (!fullName || !kebeleId) {
+      toast.error("Please fill all fields")
+      return
+    }
 
-    //  Success
+    try {
+      setIsLoading(true)
+
+    // ⏳ Loading toast
+    const loadingToast = toast.loading("Creating profile...")
+
+      const res = await createProfile({
+        fullName,
+        kebeleId
+      })
+
+      console.log("Profile created:", res)
+      console.log("Role selected:", role)
+
+    // ✅ Success
     toast.dismiss(loadingToast)
-    toast.success("Profile created successfully ")
+    toast.success("Profile created successfully 🎉")
 
-    //  Redirect based on role
+    // 🔁 Redirect based on role
     setTimeout(() => {
       if (role === "BUYER") {
         router.push("/buyer")
@@ -139,12 +139,12 @@ export default function OtherSignUpPage() {
       }
     }, 1000)
 
-  } catch (error) {
+  } catch (error: any) {
     console.log(error)
 
     toast.error(
-      // error?.response?.data?.message ||
-      // error?.message ||
+      error?.response?.data?.message ||
+      error?.message ||
       "Failed to create profile"
     )
   } finally {
@@ -197,9 +197,9 @@ export default function OtherSignUpPage() {
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Zone</label>
 
-          <Select value={zoneId} onValueChange={setZoneId} disabled={!regionId}>
+          <Select value={zoneId} onValueChange={setZoneId} disabled={!regionId || zones.length === 0}>
             <SelectTrigger className="h-11 w-full rounded-xl">
-              <SelectValue placeholder="Select Zone" />
+              <SelectValue placeholder={!!regionId && zones.length === 0 ? "No zones available" : "Select Zone"} />
             </SelectTrigger>
 
             <SelectContent className="w-full">
@@ -217,9 +217,9 @@ export default function OtherSignUpPage() {
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Woreda</label>
 
-          <Select value={woredaId} onValueChange={setWoredaId} disabled={!zoneId}>
+          <Select value={woredaId} onValueChange={setWoredaId} disabled={!zoneId || woredas.length === 0}>
             <SelectTrigger className="h-11 w-full rounded-xl">
-              <SelectValue placeholder="Select Woreda" />
+              <SelectValue placeholder={!!zoneId && woredas.length === 0 ? "No woredas available" : "Select Woreda"} />
             </SelectTrigger>
 
             <SelectContent className="w-full">
@@ -237,9 +237,9 @@ export default function OtherSignUpPage() {
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Kebele</label>
 
-          <Select value={kebeleId} onValueChange={setKebeleId} disabled={!woredaId}>
+          <Select value={kebeleId} onValueChange={setKebeleId} disabled={!woredaId || kebeles.length === 0}>
             <SelectTrigger className="h-11 w-full rounded-xl">
-              <SelectValue placeholder="Select Kebele" />
+              <SelectValue placeholder={!!woredaId && kebeles.length === 0 ? "No kebeles available" : "Select Kebele"} />
             </SelectTrigger>
 
             <SelectContent className="w-full">

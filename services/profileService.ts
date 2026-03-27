@@ -102,12 +102,7 @@ export const createProfile = async (data: {
       formData.append("image", data.image)
     }
 
-    const res = await instance.post("/profile", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`, // <-- add token here
-      },
-    })
+    const res = await instance.post("/profile", formData)
 
     return res.data
    } catch (error) {
@@ -117,11 +112,7 @@ export const createProfile = async (data: {
 }
 
 export const updateProfile = async (formData: FormData) => {
-  const res = await instance.patch("/profile", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const res = await instance.patch("/profile", formData);
 
   console.log("AXIOS RAW RESPONSE:", res); 
 
