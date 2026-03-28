@@ -33,6 +33,7 @@ export const addProducts = async (data: CreateProductPayload) => {
 export const getProducts= async (): Promise<Product[]> => {
   try {
     const res = await instance.get("/product")
+    console.log(res.data)
     return res.data
   } catch (error) {
     console.error("Get products error:", error)
@@ -53,7 +54,7 @@ export const getMyProducts = async (): Promise<Product[]> => {
 export const getProductById = async (id: string) => {
   try {
     const res = await instance.get(`/product/${id}`)
-    // console.log(res.data)
+    console.log(res.data)
     return res.data
   } catch (error) {
     console.log("Get product by id error:", error)

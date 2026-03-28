@@ -295,53 +295,47 @@ export default function ProductDetailPage() {
 
 
             {/* FARMER CARD */}
-
             {product.farmer && (
-
               <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border mb-8">
 
                 <div className="flex items-center gap-3">
 
+                  {/* IMAGE */}
                   <div className="relative h-12 w-12 rounded-full overflow-hidden bg-gray-200">
-
                     <Image
-                      src="/placeholder.png"
+                      src={product.farmer?.profile?.imageUrl || "/placeholder.png"}
                       alt="Farmer"
                       fill
                       className="object-cover"
                     />
-
                   </div>
 
                   <div>
 
+                    {/* NAME */}
                     <h3 className="font-semibold text-sm text-gray-900">
-                      {product.farmer.email}
+                      {product.farmer?.profile?.fullName || "Unknown Farmer"}
                     </h3>
 
-                    {product.farmer.phone && (
+                    {/* EMAIL */}
+                    <p className="text-xs text-gray-500">
+                      {product.farmer?.email}
+                    </p>
 
+                    {/* PHONE */}
+                    {product.farmer?.phone && (
                       <div className="text-xs text-gray-500 mt-1">
-
                         {!showPhone ? (
-
                           <button
                             onClick={() => setShowPhone(true)}
                             className="text-emerald-600 font-medium hover:underline"
                           >
                             Show Phone Number
                           </button>
-
                         ) : (
-
-                          <span>
-                            Farmer • {product.farmer.phone}
-                          </span>
-
+                          <span>📞 {product.farmer.phone}</span>
                         )}
-
                       </div>
-
                     )}
 
                   </div>
@@ -349,7 +343,6 @@ export default function ProductDetailPage() {
                 </div>
 
                 <Button
-                  // onClick={handleSend}
                   variant="outline"
                   className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg text-sm h-9"
                 >
@@ -358,7 +351,6 @@ export default function ProductDetailPage() {
                 </Button>
 
               </div>
-
             )}
 
 
@@ -427,8 +419,9 @@ export default function ProductDetailPage() {
                 </p>
 
                 <p className="text-sm font-semibold">
-                  {product.farmer?.profile?.kebele?.name},
-                  {product.farmer?.profile?.kebele?.woreda?.name}
+
+                 
+                  {product.farmer?.profile?.kebele?.woreda?.zone?.region?.name} • {product.farmer?.profile?.kebele?.woreda?.zone?.name} • {product.farmer?.profile?.kebele?.woreda?.name} • {product.farmer?.profile?.kebele?.name}
                 </p>
               </div>
 

@@ -38,7 +38,7 @@ export default function BuyerOrdersPage() {
 
   const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
-      case "completed":
+      case "paid":
         return "bg-green-100 text-green-700"
       case "pending":
         return "bg-yellow-100 text-yellow-700"
@@ -96,8 +96,8 @@ export default function BuyerOrdersPage() {
                         <Image
                           src={item.product?.image }
                           alt={item.product?.name }
-                          width={50}
-                          height={50}
+                          width={40}
+                          height={40}
                           className="rounded-md object-cover border"
                         />
 

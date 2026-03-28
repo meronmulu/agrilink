@@ -2,7 +2,7 @@ import React from "react"
 import Header from "@/components/Header"
 import Sidebar from "@/components/Sidebar"
 import ProtectedRoute from "@/components/ProtectedRoute"
-import Footer from "@/components/Footer"
+import AiAssistant from "@/components/AiAssistance"
 
 export default function FarmerDashboardLayout({
     children,
@@ -28,6 +28,7 @@ export default function FarmerDashboardLayout({
                     <div className="max-w-7xl mx-auto p-8 min-h-[calc(100vh-16rem)]">
                         {children}
                     </div>
+                    <AiAssistant/>
                 </main>
             </div>
             <Footer />

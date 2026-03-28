@@ -44,6 +44,7 @@ import {
 
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
+import Image from "next/image"
 
 export default function AdminUsersPage() {
 
@@ -78,6 +79,7 @@ export default function AdminUsersPage() {
     setLoading(true)
     try {
       const data = await getUsers()
+      console.log("FRONTEND DATA:", data)
       setUsers(data)
     } catch (err) {
       console.error(err)
@@ -124,9 +126,9 @@ export default function AdminUsersPage() {
       setConfirmPassword("")
     } catch (error) {
       console.log(error)
-     toast.error("Failed to update password")
+      toast.error("Failed to update password")
 
-}
+    }
   }
 
   //  FILTER + SORT (NEWEST FIRST)
@@ -169,13 +171,13 @@ export default function AdminUsersPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-          User Management
-        </h1>
-        <p className="text-sm text-gray-500">
-          Manage users, roles, and account status
-        </p>
+            User Management
+          </h1>
+          <p className="text-sm text-gray-500">
+            Manage users, roles, and account status
+          </p>
         </div>
-        
+
 
         {/* FILTERS */}
         <div className="flex gap-2 flex-wrap">
@@ -236,7 +238,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* TABLE */}
-     <Card className=" ">
+      <Card className=" ">
         <CardContent className="p-4">
           <div className="overflow-x-auto">
 
@@ -264,7 +266,24 @@ export default function AdminUsersPage() {
                     <TableRow key={user.id} className="hover:bg-gray-50">
 
                       <TableCell className="pl-6">
-                        {user.profile?.fullName || "No Name"}
+                        <div className="flex items-center gap-3">
+
+                          {/* Avatar */}
+                          <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
+                            <Image
+                              src={user.profile?.imageUrl || "/placeholder.png"}
+                              alt={user.profile?.fullName || "User"}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+
+                          {/* Name */}
+                          <span className="font-medium text-gray-900 capitalize">
+                            {user.profile?.fullName || "No Name"}
+                          </span>
+
+                        </div>
                       </TableCell>
 
                       <TableCell>{user.email}</TableCell>
@@ -305,7 +324,7 @@ export default function AdminUsersPage() {
                               }}
                             >
                               <Pencil size={14} className="mr-2" />
-                              Edit Password
+                              Update Password
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -331,8 +350,8 @@ export default function AdminUsersPage() {
 
           </div>
         </CardContent>
-      </Card> 
-       
+      </Card>
+
 
       {/* PAGINATION */}
       <div className="flex justify-between items-center">
@@ -412,7 +431,7 @@ export default function AdminUsersPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
             <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '
-             onClick={handleUpdatePassword}>
+              onClick={handleUpdatePassword}>
               Update
             </Button>
           </DialogFooter>
