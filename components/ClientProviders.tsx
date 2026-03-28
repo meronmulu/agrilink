@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { CartProvider } from '@/context/CartContext';
+import { MessageProvider } from '@/context/MessageContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import i18n from '@/lib/i18n';
 
@@ -22,7 +23,9 @@ export default function ClientProviders({ children }: { children: React.ReactNod
       <AuthProvider>
         <LanguageProvider>
           <CartProvider>
-            {children}
+            <MessageProvider>
+              {children}
+            </MessageProvider>
           </CartProvider>
         </LanguageProvider>
       </AuthProvider>

@@ -1,8 +1,10 @@
+
 export interface Message {
   id: string
   message: string
   senderId: string
   createdAt: string
+  isRead?: boolean
 }
 
 export interface Conversation {
@@ -13,8 +15,9 @@ export interface Conversation {
   }
   userOneId?: string
   userTwoId?: string
-  messages?: Array<{ message?: string; text?: string; content?: string; senderId?: string;[key: string]: any }>
-  chatMessages?: Array<{ message?: string; text?: string; content?: string; senderId?: string;[key: string]: any }>
+  messages?: Message[]
+  chatMessages?: Message[]
   data?: any
   lastMessage?: string
+  unreadCount?: number
 }

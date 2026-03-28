@@ -9,7 +9,7 @@ type Ctx = {
   loading: boolean;
 };
 
-const LanguageContext = createContext<Ctx | undefined>(undefined);
+export const LanguageContext = createContext<Ctx | undefined>(undefined);
 
 // Simple in-memory cache for loaded locales
 const localeCache: Record<string, Record<string, string> | null> = {

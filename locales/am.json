@@ -178,5 +178,13 @@
   "settings_push_notifications": "የመገጨታ ማሳወቂያዎች",
   "settings_push_desc": "የመገጨታ ማሳወቂያዎችን ያገኙ",
   "settings_saving": "በማስቀመጥ ላይ...",
-  "settings_save_changes": "ለውጦችን አስቀምጥ"
+  "settings_save_changes": "ለውጦችን አስቀምጥ",
+  "no_orders_yet": "አሁን ምንም ትዕዛዞች የሉም",
+  "my_orders": "የኔ ትዕዛዞች",
+  "product": "ምርት",
+  "quantity": "ብዛት",
+  "price": "ዋጋ",
+  "total_price": "ጠቅላላ ዋጋ",
+  "status": "ሁኔታ",
+  "date": "ቀን"
 }

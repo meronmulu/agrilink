@@ -178,5 +178,13 @@
   "settings_push_notifications": "Beeksisa Daangessaa",
   "settings_push_desc": "Beeksisa daangessaa argadhu",
   "settings_saving": "Olaantumaan...",
-  "settings_save_changes": "Jijjiiramaa Olkaa'i"
+  "settings_save_changes": "Jijjiiramaa Olkaa'i",
+  "no_orders_yet": "Ajajni hin jiru",
+  "my_orders": "Ajajoota Kooti",
+  "product": "Oomisha",
+  "quantity": "Baay'ina",
+  "price": "Gatii",
+  "total_price": "Gatii Waliigala",
+  "status": "Sadarkaa",
+  "date": "Guyyaa"
 }

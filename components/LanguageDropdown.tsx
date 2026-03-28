@@ -36,7 +36,11 @@ export default function LanguageDropdown() {
       >
         <Globe className="w-4 h-4" />
         <span className="text-sm">
-          {OPTIONS.find((o) => o.value === lang)?.flag} {lang.toUpperCase()}
+          {/* Always render all flags, but only show the selected one to avoid hydration mismatch */}
+          {(() => {
+            const opt = OPTIONS.find((o) => o.value === lang)
+            return opt ? `${opt.flag} ${lang.toUpperCase()}` : lang.toUpperCase()
+          })()}
         </span>
       </button>
 

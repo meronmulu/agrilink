@@ -7,10 +7,12 @@ import { LayoutDashboard, ShoppingBag, MessageSquare, BrainCircuit, Settings, Sp
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
+import { useMessage } from '@/context/MessageContext'
 
 export default function Sidebar() {
   const pathname = usePathname()
   const { cartCount } = useCart()
+  const { unreadCount } = useMessage()
   const { user } = useAuth()
   console.log("USER ROLE:", user?.role)
 
@@ -28,7 +30,7 @@ export default function Sidebar() {
     BUYER: [
       { name: 'Orders', href: '/buyer/order', icon: ListOrdered },
       { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
-      { name: 'Messages', href: '/message', icon: MessageSquare, badge: 3 },
+      { name: 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Insights', href: '/buyer/insights', icon: BrainCircuit },
     ],
 
@@ -36,7 +38,7 @@ export default function Sidebar() {
       { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
       { name: 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
-      { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
+      { name: 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
     ],
 
