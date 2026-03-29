@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 type Role = 'ADMIN' | 'AGENT' | 'BUYER' | 'FARMER'
 
@@ -14,29 +15,34 @@ export default function ProtectedRoute({
   roles?: Role[]
 }) {
 
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
+  const router = useRouter()
 
+  //  Handle redirect AFTER loading
   useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.replace("/")
+        return
+      }
 
-    if (!user) {
-      window.location.href = "/"
-      return
+      if (roles && !roles.includes(user.role as Role)) {
+        router.replace("/unauthorized")
+      }
     }
+  }, [user, loading, roles, router])
 
-    if (roles && !roles.includes(user.role as Role)) {
-      window.location.href = "/unauthorized"
-    }
-
-  }, [user, roles])
-
-  
-  if (!user) {
+  if (loading) {
     return (
-     <div className="h-[70vh] flex items-center justify-center">
+      <div className="h-[70vh] flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-500" size={32} />
       </div>
     )
   }
+
+  if (!user) return null
+
+  if (roles && !roles.includes(user.role as Role)) return null
 
   return <>{children}</>
 }

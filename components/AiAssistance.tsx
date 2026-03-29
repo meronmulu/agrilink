@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Plus, Send, X, Minimize2, Maximize2, Bot, User } from 'lucide-react'
+import { Plus, Send, Bot, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
 
@@ -60,7 +59,7 @@ export default function AiAssistant() {
         ...prev,
         { 
           role: 'ai', 
-          text: '❌ Failed to get response. Please try again.', 
+          text: ' Failed to get response. Please try again.', 
           timestamp: new Date(),
           isError: true 
         }
@@ -71,9 +70,7 @@ export default function AiAssistant() {
     }
   }
 
-  const clearChat = () => {
-    setMessages([])
-  }
+  
 
   const formatTime = (date: Date) => {
     return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -87,7 +84,8 @@ export default function AiAssistant() {
           onClick={() => setOpen(true)}
           className="rounded-full w-14 h-14 shadow-lg flex items-center justify-center bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 hover:scale-105"
         >
-          <Plus className="w-6 h-6 text-white" />
+          {/* <Plus className="w-6 h-6 text-white" /> */}
+          AI
         </Button>
       </div>
 

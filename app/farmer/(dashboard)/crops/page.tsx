@@ -68,9 +68,7 @@ export default function MyCropsPage() {
     fetchData()
   }, [])
 
-  const filteredSubcategories = selectedCategory
-    ? subcategories.filter((sub) => sub.categoryId === selectedCategory)
-    : []
+  
 
   //  DELETE FUNCTION
   const handleDelete = async () => {
@@ -98,11 +96,7 @@ export default function MyCropsPage() {
     }
   }
 
-  const clearFilters = () => {
-    setSearch("")
-    setSelectedCategory(null)
-    setSelectedSubCategory(null)
-  }
+ 
 
   const filteredCrops = crops
     .filter((crop) => {
@@ -123,7 +117,6 @@ export default function MyCropsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-600" size={40} />
-        <span className="ml-4 text-emerald-600 font-medium">{t('loading')}</span> {/* TODO: Add to locales */}
       </div>
     )
   }

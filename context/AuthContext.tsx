@@ -7,6 +7,7 @@ import { User } from '@/types/auth'
 
 interface AuthContextType {
   user: User | null
+  loading: boolean
   login: (credentials: { email?: string; phone?: string; password: string }) => Promise<User | null>
   logout: () => void
   setUser: React.Dispatch<React.SetStateAction<User | null>>
@@ -15,30 +16,34 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-
   const router = useRouter()
 
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
+  // ✅ Restore user on refresh
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const userString = localStorage.getItem("user")
-      if (userString) {
-        try {
-          const parsedUser = JSON.parse(userString)
-          setUser({
-            id: parsedUser.id,
-            role: parsedUser.role,
-            email: parsedUser.email ?? '',
-            phone: parsedUser.phone ?? '',
-          })
-        } catch (error) {
-          console.error("Failed to parse user data from local storage", error)
-        }
+    const userString = localStorage.getItem("user")
+
+    if (userString) {
+      try {
+        const parsedUser = JSON.parse(userString)
+
+        setUser({
+          id: parsedUser.id,
+          role: parsedUser.role,
+          email: parsedUser.email ?? '',
+          phone: parsedUser.phone ?? '',
+        })
+      } catch (error) {
+        console.error("Failed to parse user data", error)
       }
     }
+
+    setLoading(false) 
   }, [])
 
+  
   const login = async (credentials: { email?: string; phone?: string; password: string }) => {
     const res = await AuthService.login(credentials)
 
@@ -60,22 +65,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return null
   }
 
+  
   const logout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setUser(null)
-    router.push('/')
+    router.replace('/') 
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
+// Hook
 export const useAuth = () => {
   const context = useContext(AuthContext)
-  if (!context) throw new Error('useAuth must be used within an AuthProvider')
+  if (!context) throw new Error('useAuth must be used within AuthProvider')
   return context
 }
