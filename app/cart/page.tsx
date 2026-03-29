@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useLanguage } from '@/context/LanguageContext'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -24,6 +25,7 @@ import { checkoutOrder } from '@/services/orderService'
 import { toast } from 'sonner'
 
 export default function CartPage() {
+  const { t } = useLanguage()
   const [cart, setCart] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
@@ -36,7 +38,7 @@ export default function CartPage() {
       setCart(data)
     } catch (err) {
       console.error(err)
-      toast.error("Failed to load cart")
+      toast.error(t('failed_to_load_cart')) // TODO: Add to locales
     } finally {
       setLoading(false)
     }
@@ -55,10 +57,10 @@ export default function CartPage() {
     try {
       await updateCart({ productId, amount })
       await fetchCart()
-      toast.success("Quantity updated successfully")
+      toast.success(t('quantity_updated_successfully')) // TODO: Add to locales
     } catch (err) {
       console.error(err)
-      toast.error("Update failed")
+      toast.error(t('update_failed')) // TODO: Add to locales
     } finally {
       setUpdatingItems(prev => {
         const newSet = new Set(prev)
@@ -79,11 +81,11 @@ export default function CartPage() {
         prev.filter(item => item.product.id !== productId)
       )
 
-      toast.success("Product removed from cart")
+      toast.success(t('product_removed_from_cart')) // TODO: Add to locales
     } catch (err) {
       console.error(err)
       fetchCart()
-      toast.error("Remove failed")
+      toast.error(t('remove_failed')) // TODO: Add to locales
     } finally {
       setUpdatingItems(prev => {
         const newSet = new Set(prev)
@@ -95,15 +97,15 @@ export default function CartPage() {
 
 
   const handleClear = async () => {
-    if (!confirm('Are you sure you want to clear your cart?')) return
+    if (!confirm(t('clear_cart_confirm'))) return // TODO: Add to locales
 
     try {
       await clearCart()
       setCart([])
-      toast.success("Cart cleared")
+      toast.success(t('cart_cleared')) // TODO: Add to locales
     } catch (err) {
       console.error(err)
-      toast.error("Failed to clear cart")
+      toast.error(t('failed_to_clear_cart')) // TODO: Add to locales
     }
   }
 
@@ -121,7 +123,7 @@ export default function CartPage() {
 
     const res = await checkoutOrder(checkoutData)
 
-    toast.success("Order created. Redirecting to payment...")
+    toast.success(t('order_created_redirecting')) // TODO: Add to locales
 
     if (res?.paymentUrl) {
       window.location.href = res.paymentUrl
@@ -129,7 +131,7 @@ export default function CartPage() {
 
   } catch (error) {
     console.log(error)
-    toast.error("Checkout error")
+    toast.error(t('checkout_error')) // TODO: Add to locales
   } finally {
     setCheckingOut(false)
   }
@@ -159,6 +161,7 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-600" size={40} />
+        <span className="ml-4 text-emerald-600 font-medium">{t('loading')}</span> {/* TODO: Add to locales */}
       </div>
     )
   }
@@ -169,12 +172,12 @@ export default function CartPage() {
       <div className="max-w-7xl mx-auto px-4">
 
         {/* HEADER */}
-        <h1 className="text-2xl font-bold mb-8">Shopping Cart</h1>
+        <h1 className="text-2xl font-bold mb-8">{t('shopping_cart')}</h1> {/* TODO: Add to locales */}
 
         {cart.length === 0 ? (
           <div className="bg-white rounded-2xl shadow p-12 text-center">
             <ShoppingCart className="mx-auto mb-4 text-gray-400" size={50} />
-            <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+            <h2 className="text-xl font-semibold mb-2">{t('your_cart_is_empty')}</h2> {/* TODO: Add to locales */}
           </div>
         ) : (
           <div className="grid lg:grid-cols-12 gap-8">
@@ -252,19 +255,19 @@ export default function CartPage() {
 
             {/* SUMMARY */}
             <div className="lg:col-span-4 bg-white rounded-2xl shadow p-6 h-fit">
-              <h2 className="font-semibold mb-4">Order Summary</h2>
+              <h2 className="font-semibold mb-4">{t('order_summary')}</h2> {/* TODO: Add to locales */}
 
               <div className="flex justify-between text-sm text-gray-600">
-                <span>Items</span>
+                <span>{t('items')}</span>
                 <span>{cart.length}</span>
               </div>
               <div className="flex justify-between mb-2">
-                <span>Subtotal</span>
+                <span>{t('subtotal')}</span>
                 <span>ETB {subtotal.toLocaleString()}</span>
               </div>
 
               <div className="flex justify-between text-lg font-bold border-t pt-4">
-                <span>Total</span>
+                <span>{t('total')}</span>
                 <span className="text-emerald-600">
                   ETB {total.toLocaleString()}
                 </span>
@@ -278,7 +281,7 @@ export default function CartPage() {
                 {checkingOut ? (
                   <Loader2 className="animate-spin mx-auto" />
                 ) : (
-                  "Proceed to Checkout"
+                  t('proceed_to_checkout')
                 )}
               </Button>
 
@@ -287,7 +290,7 @@ export default function CartPage() {
                 className="w-full mt-3"
                 onClick={handleClear}
               >
-                Clear Cart
+                {t('clear_cart')}
               </Button>
             </div>
 

@@ -178,5 +178,13 @@
   "settings_push_notifications": "Push Notifications",
   "settings_push_desc": "Receive push notifications",
   "settings_saving": "Saving...",
-  "settings_save_changes": "Save Changes"
+  "settings_save_changes": "Save Changes",
+  "no_orders_yet": "No orders yet",
+  "my_orders": "My Orders",
+  "product": "Product",
+  "quantity": "Quantity",
+  "price": "Price",
+  "total_price": "Total Price",
+  "status": "Status",
+  "date": "Date"
 }

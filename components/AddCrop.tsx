@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import { useLanguage } from '@/context/LanguageContext'
 import Cropper from 'react-easy-crop'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 export default function AddCrop() {
+    const { t } = useLanguage();
     // Image Cropping State
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
@@ -103,20 +105,20 @@ export default function AddCrop() {
     const handleSaveCrop = async () => {
   try {
     // 🔍 Validation
-    if (!name || !category || !amount || !price) {
-      toast.error("Please fill all required fields")
-      return
-    }
+        if (!name || !category || !amount || !price) {
+            toast.error(t('addcrop_required_fields'))
+            return
+        }
 
-    const imageBlob = await getCroppedImageBlob()
+        const imageBlob = await getCroppedImageBlob()
 
-    if (!imageBlob) {
-      toast.error("Please upload and crop an image")
-      return
-    }
+        if (!imageBlob) {
+            toast.error(t('addcrop_upload_crop_image'))
+            return
+        }
 
-    // ⏳ Optional loading toast
-    const loadingToast = toast.loading("Uploading product...")
+        // ⏳ Optional loading toast
+        const loadingToast = toast.loading(t('addcrop_uploading_product'))
 
     // 🚀 API call
     await addProducts({
@@ -130,7 +132,7 @@ export default function AddCrop() {
 
     // ✅ Success
     toast.dismiss(loadingToast)
-    toast.success("Product uploaded successfully ")
+    toast.success(t('addcrop_product_uploaded'))
 
     // 🔁 Redirect
     setTimeout(() => {
@@ -140,11 +142,11 @@ export default function AddCrop() {
   } catch (error: any) {
     console.error(error)
 
-    toast.error(
-      error?.response?.data?.message ||
-      error?.message ||
-      "Something went wrong."
-    )
+        toast.error(
+            error?.response?.data?.message ||
+            error?.message ||
+            t('addcrop_something_wrong')
+        )
   }
 }
 
@@ -154,8 +156,8 @@ export default function AddCrop() {
             <header className="bg-white border-b border-slate-100 px-6 py-4  flex rounded-2xl ">
                 {/* Header */}
                 <div className=" border-slate-100 pb-6">
-                    <h1 className="text-2xl font-bold text-slate-900 mb-1">Add New Crop</h1>
-                    <p className="text-sm text-slate-500">Fill in the details, set your price, and upload a clear image of your produce.</p>
+                    <h1 className="text-2xl font-bold text-slate-900 mb-1">{t('addcrop_title')}</h1>
+                    <p className="text-sm text-slate-500">{t('addcrop_subtitle')}</p>
                 </div>
             </header>
             {/* Main Content */}
@@ -170,20 +172,20 @@ export default function AddCrop() {
 
 
                             <div className="space-y-1.5">
-                                <Label className="text-sm font-semibold text-slate-700">Crop Name <span className="text-red-500">*</span></Label>
+                                <Label className="text-sm font-semibold text-slate-700">{t('addcrop_crop_name')} <span className="text-red-500">*</span></Label>
                                 <Input
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="e.g. Premium Teff"
+                                    placeholder={t('addcrop_crop_name_placeholder')}
                                     className="h-11 shadow-sm border-slate-200"
                                 />
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label className="text-sm font-semibold text-slate-700">Category <span className="text-red-500">*</span></Label>
+                                <Label className="text-sm font-semibold text-slate-700">{t('addcrop_category')} <span className="text-red-500">*</span></Label>
                                 <Select value={category} onValueChange={setCategory}>
                                     <SelectTrigger className="h-11 w-full shadow-sm border-slate-200">
-                                        <SelectValue placeholder="Select a category" />
+                                        <SelectValue placeholder={t('addcrop_select_category')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {subCategories.map((sub) => (
@@ -196,7 +198,7 @@ export default function AddCrop() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label className="text-sm font-semibold text-slate-700">Description</Label>
+                                <Label className="text-sm font-semibold text-slate-700">{t('addcrop_description')}</Label>
                                 <div className="border border-slate-200 rounded-lg shadow-sm focus-within:ring-1 focus-within:ring-[#10B981] focus-within:border-[#10B981] overflow-hidden">
 
                                     <textarea
@@ -204,10 +206,10 @@ export default function AddCrop() {
                                         onChange={(e) => setDescription(e.target.value)}
                                         rows={4}
                                         className="w-full p-3 text-sm border-none focus:ring-0 resize-none placeholder:text-slate-400 outline-none"
-                                        placeholder="Describe your crop details, harvest method, quality, etc."
+                                        placeholder={t('addcrop_description_placeholder')}
                                     />
                                 </div>
-                                <p className="text-xs text-slate-400 text-right">{description.length}/2000 characters</p>
+                                <p className="text-xs text-slate-400 text-right">{description.length}/2000 {t('addcrop_characters')}</p>
                             </div>
                         </div>
 
@@ -216,7 +218,7 @@ export default function AddCrop() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
-                                    <Label className="text-sm font-semibold text-slate-700">Price (ETB) <span className="text-red-500">*</span></Label>
+                                    <Label className="text-sm font-semibold text-slate-700">{t('addcrop_price')} <span className="text-red-500">*</span></Label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <span className="text-slate-500 sm:text-sm font-medium">ETB</span>
@@ -225,19 +227,19 @@ export default function AddCrop() {
                                             type="number"
                                             value={price}
                                             onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                                            placeholder="0.00"
+                                            placeholder={t('addcrop_price_placeholder')}
                                             className="h-11 pl-12 shadow-sm border-slate-200"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label className="text-sm font-semibold text-slate-700">Available Amount <span className="text-red-500">*</span></Label>
+                                    <Label className="text-sm font-semibold text-slate-700">{t('addcrop_available_amount')} <span className="text-red-500">*</span></Label>
                                     <Input
                                         type="number"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                                        placeholder="e.g. 50 (kg or quintals)"
+                                        placeholder={t('addcrop_available_amount_placeholder')}
                                         className="h-11 shadow-sm border-slate-200"
                                     />
                                 </div>
@@ -248,7 +250,7 @@ export default function AddCrop() {
                         {/* SECTION 3: Photos */}
                         <div className="space-y-6">
                             <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                Crop Photo <span className="text-red-500 text-sm">*</span>
+                                {t('addcrop_crop_photo')} <span className="text-red-500 text-sm">*</span>
                             </h2>
 
                             <div className="space-y-4">
@@ -264,8 +266,8 @@ export default function AddCrop() {
                                         <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-slate-400">
                                             <Camera className="w-6 h-6" />
                                         </div>
-                                        <span className="text-sm font-semibold text-slate-700">Click to upload a crop image</span>
-                                        <span className="text-xs text-slate-400">PNG, JPG up to 10MB</span>
+                                        <span className="text-sm font-semibold text-slate-700">{t('addcrop_click_upload')}</span>
+                                        <span className="text-xs text-slate-400">{t('addcrop_upload_hint')}</span>
                                     </Label>
                                 </div>
 
@@ -287,11 +289,11 @@ export default function AddCrop() {
                                         </div>
                                         <div className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
                                             <div className="flex items-center gap-4">
-                                                <span className="text-xs font-medium text-slate-600 w-12">Zoom</span>
+                                                <span className="text-xs font-medium text-slate-600 w-12">{t('addcrop_zoom')}</span>
                                                 <Slider value={[zoom]} min={1} max={3} step={0.1} onValueChange={(val) => setZoom(val[0])} className="flex-1" />
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <span className="text-xs font-medium text-slate-600 w-12">Rotate</span>
+                                                <span className="text-xs font-medium text-slate-600 w-12">{t('addcrop_rotate')}</span>
                                                 <Slider value={[rotation]} min={0} max={360} step={1} onValueChange={(val) => setRotation(val[0])} className="flex-1" />
                                             </div>
                                         </div>
@@ -303,11 +305,11 @@ export default function AddCrop() {
                         {/* Bottom Actions */}
                         <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100 mt-8">
                             <Button variant="outline" className="text-slate-600 border-slate-200 hover:bg-slate-50 font-medium px-6 h-11">
-                                Cancel
+                                {t('addcrop_cancel')}
                             </Button>
                             <Button onClick={handleSaveCrop} className="bg-[#10B981] hover:bg-[#059669] text-white shadow-sm font-medium px-6 h-11 flex items-center gap-2">
                                 <Save className="w-4 h-4" />
-                                Save & Upload
+                                {t('addcrop_save_upload')}
                             </Button>
                         </div>
 

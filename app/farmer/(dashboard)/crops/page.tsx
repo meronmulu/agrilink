@@ -4,7 +4,8 @@ import { Search, Plus, Sprout, Pencil, Trash2, Layers, XCircle, ChevronDown, Loa
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
+import { useLanguage } from '@/context/LanguageContext'
 import { getMyProducts, deleteProducts } from '@/services/productService'
 import { Product } from '@/types/product'
 import Image from 'next/image'
@@ -22,6 +23,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { toast } from 'sonner'
 
 export default function MyCropsPage() {
+  const { t } = useLanguage()
 
   const [crops, setCrops] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -80,7 +82,7 @@ export default function MyCropsPage() {
       // remove from UI
       setCrops((prev) => prev.filter((crop) => crop.id !== deleteId))
 
-      toast.success("Crop deleted successfully. ")
+      toast.success(t('crop_deleted_successfully')) // TODO: Add to locales
 
 
 
@@ -91,7 +93,7 @@ export default function MyCropsPage() {
       toast.error(
         // error?.response?.data?.message ||
         // error?.message ||
-        "Something went wrong."
+        t('something_went_wrong') // TODO: Add to locales
       )
     }
   }
@@ -121,6 +123,7 @@ export default function MyCropsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-600" size={40} />
+        <span className="ml-4 text-emerald-600 font-medium">{t('loading')}</span> {/* TODO: Add to locales */}
       </div>
     )
   }
@@ -130,14 +133,14 @@ export default function MyCropsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">My Crops</h1>
-          <p className="text-gray-500">Manage your listings</p>
+          <h1 className="text-3xl font-bold">{t('my_crops')}</h1> {/* TODO: Add to locales */}
+          <p className="text-gray-500">{t('manage_your_listings')}</p> {/* TODO: Add to locales */}
         </div>
 
         <Link href="/farmer/crops/add-crop">
           <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-5">
             <Plus className="mr-2" size={18} />
-            Post New Crop
+            {t('post_new_crop')}
           </Button>
         </Link>
       </div>
@@ -148,7 +151,7 @@ export default function MyCropsPage() {
         <div className="relative flex-1 min-w-62.5 py-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <Input
-            placeholder="Search..."
+            placeholder={t('search_placeholder')}
             className="pl-10 "
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -161,7 +164,7 @@ export default function MyCropsPage() {
               <ChevronDown size={16} />
               {selectedSubCategory
                 ? subcategories.find(s => s.id === selectedSubCategory)?.name
-                : "Categories"}
+                : t('categories')}
             </Button>
           </DropdownMenuTrigger>
 
@@ -169,7 +172,7 @@ export default function MyCropsPage() {
 
             {/* Reset Filter */}
             <DropdownMenuItem onClick={() => setSelectedSubCategory(null)}>
-              All Categories
+              {t('all_categories')}
             </DropdownMenuItem>
 
             <DropdownMenuSeparator />
@@ -208,10 +211,10 @@ export default function MyCropsPage() {
         filteredCrops.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-lg font-medium text-gray-600">
-              No products in this category
+              {t('no_products_in_category')}
             </p>
             <p className="text-sm text-gray-400 mt-2">
-              Try selecting another category or search again.
+              {t('try_selecting_another_category')}
             </p>
           </div>
         ) : (
@@ -244,18 +247,19 @@ export default function MyCropsPage() {
                     {/* Buttons */}
                     <div className="absolute top-3 right-3 flex gap-2">
 
-                      <Link href={`/farmer/crops/${crop.id}`}>
-                        <button className="p-2 bg-white rounded-full shadow">
-                          <Pencil size={16} />
-                        </button>
-                      </Link>
+            <Link href={`/farmer/crops/${crop.id}`}>
+            <button className="p-2 bg-white rounded-full shadow" title={t('edit_crop')}>
+              <Pencil size={16} />
+            </button>
+            </Link>
 
-                      <button
-                        onClick={() => setDeleteId(crop.id)}
-                        className="p-2 bg-white rounded-full text-red-600 shadow"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+            <button
+            onClick={() => setDeleteId(crop.id)}
+            className="p-2 bg-white rounded-full text-red-600 shadow"
+            title={t('delete_crop')}
+            >
+            <Trash2 size={16} />
+            </button>
 
                     </div>
                   </div>
@@ -294,23 +298,24 @@ export default function MyCropsPage() {
       }}>
         <DialogContent className="rounded-2xl">
           <DialogHeader>
-            <DialogTitle>Delete Crop</DialogTitle>
+            <DialogTitle>{t('delete_crop')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this crop?
-              This action cannot be undone.
+              {t('delete_crop_confirm')}
+              <br />
+              {t('action_cannot_be_undone')}
             </DialogDescription>
           </DialogHeader>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>
-              Cancel
+              {t('cancel')}
             </Button>
 
             <Button
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={handleDelete}
             >
-              Delete
+              {t('delete')}
             </Button>
           </DialogFooter>
         </DialogContent>
