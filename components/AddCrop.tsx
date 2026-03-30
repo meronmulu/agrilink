@@ -36,7 +36,7 @@ export default function AddCrop() {
     const router = useRouter()
     
 
-    const onCropComplete = useCallback((_, croppedAreaPixels: any) => {
+    const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
         setCroppedAreaPixels(croppedAreaPixels)
     }, [])
 

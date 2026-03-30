@@ -134,9 +134,11 @@ export default function AdminUsersPage() {
   //  FILTER + SORT (NEWEST FIRST)
   const filteredUsers = users
     .slice()
-    .sort((a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+    .sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return bTime - aTime
+    })
     .filter((user) => {
       const matchesSearch =
         user.profile?.fullName?.toLowerCase().includes(search.toLowerCase()) ||
@@ -274,6 +276,7 @@ export default function AdminUsersPage() {
                               src={user.profile?.imageUrl || "/placeholder.png"}
                               alt={user.profile?.fullName || "User"}
                               fill
+                              unoptimized
                               className="object-cover"
                             />
                           </div>

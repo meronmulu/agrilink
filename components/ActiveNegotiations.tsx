@@ -1,39 +1,47 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Handshake } from 'lucide-react'
+import { Handshake, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-
-// Mock Data
-const negotiations = [
-    {
-        id: 1,
-        product: 'Premium Teff (High Grade)',
-        farmer: 'Abebe Kebede',
-        image: 'https://images.unsplash.com/photo-1586201375761-83865001e8ac?auto=format&fit=crop&q=80&w=2070',
-        quantity: '200 kg',
-        currentPrice: '165 ETB/kg',
-        originalPrice: '180 ETB/kg',
-        status: 'Counter Offer Received',
-        statusColor: 'bg-amber-100 text-amber-700',
-        actions: ['Review Offer', 'Message']
-    },
-    {
-        id: 2,
-        product: 'Organic Avocados',
-        farmer: "Sara's Organic Farm",
-        image: 'https://images.unsplash.com/photo-1519448896000-844d18fa0fd4?auto=format&fit=crop&q=80&w=2074&ixlib=rb-4.0.3',
-        quantity: '500 kg',
-        myOffer: '85 ETB/kg',
-        status: 'Awaiting Farmer Response',
-        statusColor: 'bg-blue-100 text-blue-700',
-        actions: ['Withdraw Offer']
-    }
-]
+import { getActiveNegotiations, NegotiationItem } from '@/services/buyerService'
 
 export default function ActiveNegotiations() {
+    const [negotiations, setNegotiations] = useState<NegotiationItem[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchNegotiations = async () => {
+            try {
+                const data = await getActiveNegotiations()
+                setNegotiations(data)
+            } catch (error) {
+                console.error('Failed to fetch negotiations:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchNegotiations()
+    }, [])
+
+    if (loading) {
+        return (
+            <Card className="rounded-2xl border-gray-100 shadow-sm border">
+                <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="text-lg font-bold flex items-center gap-2">
+                        <Handshake className="text-emerald-500" size={20} />
+                        Active Negotiations
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6">
+                    <Loader2 className="animate-spin text-gray-400" size={24} />
+                </CardContent>
+            </Card>
+        )
+    }
+
     return (
-        <Card className="rounded-2xl border-gray-100 shadow-sm border overflow-hidden">
+        <Card className="rounded-2xl border-gray-100 shadow-sm border">
             <CardHeader className="p-4 sm:p-6 border-b border-gray-100 bg-white flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-lg font-bold flex items-center gap-2 text-gray-900">
                     <Handshake className="text-emerald-500 shrink-0" size={20} />

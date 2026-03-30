@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket Chat Test</title>
+</head>
+<body>
+
+<h2>Simple Chat Test</h2>
+
+<label>User ID:</label>
+<input id="userId" placeholder="userA" />
+<button onclick="join()">Join</button>
+
+<br><br>
+
+<label>Receiver ID:</label>
+<input id="receiverId" placeholder="userB" />
+
+<br><br>
+
+<input id="message" placeholder="Type message..." />
+<button onclick="sendMessage()">Send</button>
+
+<h3>Messages</h3>
+<ul id="messages"></ul>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+<script>
+ const socket = io("http://localhost:3000", {
+  transports: ["websocket"]
+});
+
+  socket.on("connect", () => {
+    console.log("Connected:", socket.id);
+  });
+
+  function join() {
+    const userId = document.getElementById("userId").value;
+    socket.emit("join", userId);
+    alert("Joined as " + userId);
+  }
+
+  function sendMessage() {
+    const senderId = document.getElementById("userId").value;
+    const receiverId = document.getElementById("receiverId").value;
+    const message = document.getElementById("message").value;
+
+    socket.emit("sendMessage", {
+      senderId: senderId,
+      receiverId: receiverId,
+      message: message
+    });
+  }
+
+  socket.on("receiveMessage", (msg) => {
+    const li = document.createElement("li");
+    li.textContent = msg.senderId + ": " + msg.message;
+    document.getElementById("messages").appendChild(li);
+  });
+
+</script>
+
+</body>
+</html>

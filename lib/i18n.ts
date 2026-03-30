@@ -13,7 +13,7 @@ if (typeof window !== 'undefined' && !i18n.isInitialized) {
       ns: ['common'],
       defaultNS: 'common',
       backend: {
-        loadPath: '/locales/{{lng}}/{{ns}}.json'
+        loadPath: '/locales/{{lng}}.json'
       },
       interpolation: { escapeValue: false },
       react: { useSuspense: true }

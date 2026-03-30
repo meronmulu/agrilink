@@ -1,10 +1,12 @@
 'use client'
 
+import { Suspense } from 'react'
 import Image from 'next/image'
 import img from "../../public/Agricultural.jpg"
 import { useLanguage } from '@/context/LanguageContext'
 import OtherSignUpPage from '@/components/OtherSignUpPage'
 
+export const dynamic = 'force-dynamic'
 
 export default function SignupPage() {
   const { t } = useLanguage()
@@ -50,8 +52,10 @@ export default function SignupPage() {
 
            
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                  <OtherSignUpPage/>
-                </div>
+              <Suspense fallback={<div>Loading signup form...</div>}>
+                <OtherSignUpPage />
+              </Suspense>
+            </div>
             
             </div>
 

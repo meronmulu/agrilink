@@ -13,11 +13,11 @@ const quickQuestions = [
 ];
 
 export default function CropAdvisorChat({ defaultLocation = "Central Ethiopia" }) {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [location, setLocation] = useState(defaultLocation);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,17 +52,18 @@ export default function CropAdvisorChat({ defaultLocation = "Central Ethiopia" }
         timestamp: new Date().toLocaleTimeString(),
       };
       setMessages((prev) => [...prev, aiMessage]);
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as any
       let errorMessage = "Sorry, I encountered an error. Please try again.";
-      if (error.code === "ECONNREFUSED") {
+      if (error?.code === "ECONNREFUSED") {
         errorMessage = "Cannot connect to the server.";
-      } else if (error.response) {
+      } else if (error?.response) {
         errorMessage = `Server error: ${error.response.status} - ${error.response.data?.detail || "Unknown error"}`;
-      } else if (error.request) {
+      } else if (error?.request) {
         errorMessage = "No response from server.";
-      } else if (error.message?.includes("Network Error")) {
+      } else if (error?.message?.includes("Network Error")) {
         errorMessage = "Network error. Check your connection.";
-      } else if (error.message?.includes("timeout")) {
+      } else if (error?.message?.includes("timeout")) {
         errorMessage = "Request timeout. The server is taking too long to respond.";
       }
       const errorMessageObj = {
@@ -77,7 +78,7 @@ export default function CropAdvisorChat({ defaultLocation = "Central Ethiopia" }
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -129,7 +130,7 @@ export default function CropAdvisorChat({ defaultLocation = "Central Ethiopia" }
                   {msg.agentBreakdown && msg.agentBreakdown.length > 0 && (
                     <div className="mt-2 text-xs">
                       <div className="font-bold mb-1">Expert Analysis:</div>
-                      {msg.agentBreakdown.map((agent, idx) => (
+                      {msg.agentBreakdown.map((agent: any, idx: number) => (
                         <div key={idx} className="mb-1">
                           <span className="font-semibold">{agent.agent_type?.replace("_", " ") || "Expert"}</span>
                           <div className="w-full bg-gray-200 rounded h-2 mt-1">

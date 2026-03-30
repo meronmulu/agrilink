@@ -86,7 +86,16 @@ export default function MessagesLayout({ children }: any) {
                       ? 'font-medium text-gray-900'
                       : 'text-gray-500'
                     }`}>
-                    {conv.messages?.[conv.messages.length - 1]?.message || 'No messages yet'}
+                    {(() => {
+                      const lastMsg = conv.messages?.[conv.messages.length - 1]
+                      if (!lastMsg) return 'No messages yet'
+                      const candidate = lastMsg.message ?? lastMsg.text ?? lastMsg.content
+                      if (typeof candidate === 'string' || typeof candidate === 'number') return candidate
+                      if (typeof candidate === 'object' && candidate !== null) {
+                        return candidate.message || candidate.text || candidate.content || JSON.stringify(candidate)
+                      }
+                      return 'No messages yet'
+                    })()}
                   </p>
                 </div>
               </div>

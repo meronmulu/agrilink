@@ -200,6 +200,7 @@ export default function ProductDetailPage() {
                 src={selectedImage || "/placeholder.png"}
                 alt={product.name}
                 fill
+                unoptimized
                 className="object-cover"
               />
 
@@ -222,6 +223,7 @@ export default function ProductDetailPage() {
                     src={img || "/placeholder.png"}
                     alt={`preview-${index}`}
                     fill
+                    unoptimized
                     className="object-cover"
                   />
 
@@ -306,6 +308,7 @@ export default function ProductDetailPage() {
                       src={product.farmer?.profile?.imageUrl || "/placeholder.png"}
                       alt="Farmer"
                       fill
+                      unoptimized
                       className="object-cover"
                     />
                   </div>
@@ -343,6 +346,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 <Button
+                  onClick={() => router.push(`/message/${product.farmer?.id}`)}
                   variant="outline"
                   className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg text-sm h-9"
                 >

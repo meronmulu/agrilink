@@ -43,9 +43,9 @@ export default function Sidebar() {
     ],
 
     AGENT: [
-      { name: 'Dashboard', href: '/Agent/dashboard', icon: LayoutDashboard },
-      { name: 'Farmers', href: '/Agent/farmer', icon: Users },
-      { name: 'Register Farmer', href: '/Agent/register-farmer', icon: Users },
+      { name: 'Dashboard', href: '/agent/dashboard', icon: LayoutDashboard },
+      { name: 'Farmers', href: '/agent/farmer', icon: Users },
+      { name: 'Register Farmer', href: '/agent/register-farmer', icon: Users },
       // { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
     ],
 

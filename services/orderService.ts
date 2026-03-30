@@ -1,7 +1,14 @@
 import instance from "@/axios"
 import { Order } from "@/types/order"
 
-export const checkoutOrder = async (data: Order) => {
+export interface CheckoutOrderPayload {
+  items: {
+    productId: string
+    amount: number
+  }[]
+}
+
+export const checkoutOrder = async (data: CheckoutOrderPayload) => {
   try {
     const res = await instance.post("/orders/checkout", data)
     console.log("Data:", res.data)
