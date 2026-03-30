@@ -61,8 +61,8 @@ export default function Sidebar() {
   const navItems = roleNav[user?.role as keyof typeof roleNav] || []
 
   return (
-    <aside className="w-64 border-r border-gray-200 bg-white hidden md:flex flex-col h-full shrink-0 pt-6">
-      <div className="px-4 space-y-2">
+<aside className="w-64 h-full border-r border-gray-200 bg-white hidden md:flex flex-col pt-6">     
+   <div className="px-4 space-y-2">
 
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href)
