@@ -1,19 +1,51 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { ShoppingCart, Handshake, Bookmark, Wallet } from 'lucide-react'
-
-// Mock Data
-const metrics = {
-    totalOrders: 12,
-    activeNegotiations: 5,
-    savedFarms: 8,
-    walletBalance: '45,200',
-}
+import { ShoppingCart, Handshake, Bookmark, Wallet, Loader2 } from 'lucide-react'
+import { getBuyerMetrics, BuyerMetrics } from '@/services/buyerService'
 
 export default function BuyerMetricsCards() {
+    const [metrics, setMetrics] = useState<BuyerMetrics | null>(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchMetrics = async () => {
+            try {
+                const data = await getBuyerMetrics()
+                setMetrics(data)
+            } catch (error) {
+                console.error('Failed to fetch buyer metrics:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchMetrics()
+    }, [])
+
+    if (loading) {
+        return (
+            <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8 px-6">
+                {[...Array(4)].map((_, i) => (
+                    <Card key={i} className="rounded-2xl border-gray-100 shadow-sm border">
+                        <CardContent className="p-4 sm:p-6">
+                            <Loader2 className="animate-spin text-gray-400" size={24} />
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        )
+    }
+
+    if (!metrics) {
+        return (
+            <div className="text-center py-8">
+                <p className="text-gray-500">Failed to load metrics</p>
+            </div>
+        )
+    }
+
     return (
         <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8 px-6">
-
             {/* Total Orders */}
             <Card className="rounded-2xl border-gray-100 shadow-sm border ">
                 <CardContent className="p-4 sm:p-6  items-start  gap-4 h-full">
@@ -74,7 +106,6 @@ export default function BuyerMetricsCards() {
                     </div>
                 </CardContent>
             </Card>
-
         </div>
     )
 }

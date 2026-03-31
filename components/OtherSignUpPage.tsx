@@ -13,13 +13,18 @@ import {
 } from "@/components/ui/select"
 
 import { Input } from "./ui/input"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 export default function OtherSignUpPage() {
   const router = useRouter()
-  const params = useSearchParams()
-  const role = params.get("role") || "BUYER"
+  const [role, setRole] = useState("BUYER")
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.search)
+    setRole(params.get("role") || "BUYER")
+  }, [])
 
   const [regions, setRegions] = useState<Region[]>([])
   const [zones, setZones] = useState<Zone[]>([])

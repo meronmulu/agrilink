@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Button } from "@/components/ui/button"
@@ -10,13 +10,20 @@ import { useAuth } from "@/context/AuthContext"
 
 export default function VerifyOTP() {
   const router = useRouter()
-  const params = useSearchParams()
 
   const { setUser } = useAuth()
 
-  const identifier = params.get("identifier") || ""
-  const purpose = params.get("purpose") || "SIGNUP"
-  const role = params.get("role") || "BUYER"
+  const [identifier, setIdentifier] = useState("")
+  const [purpose, setPurpose] = useState("SIGNUP")
+  const [role, setRole] = useState("BUYER")
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.search)
+    setIdentifier(params.get("identifier") || "")
+    setPurpose(params.get("purpose") || "SIGNUP")
+    setRole(params.get("role") || "BUYER")
+  }, [])
 
   const [otp, setOtp] = useState("")
   const [loading, setLoading] = useState(false)

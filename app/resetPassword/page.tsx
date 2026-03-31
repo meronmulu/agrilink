@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { resetPassword } from "@/services/authService"
@@ -9,8 +9,13 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/com
 
 export default function ResetPassword() {
   const router = useRouter()
-  const params = useSearchParams()
-  const identifier = params.get("identifier") || ""
+  const [identifier, setIdentifier] = useState("")
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.search)
+    setIdentifier(params.get("identifier") || "")
+  }, [])
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")

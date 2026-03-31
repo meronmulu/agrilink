@@ -1,6 +1,7 @@
 import React from "react"
 import Header from "@/components/Header"
 import Sidebar from "@/components/Sidebar"
+import Footer from "@/components/Footer"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import AiAssistant from "@/components/AiAssistance"
 

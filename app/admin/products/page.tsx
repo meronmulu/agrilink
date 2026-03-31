@@ -154,6 +154,7 @@ export default function AdminProductsPage() {
                           src={product.image || "/placeholder.png"}
                           alt={product.name}
                           fill
+                          unoptimized
                           className="object-cover"
                         />
 
@@ -230,6 +231,7 @@ export default function AdminProductsPage() {
                             src={product.farmer?.profile?.imageUrl || "/placeholder.png"}
                             alt="Farmer"
                             fill
+                            unoptimized
                             className="object-cover"
                           />
                         </div>

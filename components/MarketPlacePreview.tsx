@@ -65,6 +65,7 @@ export default function MarketPlacePreview() {
                     src={product.image || '/placeholder.png'}
                     alt={product.name}
                     fill
+                    unoptimized
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   

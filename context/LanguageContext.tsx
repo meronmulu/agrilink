@@ -20,9 +20,9 @@ const localeCache: Record<string, Record<string, string> | null> = {
 
 async function loadLocaleFile(lang: Lang) {
   if (localeCache[lang]) return localeCache[lang]!;
-  // dynamic import ensures lazy loading of JSON per language
-  const mod = await import(`@/locales/${lang}.json`);
-  const data = mod.default ?? mod;
+  // fetch from public/locales/
+  const response = await fetch(`/locales/${lang}.json`);
+  const data = await response.json();
   localeCache[lang] = data;
   return data;
 }

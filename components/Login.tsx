@@ -75,7 +75,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     const roleRoutes: Record<string, string> = {
       ADMIN: "/admin/dashboard",
-      AGENT: "/Agent/dashboard",
+      AGENT: "/agent/dashboard",
       BUYER: "/buyer",
       FARMER: "/farmer",
     };
@@ -135,7 +135,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     const roleRoutes: Record<string, string> = {
       ADMIN: "/admin/dashboard",
-      AGENT: "/Agent/dashboard",
+      AGENT: "/agent/dashboard",
       BUYER: "/buyer",
       FARMER: "/farmer",
     };
