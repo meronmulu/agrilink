@@ -36,36 +36,38 @@ import { createRoleRequest } from "@/services/roleRequestService"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { useCart } from "@/context/CartContext"
+import Image from "next/image"
 
 export default function Header() {
   const { user, logout } = useAuth()
+  console.log("HEADER USER:", user) // 👈 ADD HERE
   const router = useRouter()
   const { t } = useLanguage()
   const pathname = usePathname()
   const { cartCount } = useCart()
-  
+
 
   const dashboardRoute =
     user?.role === "FARMER"
       ? "/farmer/crops"
       : user?.role === "BUYER"
-      ? "/buyer/order"
-      : "/"
+        ? "/buyer/order"
+        : "/"
 
- const handleRoleRequest = async () => {
-  try {
-    await createRoleRequest();
+  const handleRoleRequest = async () => {
+    try {
+      await createRoleRequest();
 
-    toast.success("Role request submitted successfully ");
+      toast.success("Role request submitted successfully ");
 
-  } catch (error) {
-    console.log(error);
+    } catch (error) {
+      console.log(error);
 
-    toast.error(
-      // error?.message || 
-      "Failed to send request");
-  }
-};
+      toast.error(
+        // error?.message || 
+        "Failed to send request");
+    }
+  };
 
   type NavItem = {
     name: string
@@ -77,12 +79,12 @@ export default function Header() {
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
       { name: "Orders", href: "/buyer/order", icon: ShoppingBag },
-      { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart ,badge: cartCount},
+      { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart, badge: cartCount },
       { name: "Messages", href: "/message", icon: MessageSquare, badge: 3 },
       { name: "Market Insights", href: "/buyer/insights", icon: BrainCircuit },
     ],
 
-   FARMER: [
+    FARMER: [
       { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
       { name: 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
@@ -110,7 +112,7 @@ export default function Header() {
   return (
     <header className="w-full fixed h-16 top-0 left-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 flex items-center justify-between">
-        
+
         {/* LEFT SIDE */}
         <div className="flex items-center gap-3">
 
@@ -218,7 +220,7 @@ export default function Header() {
         {user && (
           <div className="flex items-center gap-4">
 
-            {(user.role === "BUYER" || user.role === "FARMER") && (
+            {user.role === "BUYER" && (
               <Button
                 onClick={handleRoleRequest}
                 className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 rounded-lg"
@@ -233,8 +235,23 @@ export default function Header() {
             <DropdownMenu>
 
               <DropdownMenuTrigger asChild>
-                <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center cursor-pointer">
-                  <UserIcon className="w-4 h-4" />
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <div className="relative h-8 w-8 rounded-full overflow-hidden bg-emerald-500 flex items-center justify-center">
+                    {user.profile?.imageUrl ? (
+                      <Image
+                        src={user.profile.imageUrl}
+                        alt={user.profile.fullName}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <UserIcon className="w-6 h-6 text-white" /> 
+                    )}
+                  </div>
+                  <div className="text-sm leading-4 text-gray-800 dark:text-white">
+                    <p>{user.profile?.fullName}</p>
+                    <p className=" text-emerald-600">{user.role.charAt(0) + user.role.slice(1).toLowerCase()}</p>
+                  </div>
                 </div>
               </DropdownMenuTrigger>
 
