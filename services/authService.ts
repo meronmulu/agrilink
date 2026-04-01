@@ -9,22 +9,9 @@ export const register = async (userData: RegisterRequest): Promise<User> => {
     const res = await instance.post<User>("/auth/signup", userData)
     console.log(res)
     return res.data
-  } catch (error: any) {
-    if (error.response) {
-      const err = new Error(error.response.data?.message || "Registration failed")
-      ;(err as any).status = error.response.status
-      throw err
-    } else if (error.code === "ECONNABORTED") {
-      const err = new Error("Server timeout. Please try again.")
-      ;(err as any).status = 504
-      throw err
-    } else {
-      const err = new Error("Network error. Please try again.")
-      ;(err as any).status = 0
-      throw err
-    }
-    
-
+  } catch (error) {
+    console.log(error)
+    throw error
   }
 }
 
@@ -33,21 +20,17 @@ export const login = async (credentials: { email?: string; phone?: string; passw
     console.log("Sending login request:", credentials);
 
     const res = await instance.post("/auth/signin", credentials);
-    // console.log("API response:", res.data);
 
     if (res.data?.token && res.data?.user) {
       const decoded = JSON.parse(atob(res.data.token.split('.')[1]));
       console.log("Decoded JWT:", decoded);
 
-      // Use role from API response (safer)
       const user = {
         id: res.data.user.id,
         role: res.data.user.role,
         email: res.data.user.email,
         phone: res.data.user.phone
       };
-
-      // console.log("User object returned:", user);
 
       return {
         token: res.data.token,
@@ -56,20 +39,23 @@ export const login = async (credentials: { email?: string; phone?: string; passw
     }
 
     throw new Error("Invalid credentials");
-  } catch (error: any) {
-    if (error.response) {
-      const err = new Error(error.response.data?.message || "Login failed")
-        ; (err as any).status = error.response.status
-      throw err
-    } else if (error.code === "ECONNABORTED") {
-      const err = new Error("Server timeout. Please try again.")
-        ; (err as any).status = 504
-      throw err
-    } else {
-      const err = new Error("Network error. Please try again.")
-        ; (err as any).status = 0
-      throw err
-    }
+  } catch (error) {
+    // Uncomment and use proper error handling if needed
+    // if (error.response) {
+    //   const err = new Error(error.response.data?.message || "Login failed");
+    //   (err as any).status = error.response.status;
+    //   throw err;
+    // } else if (error.code === "ECONNABORTED") {
+    //   const err = new Error("Server timeout. Please try again.");
+    //   (err as any).status = 504;
+    //   throw err;
+    // } else {
+    //   const err = new Error("Network error. Please try again.");
+    //   (err as any).status = 0;
+    //   throw err;
+    // }
+    console.log(error);
+    throw error;
   }
 };
 
@@ -129,7 +115,7 @@ export const googleSignin = async () => {
     const idToken = await user.getIdToken();
     console.log("🔐 Firebase Token:", idToken);
 
-    // ✅ Send token in body ONLY (backend expects this)
+    //  Send token in body ONLY (backend expects this)
     const res = await instance.post("/auth/google-signin", { idToken });
 
     // Store token locally for future requests if needed
@@ -190,8 +176,8 @@ export const updateUserPassword = async (
       data
     )
     return res.data
-  } catch (error: any) {
-    console.log("UPDATE PASSWORD ERROR:", error?.response?.data)
+  } catch (error) {
+    console.log("UPDATE PASSWORD ERROR:", error)
     throw error
   }
 }

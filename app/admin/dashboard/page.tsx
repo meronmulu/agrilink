@@ -33,6 +33,7 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import { Loader2 } from "lucide-react"
+import Image from "next/image"
 
 interface ChartData {
   month: string
@@ -53,7 +54,7 @@ export default function AdminDashboardPage() {
 
   function groupDataByMonth(products: Product[], users: User[]): ChartData[] {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
     const monthlyData: ChartData[] = months.map((m) => ({
       month: m,
@@ -133,7 +134,7 @@ export default function AdminDashboardPage() {
   const recentProducts = products.slice(0, 5)
   const recentUsers = users.slice(0, 5)
 
-if (loading) {
+  if (loading) {
     return (
       <div className="h-[70vh] flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-500" size={32} />
@@ -208,7 +209,24 @@ if (loading) {
               <TableBody>
                 {recentProducts.map((p) => (
                   <TableRow key={p.id}>
-                    <TableCell>{p.name}</TableCell>
+                    <TableCell className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-md overflow-hidden border">
+
+                        <Image
+                          src={p.image || "/placeholder.png"}
+                          alt={p.name}
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                        
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {p.name}
+                        </p>
+                      </div>
+                    </TableCell>
                     <TableCell>{typeof p.subCategory === 'string' ? p.subCategory : p.subCategory?.name || "N/A"}</TableCell>
                     <TableCell>${p.price}</TableCell>
                     <TableCell>{p.amountSold || 0}</TableCell>
@@ -233,8 +251,35 @@ if (loading) {
               <TableBody>
                 {recentUsers.map((u) => (
                   <TableRow key={u.id}>
-                    <TableCell>{u.profile?.fullName || "N/A"}</TableCell>
-                    <TableCell>{u.email}</TableCell>
+                    <TableCell className="flex items-center gap-3">
+                      <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
+                        <Image
+                          src={u.profile?.imageUrl || "/placeholder.png"}
+                          alt="Farmer"
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex flex-col leading-tight">
+
+                        {/* Name */}
+                        <span className="font-semibold text-gray-900 capitalize">
+                          {u.profile?.fullName || "Unknown Farmer"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {u.email}
+                      {u.phone && (
+                        <div className="text-xs text-gray-400">
+                          {u.phone}
+                        </div>
+                      )}
+                      
+                    </TableCell>
                     <TableCell>
                       <span className="px-2 py-1 bg-gray-100 rounded text-xs">{u.role}</span>
                     </TableCell>

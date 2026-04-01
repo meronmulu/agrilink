@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import {
   Mail,
   Phone,
-  User,
   Shield,
   Clock,
   CheckCircle,
@@ -20,7 +19,6 @@ import {
   List
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import {
   DropdownMenu,
@@ -87,7 +85,8 @@ export default function RoleRequestCards() {
         prev.map((req) => req.id === id ? { ...req, status: "APPROVED" } : req)
       )
     } catch (error) {
-      toast.error("Failed to approve role request", { position: "top-center" })
+      toast.error("Failed to approve role request", { position: "top-center" ,})
+      console.log(error)
     } finally {
       setProcessingId(null)
     }
@@ -124,11 +123,7 @@ export default function RoleRequestCards() {
     }
   }
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U"
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-  }
-
+ 
   const filteredRequests = filter === "ALL"
     ? requests
     : requests.filter(req => req.status === filter)
