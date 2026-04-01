@@ -9,7 +9,7 @@ import { useLanguage } from "@/context/LanguageContext";
 export default function Hero() {
   const { t } = useLanguage();
   return (
-    <section className="relative top-12 w-full h-[90vh] flex items-center">
+    <section className="relative top-10 w-full h-[90vh] flex items-center">
 
       {/* Background Image */}
       <div className="absolute inset-0 bg-cover bg-center">

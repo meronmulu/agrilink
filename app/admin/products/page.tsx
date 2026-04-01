@@ -6,8 +6,7 @@ import { Product } from "@/types/product"
 
 import {
   Card,
-  CardHeader,
-  CardTitle,
+  
   CardContent
 } from "@/components/ui/card"
 
@@ -48,7 +47,7 @@ export default function AdminProductsPage() {
 
   // Metrics
   const totalProducts = products.length
-  const totalSold = products.reduce((acc, p) => acc + (p.amountSold || 0), 0)
+  // const totalSold = products.reduce((acc, p) => acc + (p.amountSold || 0), 0)
   const totalInStore = products.reduce((acc, p) => acc + (p.amount - (p.amountSold || 0)), 0)
 
   const totalFarmers = new Set(products.map(p => p.farmer?.id)).size
@@ -63,7 +62,7 @@ export default function AdminProductsPage() {
   }
   return (
 
-    <div className="p-6 space-y-8">
+    <div className="p-4 space-y-8">
 
       {/* HEADER */}
 
@@ -78,7 +77,7 @@ export default function AdminProductsPage() {
 
       {/* METRICS */}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
         <Card className="shadow-sm border">
           <CardContent className="p-6">
@@ -87,12 +86,12 @@ export default function AdminProductsPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border">
+        {/* <Card className="shadow-sm border">
           <CardContent className="p-6">
             <p className="text-sm text-gray-500">Sold Products</p>
             <p className="text-3xl font-bold text-emerald-600">{totalSold}</p>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card className="shadow-sm border">
           <CardContent className="p-6">
@@ -129,7 +128,7 @@ export default function AdminProductsPage() {
                   <TableHead>Category</TableHead>
                   <TableHead>SubCategory</TableHead>
                   <TableHead>Stock</TableHead>
-                  <TableHead>Sold</TableHead>
+                  {/* <TableHead>Sold</TableHead> */}
                   <TableHead>Price</TableHead>
                   <TableHead>Farmer</TableHead>
                 </TableRow>
@@ -208,9 +207,9 @@ export default function AdminProductsPage() {
 
                     {/* SOLD */}
 
-                    <TableCell>
+                    {/* <TableCell>
                       {product.amountSold || 0}
-                    </TableCell>
+                    </TableCell> */}
 
 
                     {/* PRICE */}

@@ -9,7 +9,7 @@ import MarketPlacePreview from "@/components/MarketPlacePreview";
 export default function Home() {
   return (
     <>
-      <Header />
+     <Header/>
       <main>
         <Hero />
         <CoreFeature />
@@ -18,7 +18,7 @@ export default function Home() {
         <CustomerSays />
       </main>
       <Footer />
-    </>
+    </> 
   );
 }
 
