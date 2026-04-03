@@ -12,7 +12,7 @@ import {
     SelectValue
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { Save, ArrowLeft, Loader2, ImagePlus, ImageIcon } from 'lucide-react'
+import { Save, Loader2, ImagePlus, ImageIcon } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 
@@ -147,17 +147,16 @@ export default function EditCrop() {
 
             toast.success("Product updated successfully ")
 
-            // 🔁 redirect after success
+            // redirect after success
             setTimeout(() => {
                 router.push('/farmer/crops')
             }, 1000)
 
-        } catch (err: any) {
+        } catch (err) {
             console.error(err)
 
             toast.error(
-                err?.response?.data?.message ||
-                err?.message ||
+                
                 "Update failed"
             )
 
@@ -190,7 +189,7 @@ export default function EditCrop() {
             </header>
 
             {/* Form */}
-            <main className="p-5">
+            <main className="py-2 md:p-5">
                 <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm border space-y-8">
 
                     {/* Basic Info */}
@@ -270,7 +269,8 @@ export default function EditCrop() {
                         {/* Image Preview / Cropper Area */}
                         {newImageSrc ? (
                             <div className="space-y-4 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                <div className="relative hmb-2 sm:h-100 w-full bg-black rounded-xl overflow-hidden shadow-inner">
+                                {/* Added h-80 for mobile and sm:h-[400px] for larger screens */}
+                                <div className="relative h-80 sm:h-[400px] w-full bg-black rounded-xl overflow-hidden shadow-inner">
                                     <Cropper
                                         image={newImageSrc}
                                         crop={crop}

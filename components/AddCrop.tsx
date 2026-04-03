@@ -1,48 +1,55 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { useLanguage } from '@/context/LanguageContext'
-import Cropper from 'react-easy-crop'
+import Cropper, { Area } from 'react-easy-crop'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { Slider } from '@/components/ui/slider'
-import { Camera, Save, Loader2 } from 'lucide-react'
-import { addProducts } from '@/services/productService'
-import { SubCategory, Category } from '@/types/category'
-import { getSubCategories, getCategories } from '@/services/categoryService'
+import { Save, Loader2, ImagePlus, ImageIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
+import { addProducts } from '@/services/productService'
+import { getCategories, getSubCategories } from '@/services/categoryService'
+import { Category, SubCategory } from '@/types/category'
+
 export default function AddCrop() {
-  const { t } = useLanguage()
   const router = useRouter()
-
-  // Image Crop
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const [rotation, setRotation] = useState(0)
-  const [imageSrc, setImageSrc] = useState<string | null>(null)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
-
-  // Data
-  const [categories, setCategories] = useState<Category[]>([])
-  const [subCategories, setSubCategories] = useState<SubCategory[]>([])
-
-  // Selection
-  const [selectedCategory, setSelectedCategory] = useState('')
-  const [selectedSubCategory, setSelectedSubCategory] = useState('')
-
-  // Form
-  const [name, setName] = useState('')
-  const [amount, setAmount] = useState<number | ''>('')
-  const [price, setPrice] = useState<number | ''>('')
-  const [description, setDescription] = useState('')
 
   const [loading, setLoading] = useState(false)
 
-  // Fetch data
+  // Form
+  const [name, setName] = useState('')
+  const [price, setPrice] = useState<number | ''>('')
+  const [amount, setAmount] = useState<number | ''>('')
+  const [description, setDescription] = useState('')
+
+  const [categories, setCategories] = useState<Category[]>([])
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([])
+
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedSubCategory, setSelectedSubCategory] = useState('')
+
+  // Image
+  const [imageSrc, setImageSrc] = useState<string | null>(null)
+
+  // Crop
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [rotation, setRotation] = useState(0)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+
+  const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
+    setCroppedAreaPixels(croppedPixels)
+  }, [])
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,14 +64,9 @@ export default function AddCrop() {
     fetchData()
   }, [])
 
-  // Filter subcategories
   const filteredSubs = subCategories.filter(
     (sub) => sub.categoryId === selectedCategory
   )
-
-  const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
-    setCroppedAreaPixels(croppedAreaPixels)
-  }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -74,7 +76,6 @@ export default function AddCrop() {
     }
   }
 
-  // Crop image → Blob
   const getCroppedImageBlob = async (): Promise<Blob | null> => {
     if (!imageSrc || !croppedAreaPixels) return null
 
@@ -86,39 +87,29 @@ export default function AddCrop() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return null
 
-    const { width, height, x, y } = croppedAreaPixels
-
-    canvas.width = width
-    canvas.height = height
-
-    ctx.save()
-    ctx.translate(width / 2, height / 2)
-    ctx.rotate((rotation * Math.PI) / 180)
-    ctx.translate(-width / 2, -height / 2)
+    canvas.width = croppedAreaPixels.width
+    canvas.height = croppedAreaPixels.height
 
     ctx.drawImage(
       image,
-      x,
-      y,
-      width,
-      height,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
       0,
       0,
-      canvas.width,
-      canvas.height
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
     )
-
-    ctx.restore()
 
     return new Promise((resolve) => {
       canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9)
     })
   }
 
-  // Submit
-  const handleSaveCrop = async () => {
-    if (!name || !selectedSubCategory || !amount || !price) {
-      toast.error(t('addcrop_required_fields'))
+  const handleSave = async () => {
+    if (!name || !selectedSubCategory || amount === '' || price === '') {
+      toast.error('Please fill all required fields')
       return
     }
 
@@ -128,11 +119,9 @@ export default function AddCrop() {
       const imageBlob = await getCroppedImageBlob()
 
       if (!imageBlob) {
-        toast.error(t('addcrop_upload_crop_image'))
+        toast.error('Please upload and crop image')
         return
       }
-
-      const loadingToast = toast.loading(t('addcrop_uploading_product'))
 
       await addProducts({
         name,
@@ -143,48 +132,48 @@ export default function AddCrop() {
         image: imageBlob
       })
 
-      toast.dismiss(loadingToast)
-      toast.success(t('addcrop_product_uploaded'))
-
+      toast.success('Crop added successfully')
       router.push('/farmer/crops')
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message ||
-        error?.message ||
-        t('addcrop_something_wrong')
-      )
+
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to add crop')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8FAFC] text-slate-800">
+    <div className="min-h-screen bg-[#F8FAFC] font-sans">
 
       {/* Header */}
       <header className="bg-white border-b px-6 py-4 rounded-2xl">
-        <h1 className="text-2xl font-bold">{t('addcrop_title')}</h1>
-        <p className="text-sm text-slate-500">{t('addcrop_subtitle')}</p>
+        <div>
+          <h1 className="text-2xl font-bold">Add Crop</h1>
+          <p className="text-sm text-slate-500">
+            Create a new crop with details and image.
+          </p>
+        </div>
       </header>
 
-      {/* Content */}
-      <main className="flex-1 p-5">
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl border p-8 space-y-8">
+      {/* Form */}
+      <main className="py-2 md:p-5">
+        <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm border space-y-8">
 
-          {/* Name */}
-          <div>
-            <Label>{t('addcrop_crop_name')} *</Label>
+          {/* Basic Info */}
+          <div className="space-y-4">
+            <Label>Crop Name *</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
 
-          {/* Category */}
-          <div>
             <Label>Category *</Label>
-            <Select value={selectedCategory} onValueChange={(val) => {
-              setSelectedCategory(val)
-              setSelectedSubCategory('')
-            }}>
-              <SelectTrigger>
+            <Select
+              value={selectedCategory}
+              onValueChange={(val) => {
+                setSelectedCategory(val)
+                setSelectedSubCategory('')
+              }}
+            >
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
@@ -195,17 +184,13 @@ export default function AddCrop() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
 
-          {/* Subcategory */}
-          <div>
             <Label>Subcategory *</Label>
             <Select
               value={selectedSubCategory}
               onValueChange={setSelectedSubCategory}
-              disabled={!selectedCategory}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select subcategory" />
               </SelectTrigger>
               <SelectContent>
@@ -216,72 +201,136 @@ export default function AddCrop() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
 
-          {/* Price & Amount */}
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              type="number"
-              placeholder="Price"
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-            />
-            <Input
-              type="number"
-              placeholder="Amount"
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
+            <Label>Description</Label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full border rounded-lg p-3"
+              rows={4}
             />
           </div>
 
-          {/* Description */}
-          <textarea
-            className="border rounded-lg p-3"
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+          {/* Pricing */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <Label className="mb-2">Price (ETB) *</Label>
+              <Input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(Number(e.target.value))}
+              />
+            </div>
 
-          {/* Image Upload */}
-          <div>
-            <Input type="file" accept="image/*" onChange={handleFileChange} />
+            <div>
+              <Label className="mb-2">Available Amount *</Label>
+              <Input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+              />
+            </div>
+          </div>
 
-            {imageSrc && (
-              <>
-                <div className="relative w-full h-72 bg-black mt-4">
-                  <Cropper
-                    image={imageSrc}
-                    crop={crop}
-                    zoom={zoom}
-                    rotation={rotation}
-                    aspect={4 / 3}
-                    onCropChange={setCrop}
-                    onZoomChange={setZoom}
-                    onRotationChange={setRotation}
-                    onCropComplete={onCropComplete}
-                  />
+          {/* Image */}
+          <div className="space-y-6">
+            <h2 className="text-lg font-bold border-b pb-2">
+              Product Image
+            </h2>
+
+            <div className="relative">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+              />
+
+              <div className="w-full h-14 border-2 border-dashed rounded-xl flex items-center justify-center gap-2 text-gray-600 hover:border-emerald-400 transition">
+                <ImagePlus size={20} className="text-emerald-600" />
+                <span>
+                  {imageSrc ? "Change image" : "Upload image"}
+                </span>
+              </div>
+            </div>
+
+            {imageSrc ? (
+              <div className="space-y-4 bg-gray-50 p-4 rounded-2xl border">
+
+                {imageSrc && (
+                  <div className="relative h-72 w-full bg-black rounded-xl overflow-hidden">
+                    <Cropper
+                      key={imageSrc} 
+                      image={imageSrc}
+                      crop={crop}
+                      zoom={zoom}
+                      rotation={rotation}
+                      aspect={4 / 3}
+                      onCropChange={setCrop}
+                      onZoomChange={setZoom}
+                      onRotationChange={setRotation}
+                      onCropComplete={onCropComplete}
+                      showGrid
+                    />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2 px-2">
+                  {/* Zoom */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      <span>Zoom</span>
+                      <span>{Math.round(zoom * 100)}%</span>
+                    </div>
+
+                    <input
+                      type="range"
+                      min={1}
+                      max={3}
+                      step={0.1}
+                      value={zoom}
+                      onChange={(e) => setZoom(Number(e.target.value))}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                    />
+                  </div>
+
+                  {/* Rotation */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      <span>Rotation</span>
+                      <span>{rotation}°</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={360}
+                      step={1}
+                      value={rotation}
+                      onChange={(e) => setRotation(Number(e.target.value))}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                    />
+                  </div>
                 </div>
-
-                <div className="mt-4 space-y-3">
-                  <Slider value={[zoom]} min={1} max={3} step={0.1}
-                    onValueChange={(val) => setZoom(val[0])} />
-
-                  <Slider value={[rotation]} min={0} max={360} step={1}
-                    onValueChange={(val) => setRotation(val[0])} />
-                </div>
-              </>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 border border-dashed rounded-2xl text-gray-400">
+                <ImageIcon size={40} />
+                <p>No image selected</p>
+              </div>
             )}
           </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3">
+          {/* Buttons */}
+          <div className="flex justify-end gap-3 pt-6 border-t">
             <Button variant="outline" onClick={() => router.push('/farmer/crops')}>
-              {t('addcrop_cancel')}
+              Cancel
             </Button>
-
-            <Button onClick={handleSaveCrop} disabled={loading}>
-              {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
-              {t('addcrop_save_upload')}
+            <Button onClick={handleSave} disabled={loading} className='bg-emerald-500'>
+              {loading ? (
+                <Loader2 className="animate-spin w-4 h-4 mr-2" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              Add Crop
             </Button>
           </div>
 

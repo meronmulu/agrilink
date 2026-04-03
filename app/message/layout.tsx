@@ -68,12 +68,9 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
         <div className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Menu className="text-emerald-600 h-6 w-6 cursor-pointer" />
               <h1 className="text-xl font-bold tracking-tight text-gray-800">Messages</h1>
             </div>
-            <button className="p-2 bg-emerald-50 text-emerald-600 rounded-full hover:bg-emerald-100 transition-colors">
-               <Plus size={20} />
-            </button>
+            
           </div>
           
           <div className="relative">

@@ -124,7 +124,7 @@ export default function TelegramChat() {
             <h2 className="font-bold text-[15px] truncate">
               {receiver?.profile?.fullName || receiver?.email || 'User'}
             </h2>
-            <span className="text-[11px] text-blue-500">online</span>
+            <span className="text-[11px] text-emerald-500">online</span>
           </div>
           <div className="flex items-center gap-1 text-gray-400">
             <Button variant="ghost" size="icon"><Search className="h-5 w-5" /></Button>
@@ -163,7 +163,7 @@ export default function TelegramChat() {
         </ScrollArea>
 
         {/* Input Bar */}
-        <div className="px-4 py-4 md:px-20 lg:px-40 shrink-0 bg-transparent">
+        <div className="px-4 py-4 shrink-0 bg-transparent">
           <div className="bg-white rounded-full flex items-center px-4 py-1.5 shadow-sm border border-gray-200">
             <Button variant="ghost" size="icon" className="text-gray-400 hover:bg-transparent">
               <Paperclip className="h-5 w-5" />
@@ -182,7 +182,7 @@ export default function TelegramChat() {
               variant="ghost"
               size="icon"
               onClick={handleSend}
-              className="text-blue-500 hover:bg-transparent"
+              className="text-emerald-500 hover:text-emerald-500  hover:bg-transparent"
             >
               <SendHorizontal className="h-6 w-6" />
             </Button>

@@ -17,7 +17,7 @@ export const getUnreadMessageCount = async (userId: string) => {
 export const getConversations = async () => {
 	try {
 		const res = await instance.get(`/chat/conversations`)
-		console.log("CONVERSATIONS API:", res.data)
+		// console.log("CONVERSATIONS API:", res.data)
 
 		return Array.isArray(res.data) ? res.data : []
 	} catch (error) {
@@ -33,7 +33,7 @@ export const sendMessage = async (data: Message & { conversationId: string; rece
 
 		const res = await instance.post(`/chat/send`, data)
 
-		console.log(" SUCCESS:", res.data)
+			// console.log(" SUCCESS:", res.data)
 		return res.data
 
 	} catch (error) {

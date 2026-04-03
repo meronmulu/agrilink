@@ -40,7 +40,6 @@ import Image from "next/image"
 
 export default function Header() {
   const { user, logout } = useAuth()
-  console.log("HEADER USER:", user) // 👈 ADD HERE
   const router = useRouter()
   const { t } = useLanguage()
   const pathname = usePathname()

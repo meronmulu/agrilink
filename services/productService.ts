@@ -16,20 +16,16 @@ export const addProducts = async (data: CreateProductPayload) => {
       formData.append("description", data.description)
     }
 
-    if (data.image) {
-      formData.append("image", data.image, "image.jpg")
-    }
+    formData.append("image", data.image)
 
     const res = await instance.post("/product", formData)
-    console.log(res.data)
-    return res.data
 
-  } catch (error) {
-    console.log("Product error:", error)
+    return res.data
+  } catch (error: any) {
+    console.log("❌ ERROR:", error.response?.data || error.message)
     throw error
   }
 }
-
 export const getProducts= async (): Promise<Product[]> => {
   try {
     const res = await instance.get("/product")
@@ -44,7 +40,7 @@ export const getProducts= async (): Promise<Product[]> => {
 export const getMyProducts = async (): Promise<Product[]> => {
   try {
     const res = await instance.get<Product[]>("/product/my-products")
-    console.log(res.data)
+    console.log("my products:", res.data)
     return res.data
   } catch (error) {
     console.error("Get products error:", error)

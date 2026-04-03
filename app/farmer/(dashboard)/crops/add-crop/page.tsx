@@ -1,9 +1,9 @@
-import AddCropModal from '@/components/AddCrop'
+import AddCrop from '@/components/AddCrop'
 
 function page() {
   return (
     <div>
-        <AddCropModal/>
+        <AddCrop/>
     </div>
   )
 }
