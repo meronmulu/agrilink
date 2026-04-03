@@ -4,241 +4,191 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { io, Socket } from 'socket.io-client'
 import { getConversations } from '@/services/chatService'
+
+// shadcn components
 import { Button } from '@/components/ui/button'
-import { Send } from 'lucide-react'
-import { getUserById } from '@/services/authService'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+// Icons
+import { 
+  SendHorizontal, 
+  Paperclip, 
+  MoreVertical, 
+  Search, 
+  ChevronLeft, 
+  Smile, 
+  CheckCheck 
+} from 'lucide-react'
+import { Conversation, Message } from '@/types/chat'
+import { User } from '@/types/auth'
 
-export default function ChatPage() {
+
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000'
+
+export default function TelegramChat() {
   const { id } = useParams()
   const router = useRouter()
   const conversationId = id as string
 
-  const [messages, setMessages] = useState<any[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [message, setMessage] = useState('')
-  const [receiver, setReceiver] = useState<any>(null)
-  const [currentConv, setCurrentConv] = useState<any>(null)
-
+  const [receiver, setReceiver] = useState<User | null>(null)
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null
+    const userStr = localStorage.getItem('user')
+    return userStr ? JSON.parse(userStr).id : null
+  })
+  
   const socketRef = useRef<Socket | null>(null)
-  const [isConnected, setIsConnected] = useState(false)
-
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const userStr = localStorage.getItem('user')
-      if (userStr) {
-        try {
-          const userObj = JSON.parse(userStr)
-          setCurrentUserId(userObj.id)
-        } catch (e) {
-          console.warn('Invalid user object in localStorage', e)
-        }
-      }
-    }
-  }, [])
-
+  // Initialize Socket.IO
   useEffect(() => {
     if (!currentUserId) return
-
-    const socket = io(SOCKET_URL, {
-      transports: ['websocket'],
-      autoConnect: true,
-    })
-
+    const socket = io(SOCKET_URL, { transports: ['websocket'] })
     socketRef.current = socket
-
-    const appendIncomingMessage = (msg: any) => {
-      if (!msg) return
-
-      // conversation-based guard or one-on-one by sender/receiver
-      if (msg.conversationId && conversationId && msg.conversationId !== conversationId) return
-      if (!msg.conversationId && receiver) {
-        const validOneOnOne =
-          (msg.senderId === receiver?.id && msg.receiverId === currentUserId) ||
-          (msg.senderId === currentUserId && msg.receiverId === receiver?.id)
-        if (!validOneOnOne) return
-      }
-
-      setMessages((prev) => {
-        const alreadyExists = prev.some((m) => m.id && msg.id && m.id === msg.id)
-        if (alreadyExists) return prev
-        return [...prev, msg]
-      })
-    }
-
+    
     socket.on('connect', () => {
-      console.log('Socket connected:', socket.id)
-      setIsConnected(true)
-
-      if (currentUserId) {
-        socket.emit('join', currentUserId)
-        console.log('Joined user room', currentUserId)
-      }
-
-      if (conversationId) {
-        socket.emit('joinRoom', conversationId)
-        socket.emit('joinConversation', conversationId)
-        console.log('Joined conversation room', conversationId)
-      }
+      socket.emit('join', currentUserId)
+      if (conversationId) socket.emit('joinConversation', conversationId)
     })
 
-    socket.on('disconnect', () => {
-      console.log('Socket disconnected')
-      setIsConnected(false)
-    })
-
-    socket.on('receiveMessage', appendIncomingMessage)
-    socket.on('message', appendIncomingMessage)
-    socket.on('chatMessage', appendIncomingMessage)
-    socket.on('newMessage', appendIncomingMessage)
-
-    return () => {
-      socket.off('receiveMessage', appendIncomingMessage)
-      socket.off('message', appendIncomingMessage)
-      socket.off('chatMessage', appendIncomingMessage)
-      socket.off('newMessage', appendIncomingMessage)
-      socket.disconnect()
-      socketRef.current = null
+    const handleNewMsg = (msg: Message & { conversationId: string }) => {
+      if (msg.conversationId === conversationId) {
+        setMessages(prev => {
+          const exists = prev.some(m => m.id === msg.id)
+          return exists ? prev : [...prev, msg]
+        })
+      }
     }
-  }, [currentUserId, conversationId, receiver])
 
-  useEffect(() => {
-    loadConversation()
-  }, [conversationId])
+    socket.on('receiveMessage', handleNewMsg)
+    return () => { socket.disconnect() }
+  }, [currentUserId, conversationId])
 
+  // Load conversations and current conversation messages
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const fetchData = async () => {
+      const data = await getConversations()
+      setConversations(data)
+      const conv = data.find(c => c.id === conversationId)
+      if (conv && currentUserId) {
+        const me = currentUserId
+        const other = conv.userOneId === me ? conv.userTwo : conv.userOne
+        setReceiver(other || null)
+        setMessages(conv.messages || [])
+      }
+    }
+    fetchData()
+  }, [conversationId, currentUserId])
+
+  // Scroll to bottom when messages update
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'auto' })
   }, [messages])
 
-  const loadConversation = async () => {
-    try {
-      const user = await getUserById(conversationId)
-      if (user) setReceiver(user)
-    } catch (e) {
-      console.log('URL ID is not a direct User ID.', e)
-    }
+  const handleSend = () => {
+    if (!message.trim() || !currentUserId || !receiver) return
 
-    const data = await getConversations()
-
-    console.log('ALL CONVERSATIONS:', data)
-
-    const conv = data.find(
-      (c: any) =>
-        c.id === conversationId ||
-        c.conversationId === conversationId ||
-        c.userOneId === conversationId ||
-        c.userTwoId === conversationId
-    )
-
-    if (conv && currentUserId) {
-      const otherId = conv.userOneId === currentUserId ? conv.userTwoId : conv.userOneId
-      if (otherId && otherId !== conversationId) {
-        try {
-          const otherUser = await getUserById(otherId)
-          if (otherUser) setReceiver(otherUser)
-        } catch (e) {
-          console.warn('Failed to load other user', e)
-        }
-      }
-    }
-
-    if (!conv) {
-      console.log('Conversation not found')
-      setMessages([])
-      return
-    }
-
-    setCurrentConv(conv)
-    const msgs = conv.messages || conv.chatMessages || conv.data || []
-    setMessages(Array.isArray(msgs) ? msgs : [])
-  }
-
-  const handleSend = async () => {
-    if (!message.trim() || !currentUserId) return
-
-    const payload: any = {
+    const payload: Message & { conversationId: string; receiverId: string } = {
+      id: `${Date.now()}-${Math.random()}`,
       senderId: currentUserId,
-      receiverId: receiver?.id || conversationId,
       message,
-      conversationId: currentConv?.id || conversationId,
+      conversationId,
+      receiverId: receiver.id,
       createdAt: new Date().toISOString(),
     }
 
-    setMessages((prev) => [...prev, payload])
+    setMessages(prev => [...prev, payload])
+    socketRef.current?.emit('sendMessage', payload)
     setMessage('')
-
-    if (!socketRef.current || !isConnected) {
-      console.warn('Socket is not connected. Message queued but not sent yet.')
-      return
-    }
-
-    socketRef.current.emit('sendMessage', payload)
   }
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <div className="border-b p-4">
-        <h2 className="font-semibold text-lg">
-          {receiver ? receiver.fullName || receiver.email || 'User' : `Chat #${conversationId}`}
-        </h2>
-      </div>
+    <div className="flex h-screen w-full bg-white overflow-hidden text-black">
+      {/* MAIN CHAT AREA */}
+      <main className={`flex-1 flex flex-col bg-[#e5e7eb] ${!conversationId ? 'hidden md:flex' : 'flex'}`}>
+        {/* Header */}
+        <header className="h-15 bg-white border-b flex items-center px-4 gap-3 z-10 shrink-0">
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => router.push('/message')}>
+            <ChevronLeft />
+          </Button>
+          <Avatar className="h-10 w-10 border">
+            <AvatarFallback className="bg-gray-50 text-gray-400 font-light">
+              {receiver?.profile?.fullName?.[0] || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0 leading-tight">
+            <h2 className="font-bold text-[15px] truncate">
+              {receiver?.profile?.fullName || receiver?.email || 'User'}
+            </h2>
+            <span className="text-[11px] text-blue-500">online</span>
+          </div>
+          <div className="flex items-center gap-1 text-gray-400">
+            <Button variant="ghost" size="icon"><Search className="h-5 w-5" /></Button>
+            <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5" /></Button>
+          </div>
+        </header>
 
-      <div className="flex-1 p-6 space-y-4 overflow-y-auto bg-gray-50">
-        {messages.length === 0 ? (
-          <p className="text-center text-gray-400">No messages</p>
-        ) : (
-          messages.map((msg, i) => {
-            const rawText = msg.message ?? msg.text ?? msg.content ?? null
-            let text = '...'
-
-            if (rawText !== null && rawText !== undefined) {
-              if (typeof rawText === 'string' || typeof rawText === 'number') {
-                text = `${rawText}`
-              } else if (typeof rawText === 'object') {
-                text = rawText.message || rawText.text || rawText.content || JSON.stringify(rawText)
-              } else {
-                text = String(rawText)
-              }
-            }
-
-            const sender = msg.senderId || (typeof msg.sender === 'string' ? msg.sender : msg.sender?.id) || msg.userId
-
-            return (
-              <div
-                key={msg.id || i}
-                className={`flex ${sender === currentUserId ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`px-4 py-2 rounded-2xl max-w-xs shadow-sm text-sm ${
-                    sender === currentUserId ? 'bg-emerald-600 text-white' : 'bg-white border'
-                  }`}
-                >
-                  {text}
+        {/* Messages */}
+        <ScrollArea className="flex-1 p-4 md:p-6">
+          <div className="flex flex-col space-y-3">
+            {messages.map((msg) => {
+              const isMe = msg.senderId === currentUserId
+              return (
+                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`
+                    relative px-3 py-1.5 shadow-sm min-w-20
+                    ${isMe 
+                      ? 'bg-[#e7fecb] text-black rounded-l-xl rounded-tr-xl' 
+                      : 'bg-white text-black rounded-r-xl rounded-tl-xl'}
+                  `}>
+                    <div className="flex flex-col">
+                      <p className="text-[14px] leading-snug pr-14">{msg.message}</p>
+                      <div className="flex items-center gap-1 self-end mt-0.5">
+                        <span className="text-[10px] text-gray-400">
+                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        {isMe && <CheckCheck className="h-3 w-3 text-emerald-500" />}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )
-          })
-        )}
-        <div ref={bottomRef} />
-      </div>
+              )
+            })}
+            <div ref={bottomRef} />
+          </div>
+        </ScrollArea>
 
-      <div className="border-t p-4 flex gap-2">
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 border rounded-full px-4 py-2"
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-        />
-
-        <Button onClick={handleSend}>
-          <Send size={18} />
-        </Button>
-      </div>
+        {/* Input Bar */}
+        <div className="px-4 py-4 md:px-20 lg:px-40 shrink-0 bg-transparent">
+          <div className="bg-white rounded-full flex items-center px-4 py-1.5 shadow-sm border border-gray-200">
+            <Button variant="ghost" size="icon" className="text-gray-400 hover:bg-transparent">
+              <Paperclip className="h-5 w-5" />
+            </Button>
+            <input
+              placeholder="Message"
+              className="flex-1 bg-transparent border-none focus:ring-0 px-3 py-2 text-[15px] outline-none"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            />
+            <Button variant="ghost" size="icon" className="text-gray-400 hover:bg-transparent">
+              <Smile className="h-5 w-5" />
+            </Button>
+            <Button 
+              variant="ghost"
+              size="icon"
+              onClick={handleSend}
+              className="text-blue-500 hover:bg-transparent"
+            >
+              <SendHorizontal className="h-6 w-6" />
+            </Button>
+          </div>
+        </div>
+      </main>
     </div>
   )
 }

@@ -42,9 +42,7 @@ export default function MarketPlace() {
   useEffect(() => {
 
     const fetchData = async () => {
-
       try {
-
         const [cats, subs, prods] = await Promise.all([
           getCategories(),
           getSubCategories(),

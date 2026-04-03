@@ -131,7 +131,7 @@ export const googleSignin = async () => {
 export const getUsers= async (): Promise<User[]> => {
   try {
     const res = await instance.get("/user")
-    console.log(res.data)
+    // console.log(res.data)
     return res.data
     
   } catch (error) {
@@ -153,7 +153,7 @@ export const deleteUser = async (id: string) => {
 export const getUserById = async (id: string) => {
   try {
     const res = await instance.get(`/user/${id}`)
-    console.log(res.data)
+    // console.log(res.data)
     return res.data
     
   } catch (error) {

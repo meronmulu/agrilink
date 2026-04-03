@@ -1,14 +1,18 @@
+import instance from "@/axios"
+import { Conversation, Message } from "@/types/chat";
+
+
 // Returns the number of unread messages for the current user
 export const getUnreadMessageCount = async (userId: string) => {
 	const conversations = await getConversations();
 	let unread = 0;
-	conversations.forEach((conv: any) => {
+	conversations.forEach((conv: Conversation) => {
 		const msgs = conv.messages || conv.chatMessages || conv.data || [];
-		unread += msgs.filter((msg: any) => msg.senderId !== userId && !msg.isRead).length;
+		unread += msgs.filter((msg: Message) => msg.senderId !== userId && !msg.isRead).length;
 	});
 	return unread;
 };
-import instance from "@/axios"
+
 
 export const getConversations = async () => {
 	try {
@@ -23,18 +27,18 @@ export const getConversations = async () => {
 }
 
 // SEND message (Swagger unclear → keep flexible)
-export const sendMessage = async (data: any) => {
+export const sendMessage = async (data: Message & { conversationId: string; receiverId: string }) => {
 	try {
-		console.log("📤 SENDING:", data)
+		console.log("SENDING:", data)
 
 		const res = await instance.post(`/chat/send`, data)
 
-		console.log("✅ SUCCESS:", res.data)
+		console.log(" SUCCESS:", res.data)
 		return res.data
 
-	} catch (error: any) {
+	} catch (error) {
 		console.log("FULL ERROR:", error)
-		console.log(" BACKEND RESPONSE:", error?.response?.data)
+		console.log(" BACKEND RESPONSE:")
 
 		throw error
 	}

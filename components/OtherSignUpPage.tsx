@@ -78,7 +78,6 @@ export default function OtherSignUpPage() {
       setWoredaId("")
       setKebeles([])
     }
-
     fetchWoredas()
   }, [zoneId])
 

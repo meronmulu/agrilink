@@ -21,7 +21,7 @@ export const addProducts = async (data: CreateProductPayload) => {
     }
 
     const res = await instance.post("/product", formData)
-
+    console.log(res.data)
     return res.data
 
   } catch (error) {
@@ -44,6 +44,7 @@ export const getProducts= async (): Promise<Product[]> => {
 export const getMyProducts = async (): Promise<Product[]> => {
   try {
     const res = await instance.get<Product[]>("/product/my-products")
+    console.log(res.data)
     return res.data
   } catch (error) {
     console.error("Get products error:", error)
