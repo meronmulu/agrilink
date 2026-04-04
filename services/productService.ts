@@ -21,8 +21,8 @@ export const addProducts = async (data: CreateProductPayload) => {
     const res = await instance.post("/product", formData)
 
     return res.data
-  } catch (error: any) {
-    console.log("❌ ERROR:", error.response?.data || error.message)
+  } catch (error) {
+    console.log(" ERROR:", error)
     throw error
   }
 }

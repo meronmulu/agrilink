@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Search, Menu, Plus } from 'lucide-react'
 import { Conversation } from '@/types/chat'
+import Image from 'next/image'
 
 export default function MessagesLayout({ children }: { children: React.ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>([])
@@ -15,7 +16,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
   const router = useRouter()
   const pathname = usePathname()
 
-  
+
 
   const fetchConversations = async (userId: string | null) => {
     try {
@@ -25,11 +26,11 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
         data.map(async (conv: Conversation) => {
           // Identify the other user in the conversation
           const partnerId = String(conv.userOneId) === String(userId) ? conv.userTwoId : conv.userOneId
-          
+
           if (partnerId) {
             try {
               const partner = await getUserById(partnerId)
-              console.log("Partner Data:", partner) 
+              console.log("Partner Data:", partner)
               return { ...conv, partner }
             } catch (e) {
               console.error("Error fetching partner:", e)
@@ -64,20 +65,20 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
     <div className="flex h-screen w-full bg-white overflow-hidden">
       {/* SIDEBAR */}
       <aside className={`flex flex-col border-r w-full md:w-[320px] lg:w-95 shrink-0 ${pathname !== '/message' && !pathname.startsWith('/message/') ? 'flex' : 'hidden md:flex'}`}>
-        
+
         <div className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold tracking-tight text-gray-800">Messages</h1>
             </div>
-            
+
           </div>
-          
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500/60" />
-            <Input 
-              placeholder="Search" 
-              className="pl-10 bg-gray-50 border-gray-100 rounded-2xl h-10 focus-visible:ring-2 focus-visible:ring-emerald-500/30" 
+            <Input
+              placeholder="Search"
+              className="pl-10 bg-gray-50 border-gray-100 rounded-2xl h-10 focus-visible:ring-2 focus-visible:ring-emerald-500/30"
             />
           </div>
         </div>
@@ -87,11 +88,11 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
           {conversations.map((conv) => {
             const isActive = pathname.includes(conv.id)
             const lastMsg = conv.messages?.[conv.messages.length - 1]
-            
-            // ✅ FIX: Check profile.fullName first, then fullName, then email
-            const partnerName = 
-              conv.partner?.profile?.fullName || 
-              conv.partner?.email || 
+
+            // FIX: Check profile.fullName first, then fullName, then email
+            const partnerName =
+              conv.partner?.profile?.fullName ||
+              conv.partner?.email ||
               'User'
 
             return (
@@ -102,11 +103,14 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
                   ${isActive ? 'bg-[#effaf3]' : 'hover:bg-gray-50 active:bg-gray-100'}
                 `}
               >
-                <Avatar className="h-12 w-12 border border-emerald-100 shrink-0 shadow-sm">
-                  <AvatarFallback className={`${isActive ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-600'} font-semibold uppercase`}>
-                    {partnerName[0]}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
+                  <Image
+                    src={conv.partner?.profile?.imageUrl || "/default-avatar.png"}
+                    alt={conv.partner?.profile?.fullName || "User"}
+                    fill
+                    className="rounded-full object-cover"
+                  />
+                </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-0.5">
@@ -117,7 +121,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
                       {lastMsg ? new Date(lastMsg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                     </span>
                   </div>
-                  
+
                   <p className={`text-[13.5px] truncate leading-tight ${isActive ? 'text-emerald-700/80' : 'text-gray-500'}`}>
                     {lastMsg?.message || 'No messages yet'}
                   </p>

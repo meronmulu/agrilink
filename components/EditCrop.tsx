@@ -16,9 +16,9 @@ import { Save, Loader2, ImagePlus, ImageIcon } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 
-import { getSubCategories } from '@/services/categoryService'
+import { getCategories, getSubCategories } from '@/services/categoryService'
 import { getProductById, updateProduct } from '@/services/productService'
-import { SubCategory } from '@/types/category'
+import { Category, SubCategory } from '@/types/category'
 import { toast } from 'sonner'
 
 export default function EditCrop() {
@@ -31,11 +31,15 @@ export default function EditCrop() {
 
     // Form
     const [name, setName] = useState('')
-    const [category, setCategory] = useState('')
     const [amount, setAmount] = useState<number | ''>('')
     const [price, setPrice] = useState<number | ''>('')
     const [description, setDescription] = useState('')
+
+    // Category + Subcategory
+    const [categories, setCategories] = useState<Category[]>([])
     const [subCategories, setSubCategories] = useState<SubCategory[]>([])
+    const [selectedCategory, setSelectedCategory] = useState('')
+    const [selectedSubCategory, setSelectedSubCategory] = useState('')
 
     // Image
     const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null)
@@ -47,31 +51,45 @@ export default function EditCrop() {
     const [rotation, setRotation] = useState(0)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
 
-    const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
-        setCroppedAreaPixels(croppedAreaPixels)
+    const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
+        setCroppedAreaPixels(croppedPixels)
     }, [])
 
-    // Load Data
+    // Load data
     useEffect(() => {
         const loadData = async () => {
             if (!id) return
 
             setIsFetching(true)
             try {
-                const [product, categories] = await Promise.all([
+                const [product, cats, subs] = await Promise.all([
                     getProductById(id),
+                    getCategories(),
                     getSubCategories()
                 ])
 
-                setSubCategories(categories)
+                setCategories(cats)
+                setSubCategories(subs)
+
                 setName(product.name)
-                setCategory(product.subCategoryId)
                 setAmount(product.amount)
                 setPrice(product.price)
                 setDescription(product.description || '')
                 setExistingImageUrl(product.image || null)
+
+                setSelectedSubCategory(product.subCategoryId)
+
+                // Find category from subcategory
+                const foundSub = subs.find(
+                    (s) => s.id === product.subCategoryId
+                )
+                if (foundSub) {
+                    setSelectedCategory(foundSub.categoryId)
+                }
+
             } catch (err) {
                 console.error(err)
+                toast.error('Failed to load product')
             } finally {
                 setIsFetching(false)
             }
@@ -79,6 +97,11 @@ export default function EditCrop() {
 
         loadData()
     }, [id])
+
+    // Filter subcategories
+    const filteredSubs = subCategories.filter(
+        (sub) => sub.categoryId === selectedCategory
+    )
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -120,8 +143,8 @@ export default function EditCrop() {
     }
 
     const handleUpdate = async () => {
-        if (!name || !category || !amount || !price) {
-            toast.error("Please fill all required fields")
+        if (!name || !selectedSubCategory || !amount || !price) {
+            toast.error('Please fill all required fields')
             return
         }
 
@@ -130,36 +153,28 @@ export default function EditCrop() {
         try {
             let imageBlob
 
-            //  Handle cropped image
             if (newImageSrc && croppedAreaPixels) {
                 imageBlob = await getCroppedImageBlob()
             }
 
-            // API call
             await updateProduct(id, {
                 name,
-                subCategoryId: category,
+                subCategoryId: selectedSubCategory,
                 amount: Number(amount),
                 price: Number(price),
                 description,
                 ...(imageBlob ? { image: imageBlob } : {})
             })
 
-            toast.success("Product updated successfully ")
+            toast.success('Product updated successfully')
 
-            // redirect after success
             setTimeout(() => {
                 router.push('/farmer/crops')
             }, 1000)
 
         } catch (err) {
             console.error(err)
-
-            toast.error(
-                
-                "Update failed"
-            )
-
+            toast.error('Update failed')
         } finally {
             setIsSaving(false)
         }
@@ -178,14 +193,10 @@ export default function EditCrop() {
 
             {/* Header */}
             <header className="bg-white border-b px-6 py-4 rounded-2xl">
-                <div className="flex items-center gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold">Edit Crop</h1>
-                        <p className="text-sm text-slate-500">
-                            Update crop details and image.
-                        </p>
-                    </div>
-                </div>
+                <h1 className="text-2xl font-bold">Edit Crop</h1>
+                <p className="text-sm text-slate-500">
+                    Update crop details and image.
+                </p>
             </header>
 
             {/* Form */}
@@ -197,13 +208,38 @@ export default function EditCrop() {
                         <Label>Crop Name *</Label>
                         <Input value={name} onChange={(e) => setName(e.target.value)} />
 
+                        {/* Category */}
                         <Label>Category *</Label>
-                        <Select value={category} onValueChange={setCategory}>
-                            <SelectTrigger className='w-full'>
+                        <Select
+                            value={selectedCategory}
+                            onValueChange={(val) => {
+                                setSelectedCategory(val)
+                                setSelectedSubCategory('')
+                            }}
+                        >
+                            <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent>
-                                {subCategories.map((sub) => (
+                                {categories.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.id}>
+                                        {cat.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {/* Subcategory */}
+                        <Label>Subcategory *</Label>
+                        <Select
+                            value={selectedSubCategory}
+                            onValueChange={setSelectedSubCategory}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select subcategory" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {filteredSubs.map((sub) => (
                                     <SelectItem key={sub.id} value={sub.id}>
                                         {sub.name}
                                     </SelectItem>
@@ -223,7 +259,7 @@ export default function EditCrop() {
                     {/* Pricing */}
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                            <Label className='mb-2'>Price (ETB) *</Label>
+                            <Label>Price (ETB) *</Label>
                             <Input
                                 type="number"
                                 value={price}
@@ -232,7 +268,7 @@ export default function EditCrop() {
                         </div>
 
                         <div>
-                            <Label className='mb-2'>Available Amount *</Label>
+                            <Label>Available Amount *</Label>
                             <Input
                                 type="number"
                                 value={amount}
@@ -243,35 +279,31 @@ export default function EditCrop() {
 
                     {/* Image */}
                     <div className="space-y-6">
-                        <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-2">
+                        <h2 className="text-lg font-bold border-b pb-2">
                             Product Image
                         </h2>
 
-                        {/* Custom File Upload Button */}
                         <div className="relative">
                             <Input
                                 type="file"
                                 accept="image/*"
                                 onChange={handleFileChange}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
                             />
 
-                            <div className="w-full h-14 border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl flex items-center justify-center gap-2 text-gray-600 hover:bg-gray-100 hover:border-emerald-400 transition-all">
+                            <div className="w-full h-14 border-2 border-dashed rounded-xl flex items-center justify-center gap-2 text-gray-600 hover:border-emerald-400 transition">
                                 <ImagePlus size={20} className="text-emerald-600" />
-                                <span className="font-medium">
-                                    {newImageSrc
-                                        ? "Choose a different image"
-                                        : "Upload new image (optional)"}
+                                <span>
+                                    {newImageSrc ? "Change image" : "Upload image"}
                                 </span>
                             </div>
                         </div>
 
-                        {/* Image Preview / Cropper Area */}
                         {newImageSrc ? (
-                            <div className="space-y-4 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                {/* Added h-80 for mobile and sm:h-[400px] for larger screens */}
-                                <div className="relative h-80 sm:h-[400px] w-full bg-black rounded-xl overflow-hidden shadow-inner">
+                            <div className="space-y-4 bg-gray-50 p-4 rounded-2xl border">
+                                <div className="relative h-80 w-full bg-black rounded-xl overflow-hidden">
                                     <Cropper
+                                        key={newImageSrc}
                                         image={newImageSrc}
                                         crop={crop}
                                         zoom={zoom}
@@ -284,90 +316,27 @@ export default function EditCrop() {
                                         showGrid
                                     />
                                 </div>
-
-                                {/* Crop Controls */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2 px-2">
-                                    {/* Zoom */}
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                            <span>Zoom</span>
-                                            <span>{Math.round(zoom * 100)}%</span>
-                                        </div>
-
-                                        <input
-                                            type="range"
-                                            min={1}
-                                            max={3}
-                                            step={0.1}
-                                            value={zoom}
-                                            onChange={(e) => setZoom(Number(e.target.value))}
-                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-                                        />
-                                    </div>
-
-                                    {/* Rotation */}
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                            <span>Rotation</span>
-                                            <span>{rotation}°</span>
-                                        </div>
-
-                                        <input
-                                            type="range"
-                                            min={0}
-                                            max={360}
-                                            step={1}
-                                            value={rotation}
-                                            onChange={(e) => setRotation(Number(e.target.value))}
-                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-                                        />
-                                    </div>
-                                </div>
                             </div>
                         ) : existingImageUrl ? (
-                            <div className="space-y-3">
-                                <Label className="text-gray-500 text-sm">
-                                    Current Image
-                                </Label>
-
-                                <div className="relative w-full sm:w-2/3 md:w-1/2 aspect-4/3 rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-gray-50">
-                                    <Image
-                                        src={existingImageUrl}
-                                        alt="Current crop"
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
+                            <div className="relative w-1/2 aspect-4/3 rounded-xl overflow-hidden">
+                                <Image src={existingImageUrl} alt="crop" fill className="object-cover" />
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-10 px-4 border border-dashed border-gray-200 rounded-2xl bg-gray-50/50 text-gray-400">
-                                <ImageIcon size={48} className="mb-3 opacity-20" />
-                                <p className="text-sm font-medium">
-                                    No image currently uploaded
-                                </p>
+                            <div className="text-gray-400 text-center">
+                                <ImageIcon />
+                                No image
                             </div>
                         )}
                     </div>
 
                     {/* Buttons */}
                     <div className="flex justify-end gap-3 pt-6 border-t">
-                        <Button
-                            variant="outline"
-                            onClick={() => router.push('/farmer/crops')}
-                        >
+                        <Button variant="outline" onClick={() => router.push('/farmer/crops')}>
                             Cancel
                         </Button>
 
-                        <Button
-                            onClick={handleUpdate}
-                            disabled={isSaving}
-                            className="bg-[#10B981] hover:bg-[#059669]"
-                        >
-                            {isSaving ? (
-                                <Loader2 className="animate-spin w-4 h-4 mr-2" />
-                            ) : (
-                                <Save className="w-4 h-4 mr-2" />
-                            )}
+                        <Button onClick={handleUpdate} disabled={isSaving} className='bg-emerald-500'>
+                            {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />}
                             Update Crop
                         </Button>
                     </div>

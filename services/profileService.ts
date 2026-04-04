@@ -112,11 +112,15 @@ export const createProfile = async (data: {
 }
 
 export const updateProfile = async (formData: FormData) => {
-  const res = await instance.patch("/profile", formData);
-
-  console.log("AXIOS RAW RESPONSE:", res); 
-
-  return res.data;
+  try {
+    const res = await instance.patch("/profile", formData);
+    // console.log("UPDATE RESPONSE DATA:", res.data);
+    return res.data;
+  } catch (error) {
+      console.error("UPDATE ERROR RESPONSE:", error);
+      throw error;
+   
+  }
 };
 
 

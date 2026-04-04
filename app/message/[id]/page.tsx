@@ -44,6 +44,9 @@ export default function TelegramChat() {
   const socketRef = useRef<Socket | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
+
+    console.log("Receiver:", receiver)
+
   // Initialize Socket.IO
   useEffect(() => {
     if (!currentUserId) return
@@ -122,7 +125,7 @@ export default function TelegramChat() {
           </Avatar>
           <div className="flex-1 min-w-0 leading-tight">
             <h2 className="font-bold text-[15px] truncate">
-              {receiver?.profile?.fullName || receiver?.email || 'User'}
+              {receiver?.profile?.fullName || receiver?.email }
             </h2>
             <span className="text-[11px] text-emerald-500">online</span>
           </div>
