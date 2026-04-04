@@ -5,6 +5,7 @@ import { getProducts } from "@/services/productService"
 import { getUsers } from "@/services/authService"
 import { Product } from "@/types/product"
 import { User } from "@/types/auth"
+import { useLanguage } from "@/context/LanguageContext"
 
 // Shadcn UI components
 import {
@@ -42,6 +43,7 @@ interface ChartData {
 }
 
 export default function AdminDashboardPage() {
+  const { t } = useLanguage()
   const [products, setProducts] = useState<Product[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -144,29 +146,29 @@ export default function AdminDashboardPage() {
   return (
     <div className="p-4 space-y-8 bg-gray-50 min-h-screen">
       <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-gray-500">Overview of products and users</p>
+        <h1 className="text-2xl font-bold">{t('dashboard')}</h1>
+        <p className="text-gray-500">{t('overview_of_products_and_users')}</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="py-4">
-          <CardHeader><CardTitle>Total Products</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('total_products')}</CardTitle></CardHeader>
           <CardContent className="text-3xl font-bold text-blue-600">{totalProducts}</CardContent>
         </Card>
 
         <Card className="py-4">
-          <CardHeader><CardTitle>Total Users</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('total_users')}</CardTitle></CardHeader>
           <CardContent className="text-3xl font-bold text-green-600">{totalUsers}</CardContent>
         </Card>
 
         <Card className="py-4">
-          <CardHeader><CardTitle>Total Orders</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('total_orders')}</CardTitle></CardHeader>
           <CardContent className="text-3xl font-bold text-purple-600">{totalOrders}</CardContent>
         </Card>
 
         <Card className="py-4">
-          <CardHeader><CardTitle>Total Revenue</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('total_revenue')}</CardTitle></CardHeader>
           <CardContent className="text-3xl font-bold text-orange-600">
             ${totalRevenue.toLocaleString()}
           </CardContent>
@@ -176,7 +178,7 @@ export default function AdminDashboardPage() {
       {/* Chart */}
       <Card className="py-4">
         <CardHeader>
-          <CardTitle>Monthly Overview</CardTitle>
+          <CardTitle>{t('monthly_overview')}</CardTitle>
         </CardHeader>
         <CardContent className="h-75">
           <ResponsiveContainer width="100%" height="100%">
@@ -195,15 +197,15 @@ export default function AdminDashboardPage() {
       {/* Tables */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <Card className="py-4">
-          <CardHeader><CardTitle>Recent Products</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('recent_products')}</CardTitle></CardHeader>
           <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Sold</TableHead>
+                  <TableHead>{t('product')}</TableHead>
+                  <TableHead>{t('category')}</TableHead>
+                  <TableHead>{t('price')}</TableHead>
+                  <TableHead>{t('sold')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -238,14 +240,14 @@ export default function AdminDashboardPage() {
         </Card>
 
         <Card className="py-4">
-          <CardHeader><CardTitle>Recent Users</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('recent_users')}</CardTitle></CardHeader>
           <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
+                  <TableHead>{t('name')}</TableHead>
+                  <TableHead>{t('email')}</TableHead>
+                  <TableHead>{t('role')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -267,7 +269,7 @@ export default function AdminDashboardPage() {
 
                         {/* Name */}
                         <span className="font-semibold text-gray-900 capitalize">
-                          {u.profile?.fullName || "Unknown Farmer"}
+                          {u.profile?.fullName || t('unknown_farmer')}
                         </span>
                       </div>
                     </TableCell>

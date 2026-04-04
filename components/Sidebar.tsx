@@ -8,12 +8,14 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { useMessage } from '@/context/MessageContext'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function Sidebar() {
   const pathname = usePathname()
   const { cartCount } = useCart()
   const { unreadCount } = useMessage()
   const { user } = useAuth()
+  const { t } = useLanguage()
   console.log("USER ROLE:", user?.role)
 
 
@@ -28,33 +30,33 @@ export default function Sidebar() {
 
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
-      { name: 'Orders', href: '/buyer/order', icon: ListOrdered },
-      { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
-      { name: 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: 'Market Insights', href: '/buyer/insights', icon: BrainCircuit },
+      { name: t('nav_orders') || 'Orders', href: '/buyer/order', icon: ListOrdered },
+      { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
+      { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
+      { name: t('nav_market_insight') || 'Market Insights', href: '/buyer/insights', icon: BrainCircuit },
     ],
 
     FARMER: [
-      { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
-      { name: 'My Orders', href: '/farmer/orders', icon: ListOrdered },
-      { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
-      { name: 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
+      { name: t('my_crops') || 'My Crops', href: '/farmer/crops', icon: Sprout },
+      { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
+      { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
+      { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
+      { name: t('nav_market_insight') || 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
     ],
 
     AGENT: [
-      { name: 'Dashboard', href: '/agent/dashboard', icon: LayoutDashboard },
-      { name: 'Farmers', href: '/agent/farmer', icon: Users },
-      { name: 'Register Farmer', href: '/agent/register-farmer', icon: Users },
+      { name: t('dashboard') || 'Dashboard', href: '/agent/dashboard', icon: LayoutDashboard },
+      { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
+      { name: t('register_farmer') || 'Register Farmer', href: '/agent/register-farmer', icon: Users },
       // { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
     ],
 
     ADMIN: [
-      { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-      { name: 'User Managment', href: '/admin/user', icon: Users },
-      { name: 'Products', href: '/admin/products', icon: BookOpen },
-      { name: 'Agent Approval', href: '/admin/agent-approval', icon: Settings },
-      { name: 'Catagories', href: '/admin/catagory', icon: Settings },
+      { name: t('dashboard') || 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+      { name: t('user_management') || 'User Management', href: '/admin/user', icon: Users },
+      { name: t('products') || 'Products', href: '/admin/products', icon: BookOpen },
+      { name: t('agent_approval') || 'Agent Approval', href: '/admin/agent-approval', icon: Settings },
+      { name: t('categories') || 'Categories', href: '/admin/catagory', icon: Settings },
     ],
   }
 

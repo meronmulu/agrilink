@@ -39,6 +39,7 @@ import {
 
 import { User } from '@/types/auth'
 import { Region, Zone, Woreda, Kebele } from '@/types/profile'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface FormState {
   fullName: string
@@ -49,6 +50,7 @@ interface FormState {
 export default function Page() {
   const params = useParams()
   const id = params?.id as string
+  const { t } = useLanguage()
 
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -300,14 +302,14 @@ export default function Page() {
             <div className="lg:col-span-8">
               <Card className="p-7">
                 <CardHeader>
-                  <CardTitle>Edit Profile</CardTitle>
-                  <CardDescription>Update your personal information</CardDescription>
+                  <CardTitle>{t('edit_profile') || 'Edit Profile'}</CardTitle>
+                  <CardDescription>{t('update_personal_info') || 'Update your personal information'}</CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
                   {/* Full Name */}
                   <div className="space-y-2">
-                    <Label>Full Name</Label>
+                    <Label>{t('full_name') || 'Full Name'}</Label>
                     <Input
                       value={form.fullName}
                       onChange={(e) => setForm({ ...form, fullName: e.target.value })}
@@ -316,10 +318,10 @@ export default function Page() {
 
                   {/* Region */}
                   <div className="space-y-2">
-                    <Label>Region</Label>
+                    <Label>{t('region') || 'Region'}</Label>
                     <Select value={regionId} onValueChange={handleRegionChange}>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select region" />
+                        <SelectValue placeholder={t('select_region') || "Select region"} />
                       </SelectTrigger>
                       <SelectContent>
                         {regions.map((region) => (
@@ -333,10 +335,10 @@ export default function Page() {
 
                   {/* Zone */}
                   <div className="space-y-2">
-                    <Label>Zone</Label>
+                    <Label>{t('zone') || 'Zone'}</Label>
                     <Select value={zoneId} onValueChange={handleZoneChange} disabled={!regionId}>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select zone" />
+                        <SelectValue placeholder={t('select_zone') || "Select zone"} />
                       </SelectTrigger>
                       <SelectContent>
                         {zones.map((zone) => (
@@ -350,14 +352,14 @@ export default function Page() {
 
                   {/* Woreda */}
                   <div className="space-y-2">
-                    <Label>Woreda</Label>
+                    <Label>{t('woreda') || 'Woreda'}</Label>
                     <Select
                       value={woredaId}
                       onValueChange={handleWoredaChange}
                       disabled={!zoneId}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select woreda" />
+                        <SelectValue placeholder={t('select_woreda') || "Select woreda"} />
                       </SelectTrigger>
                       <SelectContent>
                         {woredas.map((woreda) => (
@@ -371,14 +373,14 @@ export default function Page() {
 
                   {/* Kebele */}
                   <div className="space-y-2">
-                    <Label>Kebele</Label>
+                    <Label>{t('kebele') || 'Kebele'}</Label>
                     <Select
                       value={form.kebeleId}
                       onValueChange={(value) => setForm({ ...form, kebeleId: value })}
                       disabled={!woredaId}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select kebele" />
+                        <SelectValue placeholder={t('select_kebele') || "Select kebele"} />
                       </SelectTrigger>
                       <SelectContent>
                         {kebeles.map((kebele) => (
@@ -399,12 +401,12 @@ export default function Page() {
                       {updating ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Updating...
+                          {t('updating') || 'Updating...'}
                         </>
                       ) : (
                         <>
                           <Save className="mr-2 h-4 w-4" />
-                          Update Profile
+                          {t('update_profile_btn') || 'Update Profile'}
                         </>
                       )}
                     </Button>

@@ -8,6 +8,7 @@ import {
 } from "@/services/authService"
 
 import { User } from "@/types/auth"
+import { useLanguage } from "@/context/LanguageContext"
 
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -47,6 +48,7 @@ import { Input } from "@/components/ui/input"
 import Image from "next/image"
 
 export default function AdminUsersPage() {
+  const { t } = useLanguage()
 
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -173,10 +175,10 @@ export default function AdminUsersPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            User Management
+            {t('user_management') || 'User Management'}
           </h1>
           <p className="text-sm text-gray-500">
-            Manage users, roles, and account status
+            {t('manage_users') || 'Manage users, roles, and account status'}
           </p>
         </div>
 
@@ -187,7 +189,7 @@ export default function AdminUsersPage() {
           {/* SEARCH */}
           <div className="relative">
             <Input
-              placeholder="Search users..."
+              placeholder={t('search_users') || "Search users..."}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
@@ -207,10 +209,10 @@ export default function AdminUsersPage() {
             }}
           >
             <SelectTrigger className="w-40 bg-white">
-              <SelectValue placeholder="Role" />
+              <SelectValue placeholder={t('role') || "Role"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">All Roles</SelectItem>
+              <SelectItem value="ALL">{t('all_roles') || 'All Roles'}</SelectItem>
               <SelectItem value="ADMIN">Admin</SelectItem>
               <SelectItem value="AGENT">Agent</SelectItem>
               <SelectItem value="BUYER">Buyer</SelectItem>
@@ -227,12 +229,12 @@ export default function AdminUsersPage() {
             }}
           >
             <SelectTrigger className="w-40 bg-white">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('status') || "Status"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">All Status</SelectItem>
-              <SelectItem value="ACTIVE">Active</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="ALL">{t('all_status') || 'All Status'}</SelectItem>
+              <SelectItem value="ACTIVE">{t('active') || 'Active'}</SelectItem>
+              <SelectItem value="PENDING">{t('pending') || 'Pending'}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -247,12 +249,12 @@ export default function AdminUsersPage() {
             <Table>
               <TableHeader className="">
                 <TableRow className="">
-                  <TableHead className="pl-6">User</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right pr-6">Actions</TableHead>
+                  <TableHead className="pl-6">{t('user') || 'User'}</TableHead>
+                  <TableHead>{t('email') || 'Email'}</TableHead>
+                  <TableHead>{t('phone') || 'Phone'}</TableHead>
+                  <TableHead>{t('role') || 'Role'}</TableHead>
+                  <TableHead>{t('status') || 'Status'}</TableHead>
+                  <TableHead className="text-right pr-6">{t('actions') || 'Actions'}</TableHead>
                 </TableRow>
               </TableHeader>
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { getMyOrders } from "@/services/orderService"
 import { Order } from "@/types/order"
+import { useLanguage } from "@/context/LanguageContext"
 
 import {
   Table,
@@ -18,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 
 export default function BuyerOrdersPage() {
+  const { t } = useLanguage()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -61,26 +63,26 @@ export default function BuyerOrdersPage() {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
         <Package className="w-10 h-10 mb-3" />
-        <p>No orders yet</p>
+        <p>{t('no_orders_yet') || 'No orders yet'}</p>
       </div>
     )
   }
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">My Orders</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('my_orders') || 'My Orders'}</h1>
 
       <Card className=" ">
         <CardContent className="p-4">
           <div className="overflow-x-auto">        <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Total Price</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>{t('product') || 'Product'}</TableHead>
+                <TableHead>{t('quantity') || 'Quantity'}</TableHead>
+                <TableHead>{t('price') || 'Price'}</TableHead>
+                <TableHead>{t('total_price') || 'Total Price'}</TableHead>
+                <TableHead>{t('status') || 'Status'}</TableHead>
+                <TableHead>{t('date') || 'Date'}</TableHead>
                 {/* <TableHead>Payment</TableHead> */}
               </TableRow>
             </TableHeader>

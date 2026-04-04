@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button"
 import { verifyOtp, resendOtp } from "@/services/authService"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/AuthContext"
+import { useLanguage } from "@/context/LanguageContext"
 
 export default function VerifyOTP() {
   const router = useRouter()
+  const { t } = useLanguage()
 
   const { setUser } = useAuth()
 
@@ -111,11 +113,11 @@ export default function VerifyOTP() {
 
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            Verify OTP
+            {t('verify_otp') || 'Verify OTP'}
           </CardTitle>
 
           <CardDescription>
-            Enter the 6-digit code sent to
+            {t('enter_6_digit_code') || 'Enter the 6-digit code sent to'}
             <span className="font-medium"> {identifier}</span>
           </CardDescription>
         </CardHeader>
@@ -149,13 +151,13 @@ export default function VerifyOTP() {
             onClick={handleVerify}
             disabled={loading}
           >
-            {loading ? "Verifying..." : "Verify OTP"}
+            {loading ? (t('verifying') || "Verifying...") : (t('verify_otp') || "Verify OTP")}
           </Button>
 
           <div className="text-center mt-4">
             {countdown > 0 ? (
               <p className="text-sm text-gray-500">
-                Resend code in {countdown}s
+                {t('resend_code_in') || 'Resend code in'} {countdown}s
               </p>
             ) : (
               <button
@@ -163,7 +165,7 @@ export default function VerifyOTP() {
                 disabled={resendLoading}
                 className="text-sm text-emerald-600 hover:text-emerald-700 font-medium disabled:opacity-50"
               >
-                {resendLoading ? 'Sending...' : 'Resend Code'}
+                {resendLoading ? (t('sending') || 'Sending...') : (t('resend_code') || 'Resend Code')}
               </button>
             )}
           </div>

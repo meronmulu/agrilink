@@ -1,7 +1,9 @@
 import React from 'react'
 import { BrainCircuit, Info, AlertOctagon } from 'lucide-react'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function AIStorageTips() {
+    const { t } = useLanguage()
     return (
         <div className="bg-gray-900 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg">
 
@@ -13,7 +15,7 @@ export default function AIStorageTips() {
                 <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center shrink-0">
                     <BrainCircuit className="text-emerald-400" size={20} />
                 </div>
-                <h3 className="font-bold text-lg">AI Storage Tips</h3>
+                <h3 className="font-bold text-lg">{t('ai_storage_tips') || 'AI Storage Tips'}</h3>
             </div>
 
             <div className="space-y-4">
@@ -21,10 +23,10 @@ export default function AIStorageTips() {
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2">
                         <Info size={14} />
-                        <span>For Avocados</span>
+                        <span>{t('for_avocados') || 'For Avocados'}</span>
                     </div>
                     <p className="text-sm text-gray-300 leading-relaxed">
-                        "Keep storage temp at 5°C to extend shelf life by 4 days. Humidity should be 85%."
+                        "{t('avocado_tip') || 'Keep storage temp at 5°C to extend shelf life by 4 days. Humidity should be 85%.'}"
                     </p>
                 </div>
 
@@ -32,16 +34,16 @@ export default function AIStorageTips() {
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
                         <AlertOctagon size={14} />
-                        <span>Alert</span>
+                        <span>{t('alert') || 'Alert'}</span>
                     </div>
                     <p className="text-sm text-gray-300 leading-relaxed">
-                        "High moisture detected in Teff silo #2. Aerate immediately to prevent spoilage."
+                        "{t('teff_alert') || 'High moisture detected in Teff silo #2. Aerate immediately to prevent spoilage.'}"
                     </p>
                 </div>
             </div>
 
             <button className="w-full mt-6 bg-white text-gray-900 font-bold py-3 rounded-xl text-sm hover:bg-gray-100 transition-colors shadow-sm">
-                View All Insights
+                {t('view_all_insights') || 'View All Insights'}
             </button>
 
         </div>

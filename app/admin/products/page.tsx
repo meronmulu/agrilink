@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { getProducts } from "@/services/productService"
 import { Product } from "@/types/product"
+import { useLanguage } from "@/context/LanguageContext"
 
 import {
   Card,
@@ -25,7 +26,7 @@ import Image from "next/image"
 import { Loader2 } from "lucide-react"
 
 export default function AdminProductsPage() {
-
+  const { t } = useLanguage()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -68,10 +69,10 @@ export default function AdminProductsPage() {
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          Products
+          {t('products') || 'Products'}
         </h1>
         <p className="text-sm text-gray-500">
-          Manage all marketplace products
+          {t('manage_all_marketplace_products') || 'Manage all marketplace products'}
         </p>
       </div>
 
@@ -81,28 +82,21 @@ export default function AdminProductsPage() {
 
         <Card className="shadow-sm border">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-500">Total Products</p>
+            <p className="text-sm text-gray-500">{t('total_products') || 'Total Products'}</p>
             <p className="text-3xl font-bold">{totalProducts}</p>
           </CardContent>
         </Card>
 
-        {/* <Card className="shadow-sm border">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-500">Sold Products</p>
-            <p className="text-3xl font-bold text-emerald-600">{totalSold}</p>
-          </CardContent>
-        </Card> */}
-
         <Card className="shadow-sm border">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-500">In Stock</p>
+            <p className="text-sm text-gray-500">{t('in_stock') || 'In Stock'}</p>
             <p className="text-3xl font-bold">{totalInStore}</p>
           </CardContent>
         </Card>
 
         <Card className="shadow-sm border">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-500">Total Farmers</p>
+            <p className="text-sm text-gray-500">{t('total_farmers') || 'Total Farmers'}</p>
             <p className="text-3xl font-bold">{totalFarmers}</p>
           </CardContent>
         </Card>
@@ -124,13 +118,13 @@ export default function AdminProductsPage() {
 
               <TableHeader>
                 <TableRow className="">
-                  <TableHead>Product</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>SubCategory</TableHead>
-                  <TableHead>Stock</TableHead>
+                  <TableHead>{t('product') || 'Product'}</TableHead>
+                  <TableHead>{t('category') || 'Category'}</TableHead>
+                  <TableHead>{t('subcategory') || 'SubCategory'}</TableHead>
+                  <TableHead>{t('stock') || 'Stock'}</TableHead>
                   {/* <TableHead>Sold</TableHead> */}
-                  <TableHead>Price</TableHead>
-                  <TableHead>Farmer</TableHead>
+                  <TableHead>{t('price') || 'Price'}</TableHead>
+                  <TableHead>{t('farmer') || 'Farmer'}</TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -191,13 +185,13 @@ export default function AdminProductsPage() {
                       {product.amount > 0 ? (
 
                         <Badge className="bg-emerald-100 text-emerald-700">
-                          {product.amount} Available
+                          {product.amount} {t('available') || 'Available'}
                         </Badge>
 
                       ) : (
 
                         <Badge variant="destructive">
-                          Out of stock
+                          {t('out_of_stock') || 'Out of stock'}
                         </Badge>
 
                       )}

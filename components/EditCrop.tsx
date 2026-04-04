@@ -20,11 +20,13 @@ import { getCategories, getSubCategories } from '@/services/categoryService'
 import { getProductById, updateProduct } from '@/services/productService'
 import { Category, SubCategory } from '@/types/category'
 import { toast } from 'sonner'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function EditCrop() {
     const router = useRouter()
     const params = useParams()
     const id = params?.id as string
+    const { t } = useLanguage()
 
     const [isFetching, setIsFetching] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
@@ -193,9 +195,9 @@ export default function EditCrop() {
 
             {/* Header */}
             <header className="bg-white border-b px-6 py-4 rounded-2xl">
-                <h1 className="text-2xl font-bold">Edit Crop</h1>
+                <h1 className="text-2xl font-bold">{t('edit_crop') || 'Edit Crop'}</h1>
                 <p className="text-sm text-slate-500">
-                    Update crop details and image.
+                    {t('edit_crop_desc') || 'Update crop details and image.'}
                 </p>
             </header>
 
@@ -205,11 +207,11 @@ export default function EditCrop() {
 
                     {/* Basic Info */}
                     <div className="space-y-4">
-                        <Label>Crop Name *</Label>
+                        <Label>{t('crop_name') || 'Crop Name *'}</Label>
                         <Input value={name} onChange={(e) => setName(e.target.value)} />
 
                         {/* Category */}
-                        <Label>Category *</Label>
+                        <Label>{t('category') || 'Category *'}</Label>
                         <Select
                             value={selectedCategory}
                             onValueChange={(val) => {
@@ -218,7 +220,7 @@ export default function EditCrop() {
                             }}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select category" />
+                                <SelectValue placeholder={t('select_category') || "Select category"} />
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map((cat) => (
@@ -230,13 +232,13 @@ export default function EditCrop() {
                         </Select>
 
                         {/* Subcategory */}
-                        <Label>Subcategory *</Label>
+                        <Label>{t('subcategory') || 'Subcategory *'}</Label>
                         <Select
                             value={selectedSubCategory}
                             onValueChange={setSelectedSubCategory}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select subcategory" />
+                                <SelectValue placeholder={t('select_subcategory') || "Select subcategory"} />
                             </SelectTrigger>
                             <SelectContent>
                                 {filteredSubs.map((sub) => (
@@ -247,7 +249,7 @@ export default function EditCrop() {
                             </SelectContent>
                         </Select>
 
-                        <Label>Description</Label>
+                        <Label>{t('description') || 'Description'}</Label>
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -259,7 +261,7 @@ export default function EditCrop() {
                     {/* Pricing */}
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                            <Label>Price (ETB) *</Label>
+                            <Label>{t('price_etb') || 'Price (ETB) *'}</Label>
                             <Input
                                 type="number"
                                 value={price}
@@ -268,7 +270,7 @@ export default function EditCrop() {
                         </div>
 
                         <div>
-                            <Label>Available Amount *</Label>
+                            <Label>{t('available_amount') || 'Available Amount *'}</Label>
                             <Input
                                 type="number"
                                 value={amount}
@@ -280,7 +282,7 @@ export default function EditCrop() {
                     {/* Image */}
                     <div className="space-y-6">
                         <h2 className="text-lg font-bold border-b pb-2">
-                            Product Image
+                            {t('product_image') || 'Product Image'}
                         </h2>
 
                         <div className="relative">
@@ -294,7 +296,7 @@ export default function EditCrop() {
                             <div className="w-full h-14 border-2 border-dashed rounded-xl flex items-center justify-center gap-2 text-gray-600 hover:border-emerald-400 transition">
                                 <ImagePlus size={20} className="text-emerald-600" />
                                 <span>
-                                    {newImageSrc ? "Change image" : "Upload image"}
+                                    {newImageSrc ? (t('change_image') || "Change image") : (t('upload_image') || "Upload image")}
                                 </span>
                             </div>
                         </div>
@@ -324,7 +326,7 @@ export default function EditCrop() {
                         ) : (
                             <div className="text-gray-400 text-center">
                                 <ImageIcon />
-                                No image
+                                {t('no_image') || 'No image'}
                             </div>
                         )}
                     </div>
@@ -332,12 +334,12 @@ export default function EditCrop() {
                     {/* Buttons */}
                     <div className="flex justify-end gap-3 pt-6 border-t">
                         <Button variant="outline" onClick={() => router.push('/farmer/crops')}>
-                            Cancel
+                            {t('cancel') || 'Cancel'}
                         </Button>
 
                         <Button onClick={handleUpdate} disabled={isSaving} className='bg-emerald-500'>
                             {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />}
-                            Update Crop
+                            {t('update_crop') || 'Update Crop'}
                         </Button>
                     </div>
 

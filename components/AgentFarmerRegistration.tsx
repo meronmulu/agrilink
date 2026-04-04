@@ -95,23 +95,23 @@ export default function AgentFarmerRegistration() {
 
       {/* Role (Fixed) */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Role</label>
+        <label className="text-sm font-medium text-gray-700">{t('role') || 'Role'}</label>
         <div className="h-11 flex items-center px-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600">
-          Farmer
+          {t('farmer') || 'Farmer'}
         </div>
       </div>
 
       {/* Email */}
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-gray-700">
-          Email (Optional)
+          {t('email_optional') || 'Email (Optional)'}
         </label>
         <Input
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com (optional)"
+          placeholder={t('you_example_optional') || "you@example.com (optional)"}
           className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
         />
       </div>
@@ -119,7 +119,7 @@ export default function AgentFarmerRegistration() {
       {/* Phone */}
       <div className="space-y-2">
         <label htmlFor="phone" className="text-sm font-medium text-gray-700">
-          Phone
+          {t('phone') || 'Phone'}
         </label>
         <Input
           id="phone"
@@ -134,7 +134,7 @@ export default function AgentFarmerRegistration() {
       {/* Password */}
       <div className="space-y-2">
         <label htmlFor="password" className="text-sm font-medium text-gray-700">
-          Password
+          {t('password') || 'Password'}
         </label>
         <Input
           id="password"
@@ -149,7 +149,7 @@ export default function AgentFarmerRegistration() {
       {/* Confirm Password */}
       <div className="space-y-2">
         <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-          Confirm Password
+          {t('confirm_password') || 'Confirm Password'}
         </label>
         <Input
           id="confirmPassword"
@@ -172,7 +172,7 @@ export default function AgentFarmerRegistration() {
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          "Create Farmer Account"
+          t('create_farmer_account') || "Create Farmer Account"
         )}
       </button>
 

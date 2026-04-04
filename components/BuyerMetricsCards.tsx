@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { ShoppingCart, Handshake, Bookmark, Wallet, Loader2 } from 'lucide-react'
 import { getBuyerMetrics, BuyerMetrics } from '@/services/buyerService'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function BuyerMetricsCards() {
+    const { t } = useLanguage()
     const [metrics, setMetrics] = useState<BuyerMetrics | null>(null)
     const [loading, setLoading] = useState(true)
 
@@ -54,7 +56,7 @@ export default function BuyerMetricsCards() {
                         <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                        <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1">Total Orders</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1">{t('total_orders') || 'Total Orders'}</p>
                     </div> 
                     </div>
                     
@@ -72,7 +74,7 @@ export default function BuyerMetricsCards() {
                         <Handshake size={20} className="sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                        <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1 leading-tight">Active<br className="hidden xl:block" /> Negotiations</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1 leading-tight">{t('active_negotiations') || 'Active Negotiations'}</p>
                         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 leading-none">{metrics.activeNegotiations}</h3>
                     </div>
                 </CardContent>
@@ -85,7 +87,7 @@ export default function BuyerMetricsCards() {
                         <Bookmark size={20} className="sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                        <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1">Saved Farms</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1">{t('saved_farms') || 'Saved Farms'}</p>
                         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 leading-none">{metrics.savedFarms}</h3>
                     </div>
                 </CardContent>
@@ -98,7 +100,7 @@ export default function BuyerMetricsCards() {
                         <Wallet size={20} className="sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                        <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1">Wallet Balance</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1">{t('wallet_balance') || 'Wallet Balance'}</p>
                         <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-none flex items-baseline gap-1 break-all">
                             <span className="text-xs sm:text-sm font-bold">ETB</span>
                             {metrics.walletBalance}

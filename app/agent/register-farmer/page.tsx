@@ -2,8 +2,10 @@
 
 import AgentFarmerRegistration from '@/components/AgentFarmerRegistration'
 import OtherSignUpPage from '@/components/OtherSignUpPage'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function RegisterFarmerPage() {
+    const { t } = useLanguage()
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
             
@@ -13,10 +15,10 @@ export default function RegisterFarmerPage() {
                 {/* Header */}
                 <div className="mb-6 text-center">
                     <h1 className="text-2xl font-bold text-gray-900">
-                        Registration Portal
+                        {t('registration_portal') || 'Registration Portal'}
                     </h1>
                     <p className="mt-2 text-sm text-gray-600">
-                        Complete the steps to register a farmer and create an account.
+                        {t('registration_portal_desc') || 'Complete the steps to register a farmer and create an account.'}
                     </p>
                 </div>
 

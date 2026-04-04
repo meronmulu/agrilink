@@ -165,7 +165,7 @@ export default function MarketPlace() {
 
               {selectedSubCategory
                 ? subcategories.find(s => s.id === selectedSubCategory)?.name
-                : "Categories"}
+                : (t('categories') || "Categories")}
 
             </Button>
 
@@ -174,7 +174,7 @@ export default function MarketPlace() {
           <DropdownMenuContent className="w-56">
 
             <DropdownMenuItem onClick={() => setSelectedSubCategory(null)}>
-              All Categories
+              {t('all_categories') || 'All Categories'}
             </DropdownMenuItem>
 
             <DropdownMenuSeparator />
@@ -229,11 +229,11 @@ export default function MarketPlace() {
         <div className="flex flex-col items-center justify-center py-20 text-center">
 
           <p className="text-lg font-medium text-gray-600">
-            No products in this category
+            {t('no_products_category') || 'No products in this category'}
           </p>
 
           <p className="text-sm text-gray-400 mt-2">
-            Try selecting another category or search again.
+            {t('try_selecting_another') || 'Try selecting another category or search again.'}
           </p>
 
         </div>
@@ -283,7 +283,7 @@ export default function MarketPlace() {
 
                   {/* Availability */}
                   <div className='flex gap-2'>
-                    Available:
+                    {t('available_colon') || 'Available:'}
                     <span className={`font-medium ${product.amount > 10
                       ? 'text-green-600'
                       : product.amount > 0
@@ -298,7 +298,7 @@ export default function MarketPlace() {
                   {/* Price */}
                   <div>
                     <p className="text-[11px] text-gray-400 font-medium mb-0.5 uppercase tracking-wider">
-                      Price
+                      {t('price') || 'Price'}
                     </p>
                     <p className="text-emerald-600 font-black text-xl">
                       ETB {product.price}
@@ -317,7 +317,7 @@ export default function MarketPlace() {
 
                     <Link href={`/product/${product.id}`} className="flex-1">
                       <Button variant="outline" className="w-full">
-                        View
+                        {t('view') || 'View'}
                       </Button>
                     </Link>
 

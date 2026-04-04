@@ -38,7 +38,7 @@ export default function CartPage() {
       setCart(data)
     } catch (err) {
       console.error(err)
-      toast.error(t('failed_to_load_cart')) // TODO: Add to locales
+      toast.error(t('failed_to_load_cart') || 'Failed to load cart') // TODO: Add to locales
     } finally {
       setLoading(false)
     }
@@ -57,10 +57,10 @@ export default function CartPage() {
     try {
       await updateCart({ productId, amount })
       await fetchCart()
-      toast.success(t('quantity_updated_successfully')) // TODO: Add to locales
+      toast.success(t('quantity_updated_successfully') || 'Quantity updated successfully') // TODO: Add to locales
     } catch (err) {
       console.error(err)
-      toast.error(t('update_failed')) // TODO: Add to locales
+      toast.error(t('update_failed') || 'Update failed') // TODO: Add to locales
     } finally {
       setUpdatingItems(prev => {
         const newSet = new Set(prev)
@@ -81,11 +81,11 @@ export default function CartPage() {
         prev.filter(item => item.product.id !== productId)
       )
 
-      toast.success(t('product_removed_from_cart')) // TODO: Add to locales
+      toast.success(t('product_removed_from_cart') || 'Product removed from cart') // TODO: Add to locales
     } catch (err) {
       console.error(err)
       fetchCart()
-      toast.error(t('remove_failed')) // TODO: Add to locales
+      toast.error(t('remove_failed') || 'Remove failed') // TODO: Add to locales
     } finally {
       setUpdatingItems(prev => {
         const newSet = new Set(prev)
@@ -97,15 +97,15 @@ export default function CartPage() {
 
 
   const handleClear = async () => {
-    if (!confirm(t('clear_cart_confirm'))) return // TODO: Add to locales
+    if (!confirm(t('clear_cart_confirm') || 'Are you sure you want to clear your cart?')) return // TODO: Add to locales
 
     try {
       await clearCart()
       setCart([])
-      toast.success(t('cart_cleared')) // TODO: Add to locales
+      toast.success(t('cart_cleared') || 'Cart cleared') // TODO: Add to locales
     } catch (err) {
       console.error(err)
-      toast.error(t('failed_to_clear_cart')) // TODO: Add to locales
+      toast.error(t('failed_to_clear_cart') || 'Failed to clear cart') // TODO: Add to locales
     }
   }
 
@@ -123,7 +123,7 @@ export default function CartPage() {
 
     const res = await checkoutOrder(checkoutData)
 
-    toast.success(t('order_created_redirecting')) // TODO: Add to locales
+    toast.success(t('order_created_redirecting') || 'Order created, redirecting...') // TODO: Add to locales
 
     if (res?.paymentUrl) {
       window.location.href = res.paymentUrl
@@ -131,7 +131,7 @@ export default function CartPage() {
 
   } catch (error) {
     console.log(error)
-    toast.error(t('checkout_error')) // TODO: Add to locales
+    toast.error(t('checkout_error') || 'Checkout error') // TODO: Add to locales
   } finally {
     setCheckingOut(false)
   }
@@ -161,7 +161,7 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-600" size={40} />
-        <span className="ml-4 text-emerald-600 font-medium">{t('loading')}</span> {/* TODO: Add to locales */}
+        <span className="ml-4 text-emerald-600 font-medium">{t('loading') || 'Loading...'}</span> {/* TODO: Add to locales */}
       </div>
     )
   }
@@ -172,12 +172,12 @@ export default function CartPage() {
       <div className="max-w-7xl mx-auto px-4">
 
         {/* HEADER */}
-        <h1 className="text-2xl font-bold mb-8">{t('shopping_cart')}</h1> {/* TODO: Add to locales */}
+        <h1 className="text-2xl font-bold mb-8">{t('shopping_cart') || 'Shopping Cart'}</h1> {/* TODO: Add to locales */}
 
         {cart.length === 0 ? (
           <div className="bg-white rounded-2xl shadow p-12 text-center">
             <ShoppingCart className="mx-auto mb-4 text-gray-400" size={50} />
-            <h2 className="text-xl font-semibold mb-2">{t('your_cart_is_empty')}</h2> {/* TODO: Add to locales */}
+            <h2 className="text-xl font-semibold mb-2">{t('your_cart_is_empty') || 'Your cart is empty'}</h2> {/* TODO: Add to locales */}
           </div>
         ) : (
           <div className="grid lg:grid-cols-12 gap-8">
@@ -255,19 +255,19 @@ export default function CartPage() {
 
             {/* SUMMARY */}
             <div className="lg:col-span-4 bg-white rounded-2xl shadow p-6 h-fit">
-              <h2 className="font-semibold mb-4">{t('order_summary')}</h2> {/* TODO: Add to locales */}
+              <h2 className="font-semibold mb-4">{t('order_summary') || 'Order Summary'}</h2> {/* TODO: Add to locales */}
 
               <div className="flex justify-between text-sm text-gray-600">
-                <span>{t('items')}</span>
+                <span>{t('items') || 'Items'}</span>
                 <span>{cart.length}</span>
               </div>
               <div className="flex justify-between mb-2">
-                <span>{t('subtotal')}</span>
+                <span>{t('subtotal') || 'Subtotal'}</span>
                 <span>ETB {subtotal.toLocaleString()}</span>
               </div>
 
               <div className="flex justify-between text-lg font-bold border-t pt-4">
-                <span>{t('total')}</span>
+                <span>{t('total') || 'Total'}</span>
                 <span className="text-emerald-600">
                   ETB {total.toLocaleString()}
                 </span>
@@ -281,7 +281,7 @@ export default function CartPage() {
                 {checkingOut ? (
                   <Loader2 className="animate-spin mx-auto" />
                 ) : (
-                  t('proceed_to_checkout')
+                  t('proceed_to_checkout') || 'Proceed to Checkout'
                 )}
               </Button>
 
@@ -290,7 +290,7 @@ export default function CartPage() {
                 className="w-full mt-3"
                 onClick={handleClear}
               >
-                {t('clear_cart')}
+                {t('clear_cart') || 'Clear Cart'}
               </Button>
             </div>
 

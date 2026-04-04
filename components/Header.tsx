@@ -77,32 +77,32 @@ export default function Header() {
 
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
-      { name: "Orders", href: "/buyer/order", icon: ShoppingBag },
-      { name: 'Cart', href: '/buyer/cart', icon: ShoppingCart, badge: cartCount },
-      { name: "Messages", href: "/message", icon: MessageSquare, badge: 3 },
-      { name: "Market Insights", href: "/buyer/insights", icon: BrainCircuit },
+      { name: t('orders') || "Orders", href: "/buyer/order", icon: ShoppingBag },
+      { name: t('cart') || 'Cart', href: '/buyer/cart', icon: ShoppingCart, badge: cartCount },
+      { name: t('messages') || "Messages", href: "/message", icon: MessageSquare, badge: 3 },
+      { name: t('market_insights') || "Market Insights", href: "/buyer/insights", icon: BrainCircuit },
     ],
 
     FARMER: [
-      { name: 'My Crops', href: '/farmer/crops', icon: Sprout },
-      { name: 'My Orders', href: '/farmer/orders', icon: ListOrdered },
-      { name: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
-      { name: 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
-      { name: 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
+      { name: t('my_crops') || 'My Crops', href: '/farmer/crops', icon: Sprout },
+      { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
+      { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
+      { name: t('messages') || 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
+      { name: t('market_insights') || 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
     ],
 
     AGENT: [
-      { name: "Dashboard", href: "/agent/dashboard", icon: LayoutDashboard },
-      { name: "Register Farmer", href: "/agent/register-farmer", icon: Users },
+      { name: t('dashboard') || "Dashboard", href: "/agent/dashboard", icon: LayoutDashboard },
+      { name: t('register_farmer') || "Register Farmer", href: "/agent/register-farmer", icon: Users },
       // { name: "Training Modules", href: "/agent/training", icon: BookOpen },
     ],
 
     ADMIN: [
-      { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-      { name: "User Management", href: "/admin/user", icon: Users },
-      { name: "Products", href: "/admin/products", icon: BookOpen },
-      { name: "Agent Approval", href: "/admin/agent-approval", icon: Settings },
-      { name: "Categories", href: "/admin/category", icon: Settings },
+      { name: t('dashboard') || "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+      { name: t('user_management') || "User Management", href: "/admin/user", icon: Users },
+      { name: t('products') || "Products", href: "/admin/products", icon: BookOpen },
+      { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Settings },
+      { name: t('categories') || "Categories", href: "/admin/category", icon: Settings },
     ],
   }
 
@@ -224,7 +224,7 @@ export default function Header() {
                 onClick={handleRoleRequest}
                 className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 rounded-lg"
               >
-                Ask to agent
+                {t('ask_to_agent') || 'Ask to agent'}
               </Button>
             )}
 
@@ -259,14 +259,14 @@ export default function Header() {
                 {(user.role === "BUYER" || user.role === "FARMER") && (
                   <DropdownMenuItem asChild>
                     <Link href={dashboardRoute}>
-                      Dashboard
+                      {t('dashboard') || 'Dashboard'}
                     </Link>
                   </DropdownMenuItem>
                 )}
 
                 <DropdownMenuItem asChild>
                   <Link href={`/profile/${user.id}`}>
-                    Profile
+                    {t('profile') || 'Profile'}
                   </Link>
                 </DropdownMenuItem>
 
@@ -275,7 +275,7 @@ export default function Header() {
                   className="flex items-center gap-2 text-red-500"
                 >
                   <LogOut size={16} />
-                  Logout
+                  {t('logout') || 'Logout'}
                 </DropdownMenuItem>
 
               </DropdownMenuContent>

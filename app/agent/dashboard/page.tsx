@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Users, BookOpen, Award, TrendingUp, UserPlus, GraduationCap, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { getAgentStats, getAgentActivities, AgentStats, RecentActivity } from '@/services/agentService'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function AgentDashboard() {
     const router = useRouter()
+    const { t } = useLanguage()
     const [stats, setStats] = useState<AgentStats | null>(null)
     const [activities, setActivities] = useState<RecentActivity[]>([])
     const [loading, setLoading] = useState(true)
@@ -43,23 +45,23 @@ export default function AgentDashboard() {
     if (!stats) {
         return (
             <div className="text-center py-12">
-                <p className="text-gray-500">Failed to load dashboard data</p>
+                <p className="text-gray-500">{t('failed_to_load_dashboard_data') || 'Failed to load dashboard data'}</p>
             </div>
         )
     }
 
     const statsArray = [
-        { title: 'Total Registered Farmers', value: stats.totalFarmers.toString(), icon: Users, color: 'text-emerald-600' },
-        { title: 'Training Sessions Held', value: stats.trainingSessions.toString(), icon: BookOpen, color: 'text-blue-600' },
-        { title: 'Certifications Issued', value: stats.certificationsIssued.toString(), icon: Award, color: 'text-purple-600' },
-        { title: 'Monthly Growth', value: `+${stats.monthlyGrowth}%`, icon: TrendingUp, color: 'text-amber-600' },
+        { title: t('total_registered_farmers') || 'Total Registered Farmers', value: stats.totalFarmers.toString(), icon: Users, color: 'text-emerald-600' },
+        { title: t('training_sessions_held') || 'Training Sessions Held', value: stats.trainingSessions.toString(), icon: BookOpen, color: 'text-blue-600' },
+        { title: t('certifications_issued') || 'Certifications Issued', value: stats.certificationsIssued.toString(), icon: Award, color: 'text-purple-600' },
+        { title: t('monthly_growth') || 'Monthly Growth', value: `+${stats.monthlyGrowth}%`, icon: TrendingUp, color: 'text-amber-600' },
     ]
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold text-gray-900">Agent Overview</h1>
-                <p className="text-gray-500 mt-1">Monitor your farmer registration and training activities.</p>
+                <h1 className="text-3xl font-bold text-gray-900">{t('agent_overview') || 'Agent Overview'}</h1>
+                <p className="text-gray-500 mt-1">{t('monitor_your_farmer_registration') || 'Monitor your farmer registration and training activities.'}</p>
             </div>
 
             {/* Stats Grid */}
@@ -86,7 +88,7 @@ export default function AgentDashboard() {
                     className="h-20 bg-emerald-500 hover:bg-emerald-600 flex flex-col items-center justify-center gap-2"
                 >
                     <UserPlus size={24} />
-                    <span>Register Farmer</span>
+                    <span>{t('register_farmer') || 'Register Farmer'}</span>
                 </Button>
                 <Button
                     onClick={() => router.push('/agent/farmer')}
@@ -94,7 +96,7 @@ export default function AgentDashboard() {
                     className="h-20 border-blue-200 text-blue-600 hover:bg-blue-50 flex flex-col items-center justify-center gap-2"
                 >
                     <Users size={24} />
-                    <span>View Farmers</span>
+                    <span>{t('view_farmers') || 'View Farmers'}</span>
                 </Button>
                 <Button
                     onClick={() => router.push('/agent/training')}
@@ -102,14 +104,14 @@ export default function AgentDashboard() {
                     className="h-20 border-purple-200 text-purple-600 hover:bg-purple-50 flex flex-col items-center justify-center gap-2"
                 >
                     <GraduationCap size={24} />
-                    <span>Training Modules</span>
+                    <span>{t('training_modules') || 'Training Modules'}</span>
                 </Button>
             </div>
 
             {/* Recent Activity */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
+                    <CardTitle>{t('recent_activity') || 'Recent Activity'}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">

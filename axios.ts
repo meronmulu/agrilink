@@ -8,7 +8,9 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
+    const lang = typeof window !== 'undefined' ? (localStorage.getItem("lang") || "en") : "en";
+    
     if (token && !config.url?.includes("google-signin")) {
       // Only attach token for requests other than Google login
       if (typeof config.headers.set === 'function') {
@@ -17,6 +19,15 @@ instance.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+
+    if (config.headers) {
+      if (typeof config.headers.set === 'function') {
+        config.headers.set("Accept-Language", lang);
+      } else {
+        config.headers["Accept-Language"] = lang;
+      }
+    }
+
     return config;
   },
   (error) => Promise.reject(error)

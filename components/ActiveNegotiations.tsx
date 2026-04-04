@@ -4,8 +4,10 @@ import { Handshake, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { getActiveNegotiations, NegotiationItem } from '@/services/buyerService'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function ActiveNegotiations() {
+    const { t } = useLanguage()
     const [negotiations, setNegotiations] = useState<NegotiationItem[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -30,7 +32,7 @@ export default function ActiveNegotiations() {
                 <CardHeader className="p-4 sm:p-6">
                     <CardTitle className="text-lg font-bold flex items-center gap-2">
                         <Handshake className="text-emerald-500" size={20} />
-                        Active Negotiations
+                        {t('active_negotiations') || 'Active Negotiations'}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6">
@@ -45,9 +47,9 @@ export default function ActiveNegotiations() {
             <CardHeader className="p-4 sm:p-6 border-b border-gray-100 bg-white flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-lg font-bold flex items-center gap-2 text-gray-900">
                     <Handshake className="text-emerald-500 shrink-0" size={20} />
-                    Active Negotiations
+                    {t('active_negotiations') || 'Active Negotiations'}
                 </CardTitle>
-                <span className="text-sm font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer cursor-pointer whitespace-nowrap">View All</span>
+                <span className="text-sm font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer cursor-pointer whitespace-nowrap">{t('view_all') || 'View All'}</span>
             </CardHeader>
 
             <CardContent className="p-0 divide-y divide-gray-100 bg-white">
@@ -65,7 +67,7 @@ export default function ActiveNegotiations() {
                             <div className="flex flex-col md:flex-row md:items-start justify-between gap-2 mb-3 md:mb-0">
                                 <div>
                                     <h4 className="font-bold text-gray-900">{item.product}</h4>
-                                    <p className="text-sm text-gray-500 mt-0.5">Farmer: <span className="text-emerald-600 font-medium">{item.farmer}</span></p>
+                                    <p className="text-sm text-gray-500 mt-0.5">{t('farmer') || 'Farmer'}: <span className="text-emerald-600 font-medium">{item.farmer}</span></p>
                                 </div>
                                 <div className="self-start">
                                     <span className={`text-[11px] font-bold px-3 py-1 rounded-full whitespace-nowrap ${item.statusColor}`}>
@@ -77,24 +79,24 @@ export default function ActiveNegotiations() {
                             {/* Pricing Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 mb-4 mt-2 md:mt-0">
                                 <div>
-                                    <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Quantity</p>
+                                    <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">{t('quantity') || 'Quantity'}</p>
                                     <p className="font-bold text-gray-900 text-sm sm:text-base">{item.quantity}</p>
                                 </div>
                                 {item.currentPrice && (
                                     <div>
-                                        <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Current Price</p>
+                                        <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">{t('current_price') || 'Current Price'}</p>
                                         <p className="font-bold text-gray-900 text-sm sm:text-base">{item.currentPrice}</p>
                                     </div>
                                 )}
                                 {item.originalPrice && (
                                     <div>
-                                        <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Original</p>
+                                        <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">{t('original') || 'Original'}</p>
                                         <p className="font-semibold text-gray-400 line-through text-sm sm:text-base">{item.originalPrice}</p>
                                     </div>
                                 )}
                                 {item.myOffer && (
                                     <div>
-                                        <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">My Offer</p>
+                                        <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">{t('my_offer') || 'My Offer'}</p>
                                         <p className="font-bold text-gray-900 text-sm sm:text-base">{item.myOffer}</p>
                                     </div>
                                 )}
@@ -111,7 +113,7 @@ export default function ActiveNegotiations() {
                                                 : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                                             }`}
                                     >
-                                        {action}
+                                        {t(action.toLowerCase().replace(/ /g, '_')) || action}
                                     </Button>
                                 ))}
                             </div>
