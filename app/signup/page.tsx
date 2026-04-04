@@ -35,7 +35,7 @@ export default function SignupPage() {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center justify-center p-6 lg:p-14 bg-white/80 backdrop-blur-xl">
+        <div className="flex items-center justify-center p-6 bg-white/80 backdrop-blur-xl">
           <div className="w-full max-w-md">
 
             {/* Header */}

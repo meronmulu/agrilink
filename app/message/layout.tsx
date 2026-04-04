@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { getConversations } from '@/services/chatService'
 import { getUserById } from '@/services/authService'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
-import { Search, Menu, Plus } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Conversation } from '@/types/chat'
 import Image from 'next/image'
 
@@ -55,7 +54,9 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
           userId = userObj.id
           // eslint-disable-next-line react-hooks/set-state-in-effect
           setCurrentUserId(userId)
-        } catch (e) { }
+        } catch (e) { 
+          console.error("Error parsing user from localStorage:", e)
+        }
       }
     }
     fetchConversations(userId)
