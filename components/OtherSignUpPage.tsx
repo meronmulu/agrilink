@@ -108,7 +108,7 @@ export default function OtherSignUpPage() {
       woredaId
     })
 
-    // 🔍 Validation
+    //  Validation
     if (!fullName || !kebeleId) {
       toast.error("Please fill all fields")
       return
@@ -130,9 +130,9 @@ export default function OtherSignUpPage() {
 
     // ✅ Success
     toast.dismiss(loadingToast)
-    toast.success("Profile created successfully 🎉")
+    toast.success("Profile created successfully ")
 
-    // 🔁 Redirect based on role
+    // Redirect based on role
     setTimeout(() => {
       if (role === "BUYER") {
         router.push("/buyer")
@@ -143,12 +143,12 @@ export default function OtherSignUpPage() {
       }
     }, 1000)
 
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
 
     toast.error(
-      error?.response?.data?.message ||
-      error?.message ||
+      // error?.response?.data?.message ||
+      // error?.message ||
       "Failed to create profile"
     )
   } finally {
