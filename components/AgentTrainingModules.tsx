@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { BookOpen, Video, FileText, Download, Calendar, Users } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
+import { useLanguage } from '@/context/LanguageContext'
 
 // Mock Data
 const modules = [
@@ -55,6 +56,7 @@ const modules = [
 ]
 
 export default function AgentTrainingModules() {
+    const { t } = useLanguage()
     const [searchTerm, setSearchTerm] = useState('')
 
     const filteredModules = modules.filter(m =>
@@ -66,13 +68,13 @@ export default function AgentTrainingModules() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Training Modules</h2>
-                    <p className="text-slate-500 mt-1">Access materials to facilitate farmer training sessions.</p>
+                    <h2 className="text-2xl font-bold text-gray-900">{t('training_modules') || 'Training Modules'}</h2>
+                    <p className="text-slate-500 mt-1">{t('access_materials_desc') || 'Access materials to facilitate farmer training sessions.'}</p>
                 </div>
 
                 <button className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
                     <Calendar size={18} />
-                    Schedule Session
+                    {t('schedule_session') || 'Schedule Session'}
                 </button>
             </div>
 
@@ -81,7 +83,7 @@ export default function AgentTrainingModules() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <Input
                     type="text"
-                    placeholder="Search modules..."
+                    placeholder={t('search_modules') || "Search modules..."}
                     className="pl-10 h-11"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -114,13 +116,13 @@ export default function AgentTrainingModules() {
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                         <Users size={16} className="text-gray-400" />
-                                        {module.farmersTrained} trained
+                                        {module.farmersTrained} {t('trained') || 'trained'}
                                     </div>
                                 </div>
                             </CardContent>
                             <CardFooter className="pt-0 border-t border-gray-100 mt-4 flex justify-between items-center">
                                 <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700 mt-4">
-                                    View Materials
+                                    {t('view_materials') || 'View Materials'}
                                 </button>
                                 <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full mt-4 transition-colors">
                                     <Download size={18} />

@@ -10,8 +10,10 @@ import {
 } from '@/components/ui/dialog'
 
 import { sendMessageToAI } from '@/services/aiAssistance'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function AiAssistant() {
+  const { t } = useLanguage()
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [input, setInput] = useState('')
@@ -59,7 +61,7 @@ export default function AiAssistant() {
         ...prev,
         { 
           role: 'ai', 
-          text: ' Failed to get response. Please try again.', 
+          text: t('ai_failed_response') || ' Failed to get response. Please try again.', 
           timestamp: new Date(),
           isError: true 
         }
@@ -106,7 +108,7 @@ export default function AiAssistant() {
               </div>
               <div>
                 <DialogTitle className="text-white text-lg font-semibold">
-                  AI Assistant
+                  {t('ai_assistant') || 'AI Assistant'}
                 </DialogTitle>
               </div>
             </div>
@@ -119,27 +121,27 @@ export default function AiAssistant() {
               <div className="flex flex-col items-center justify-center h-full text-center">
                 
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                  Welcome to AI Assistant!
+                  {t('ai_welcome') || 'Welcome to AI Assistant!'}
                 </h3>
                 <p className="text-sm text-gray-500 max-w-md">
-                  Ask me anything - I'm here to help you with questions, tasks, or just a friendly conversation.
+                  {t('ai_description') || "Ask me anything - I'm here to help you with questions, tasks, or just a friendly conversation."}
                 </p>
                 <div className="flex gap-2 mt-6">
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setInput("What can you help me with?")}
+                    onClick={() => setInput(t('ai_what_can_help_input') || "What can you help me with?")}
                     className="text-xs"
                   >
-                    What can you help with?
+                    {t('ai_what_can_help') || 'What can you help with?'}
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setInput("Give me a quick tip")}
+                    onClick={() => setInput(t('ai_give_tip_input') || "Give me a quick tip")}
                     className="text-xs"
                   >
-                    Give me a tip
+                    {t('ai_give_tip') || 'Give me a tip'}
                   </Button>
                 </div>
               </div>
@@ -215,7 +217,7 @@ export default function AiAssistant() {
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything..."
+                placeholder={t('ai_ask_anything') || "Ask me anything..."}
                 className="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                 disabled={loading}

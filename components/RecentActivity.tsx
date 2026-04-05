@@ -3,8 +3,10 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { History, Loader2 } from 'lucide-react'
 import { getBuyerActivities } from '@/services/buyerService'
 import type { RecentActivity } from '@/services/buyerService'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function RecentActivity() {
+    const { t } = useLanguage()
     const [activities, setActivities] = useState<RecentActivity[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -38,7 +40,7 @@ export default function RecentActivity() {
                 <CardHeader className="p-4 sm:p-6">
                     <CardTitle className="text-lg font-bold flex items-center gap-2">
                         <History className="text-emerald-500" size={20} />
-                        Recent Activity
+                        {t('recent_activity') || 'Recent Activity'}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6">
@@ -53,7 +55,7 @@ export default function RecentActivity() {
             <CardHeader className="p-4 sm:p-6 border-b border-gray-50 bg-white">
                 <CardTitle className="text-lg font-bold flex items-center gap-2 text-gray-900">
                     <History className="text-emerald-500 shrink-0" size={20} />
-                    Recent Activity
+                    {t('recent_activity') || 'Recent Activity'}
                 </CardTitle>
             </CardHeader>
 

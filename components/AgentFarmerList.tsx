@@ -50,12 +50,12 @@ export default function AgentFarmerList() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Registered Farmers</h1>
-          <p className="text-gray-500 mt-1">Manage and monitor farmers registered through your agency.</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('registered_farmers') || 'Registered Farmers'}</h1>
+          <p className="text-gray-500 mt-1">{t('manage_farmers_desc') || 'Manage and monitor farmers registered through your agency.'}</p>
         </div>
         <Button onClick={() => router.push('/agent/register-farmer')} className="bg-emerald-500 hover:bg-emerald-600">
           <Plus className="mr-2 h-4 w-4" />
-          Register New Farmer
+          {t('register_new_farmer') || 'Register New Farmer'}
         </Button>
       </div>
 
@@ -63,7 +63,7 @@ export default function AgentFarmerList() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
         <Input
-          placeholder="Search farmers by name, email, phone, or region..."
+          placeholder={t('search_farmers') || "Search farmers by name, email, phone, or region..."}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10"
@@ -77,7 +77,7 @@ export default function AgentFarmerList() {
             <div className="flex items-center">
               <User className="h-8 w-8 text-emerald-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Total Farmers</p>
+                <p className="text-sm font-medium text-gray-500">{t('total_farmers') || 'Total Farmers'}</p>
                 <p className="text-2xl font-bold text-gray-900">{farmers.length}</p>
               </div>
             </div>
@@ -90,7 +90,7 @@ export default function AgentFarmerList() {
                 <div className="h-3 w-3 bg-green-500 rounded-full"></div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Active Farmers</p>
+                <p className="text-sm font-medium text-gray-500">{t('active_farmers') || 'Active Farmers'}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {farmers.filter(f => f.status === 'active').length}
                 </p>
@@ -105,7 +105,7 @@ export default function AgentFarmerList() {
                 <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">This Month</p>
+                <p className="text-sm font-medium text-gray-500">{t('this_month') || 'This Month'}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {farmers.filter(f => new Date(f.registeredDate) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length}
                 </p>
@@ -155,10 +155,10 @@ export default function AgentFarmerList() {
               </div>
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" size="sm" className="flex-1">
-                  View Profile
+                  {t('view_profile') || 'View Profile'}
                 </Button>
                 <Button variant="outline" size="sm" className="flex-1">
-                  Message
+                  {t('message') || 'Message'}
                 </Button>
               </div>
             </CardContent>
@@ -169,9 +169,9 @@ export default function AgentFarmerList() {
       {filteredFarmers.length === 0 && (
         <div className="text-center py-12">
           <User className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No farmers found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('no_farmers_found') || 'No farmers found'}</h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm ? 'Try adjusting your search terms.' : 'Get started by registering your first farmer.'}
+            {searchTerm ? (t('adjust_search') || 'Try adjusting your search terms.') : (t('register_first_farmer') || 'Get started by registering your first farmer.')}
           </p>
         </div>
       )}

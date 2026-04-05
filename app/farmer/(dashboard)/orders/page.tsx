@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getFarmerOrders } from '@/services/orderService'
+import { useLanguage } from '@/context/LanguageContext'
 import {
     Card,
     CardContent,
@@ -21,6 +22,7 @@ import { Order } from '@/types/order'
 import Image from 'next/image'
 
 export default function FarmerOrdersPage() {
+    const { t } = useLanguage()
     const [orders, setOrders] = useState<Order[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -58,9 +60,9 @@ export default function FarmerOrdersPage() {
         <div className="md:p-6 space-y-6">
             {/* Title */}
             <div>
-                <h1 className="text-2xl font-bold">Farmer Orders</h1>
+                <h1 className="text-2xl font-bold">{t('farmer_orders') || 'Farmer Orders'}</h1>
                 <p className="text-gray-500 text-sm">
-                    Track all your orders and revenue
+                    {t('track_orders_revenue') || 'Track all your orders and revenue'}
                 </p>
             </div>
 
@@ -69,7 +71,7 @@ export default function FarmerOrdersPage() {
                 <Card className="shadow-sm border rounded-2xl p-5">
                     <CardHeader>
                         <CardTitle className="text-sm text-gray-500">
-                            Total Orders
+                            {t('total_orders') || 'Total Orders'}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -80,7 +82,7 @@ export default function FarmerOrdersPage() {
                 <Card className="shadow-sm border rounded-2xl p-5">
                     <CardHeader>
                         <CardTitle className="text-sm text-gray-500">
-                            Paid Orders
+                            {t('paid_orders') || 'Paid Orders'}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -93,7 +95,7 @@ export default function FarmerOrdersPage() {
                 <Card className="shadow-sm border rounded-2xl p-5">
                     <CardHeader>
                         <CardTitle className="text-sm text-gray-500">
-                            Total Revenue
+                            {t('total_revenue') || 'Total Revenue'}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -112,14 +114,14 @@ export default function FarmerOrdersPage() {
                     <Table>
                         <TableHeader className='py-5'>
                             <TableRow>
-                                <TableHead>Buyer</TableHead>
-                                <TableHead>Email/phone</TableHead>
-                                <TableHead>Product</TableHead>
-                                <TableHead>Quantity</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Total</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Date</TableHead>
+                                <TableHead>{t('buyer') || 'Buyer'}</TableHead>
+                                <TableHead>{t('email_phone') || 'Email/phone'}</TableHead>
+                                <TableHead>{t('product') || 'Product'}</TableHead>
+                                <TableHead>{t('quantity') || 'Quantity'}</TableHead>
+                                <TableHead>{t('price') || 'Price'}</TableHead>
+                                <TableHead>{t('total') || 'Total'}</TableHead>
+                                <TableHead>{t('status') || 'Status'}</TableHead>
+                                <TableHead>{t('date') || 'Date'}</TableHead>
                             </TableRow>
                         </TableHeader>
 
@@ -127,7 +129,7 @@ export default function FarmerOrdersPage() {
                             {orders.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-center py-6 text-gray-500">
-                                        No orders found
+                                        {t('no_orders_found') || 'No orders found'}
                                     </TableCell>
                                 </TableRow>
                             ) : (

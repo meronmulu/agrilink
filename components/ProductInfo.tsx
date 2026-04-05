@@ -23,8 +23,10 @@ import { Product } from '@/types/product'
 import { toast } from 'sonner'
 import { addToCart } from '@/services/cartService'
 import { checkoutOrder } from '@/services/orderService'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function ProductDetailPage() {
+  const { t } = useLanguage()
 
   const router = useRouter()
   const params = useParams()
@@ -159,9 +161,9 @@ export default function ProductDetailPage() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <h1 className="text-xl font-bold">Product Not Found</h1>
+          <h1 className="text-xl font-bold">{t('product_not_found') || 'Product Not Found'}</h1>
           <Button onClick={() => router.push('/marketplace')}>
-            Back to Marketplace
+            {t('back_to_marketplace') || 'Back to Marketplace'}
           </Button>
         </div>
         <Footer />
@@ -193,7 +195,7 @@ export default function ProductDetailPage() {
 
               <div className="absolute top-4 left-4 z-10 bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow">
                 <CheckCircle2 size={14} />
-                Available: {product.amount}
+                {t('available_colon') || 'Available:'} {product.amount}
               </div>
 
               <Image
@@ -241,7 +243,7 @@ export default function ProductDetailPage() {
           <div className="flex flex-col">
 
             <span className="text-xs font-bold text-emerald-600 tracking-widest uppercase mb-2">
-              {product.subCategory?.name || "General Product"}
+              {product.subCategory?.name || (t('general_product') || "General Product")}
             </span>
 
             <h1 className="text-3xl font-bold text-gray-900 mb-4 capitalize">
@@ -266,7 +268,7 @@ export default function ProductDetailPage() {
               <span className="text-sm font-semibold">4.8</span>
 
               <span className="text-sm text-gray-500 underline cursor-pointer">
-                124 reviews
+                124 {t('reviews') || 'reviews'}
               </span>
 
             </div>
@@ -290,8 +292,8 @@ export default function ProductDetailPage() {
               <div className={`h-2 w-2 rounded-full ${product.amount > 0 ? 'bg-emerald-500' : 'bg-red-500'}`} />
 
               {product.amount > 0
-                ? 'In Stock & Ready to Ship'
-                : 'Out of Stock'}
+                ? (t('in_stock_ready') || 'In Stock & Ready to Ship')
+                : (t('out_of_stock') || 'Out of Stock')}
 
             </div>
 
@@ -317,7 +319,7 @@ export default function ProductDetailPage() {
 
                     {/* NAME */}
                     <h3 className="font-semibold text-sm text-gray-900">
-                      {product.farmer?.profile?.fullName || "Unknown Farmer"}
+                      {product.farmer?.profile?.fullName || (t('unknown_farmer') || "Unknown Farmer")}
                     </h3>
 
                     {/* EMAIL */}
@@ -333,7 +335,7 @@ export default function ProductDetailPage() {
                             onClick={() => setShowPhone(true)}
                             className="text-emerald-600 font-medium hover:underline"
                           >
-                            Show Phone Number
+                            {t('show_phone_number') || 'Show Phone Number'}
                           </button>
                         ) : (
                           <span>📞 {product.farmer.phone}</span>
@@ -351,7 +353,7 @@ export default function ProductDetailPage() {
                   className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg text-sm h-9"
                 >
                   <MessageCircle size={16} className="mr-2" />
-                  Message
+                  {t('message') || 'Message'}
                 </Button>
 
               </div>
@@ -368,7 +370,7 @@ export default function ProductDetailPage() {
                 className="h-12 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium"
               >
                 <ShoppingCart size={18} className="mr-2" />
-                {cartLoading ? "Adding..." : (product.amount > 0 ? 'Add to Cart' : 'Out of Stock')}
+                {cartLoading ? (t('adding') || "Adding...") : (product.amount > 0 ? (t('add_to_cart') || 'Add to Cart') : (t('out_of_stock') || 'Out of Stock'))}
               </Button>
 
               <Button
@@ -377,7 +379,7 @@ export default function ProductDetailPage() {
                 variant="outline"
                 className="h-12 rounded-lg border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 text-sm font-medium"
               >
-                {buyLoading ? "Processing..." : "Buy Now"}
+                {buyLoading ? (t('processing') || "Processing...") : (t('buy_now') || "Buy Now")}
               </Button>
 
             </div>
@@ -392,21 +394,21 @@ export default function ProductDetailPage() {
               <div>
                 <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
                   <Package size={12} />
-                  Sub Category
+                  {t('sub_category') || 'Sub Category'}
                 </p>
 
                 <p className="text-sm font-semibold">
-                  {product.subCategory?.name || "General"}
+                  {product.subCategory?.name || (t('general') || "General")}
                 </p>
               </div>
               <div>
                 <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
                   <Package size={12} />
-                  Stock
+                  {t('stock') || 'Stock'}
                 </p>
 
                 <p className="text-sm font-semibold">
-                  {product.amount} Units
+                  {product.amount} {t('units') || 'Units'}
                 </p>
               </div>
 
@@ -419,7 +421,7 @@ export default function ProductDetailPage() {
               <div>
                 <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
                   <MapPin size={12} />
-                  Location
+                  {t('location') || 'Location'}
                 </p>
 
                 <p className="text-sm font-semibold">
@@ -435,7 +437,7 @@ export default function ProductDetailPage() {
               <div>
                 <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
                   <Calendar size={12} />
-                  Posted Date
+                  {t('posted_date') || 'Posted Date'}
                 </p>
 
                 <p className="text-sm font-semibold">
@@ -471,7 +473,7 @@ export default function ProductDetailPage() {
           <div className="mt-12 max-w-4xl">
 
             <h3 className="text-xl font-bold mb-3">
-              About this product
+              {t('about_this_product') || 'About this product'}
             </h3>
 
             <p className="text-gray-600 text-sm leading-relaxed">
