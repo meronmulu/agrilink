@@ -13,8 +13,8 @@ export interface User {
 
 // Data sent to the backend
 export interface RegisterRequest {
-  email: string;
-  phone: string;
+  email?: string
+  phone?: string
   password: string;
   confirmPassword: string;
   role: string;

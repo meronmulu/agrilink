@@ -24,6 +24,7 @@ import { useLanguage } from '@/context/LanguageContext'
 
 export default function AddCrop() {
   const router = useRouter()
+  const { t } = useLanguage()   
 
   const [loading, setLoading] = useState(false)
 

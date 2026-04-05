@@ -1,4 +1,5 @@
 import { User } from "./auth"
+import { Profile } from "./profile"
 
 export interface Message {
   id: string
@@ -12,11 +13,11 @@ export interface Conversation {
   id: string
   userOneId?: string
   userTwoId?: string
-  userOne?: User
-  userTwo?: User
-
-  messages: Message[]  
-
+  userOne?: User       
+  userTwo?: User       
+  messages: Message[]
+  chatMessages?: Message[]
+  data?: Message[]
   lastMessage?: string
   unreadCount?: number
   partner?: User

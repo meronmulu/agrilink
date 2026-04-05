@@ -100,7 +100,7 @@ export default function TelegramChat() {
   //  LOAD DATA
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getConversations()
+const data: Conversation[] = await getConversations()
       const conv = data.find(c => c.id === conversationId)
 
       if (conv && currentUserId) {
@@ -110,9 +110,9 @@ export default function TelegramChat() {
         setReceiver(other || null)
 
         // mark messages read locally
-        const updatedMessages = (conv.messages || []).map((m: { senderId: string }) =>
-          m.senderId !== me ? { ...m, isRead: true } : m
-        )
+       const updatedMessages = (conv.messages ?? []).map((m: Message) =>
+  m.senderId !== me ? { ...m, isRead: true } : m
+)
 
         setMessages(updatedMessages)
 
