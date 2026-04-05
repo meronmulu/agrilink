@@ -110,7 +110,7 @@ export default function TelegramChat() {
         setReceiver(other || null)
 
         // mark messages read locally
-        const updatedMessages = (conv.messages || []).map(m =>
+        const updatedMessages = (conv.messages || []).map((m: { senderId: string }) =>
           m.senderId !== me ? { ...m, isRead: true } : m
         )
 
