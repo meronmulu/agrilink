@@ -55,7 +55,7 @@ export default function VerifyOTP() {
 
       console.log("OTP Verified:", res)
 
-      // ✅ Save token + user
+      //  Save token + user
       if (res?.token && res?.user) {
         localStorage.setItem("token", res.token)
         localStorage.setItem("user", JSON.stringify(res.user))

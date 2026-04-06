@@ -64,7 +64,7 @@ export default function LoginPage() {
 
       if (isUnverified) {
         toast.warning(error.message || 'Account not verified')
-        router.push(`/verify-otp?identifier=${encodeURIComponent(data.identifier)}&purpose=SIGNUP`)
+        router.replace(`/verify-otp?identifier=${encodeURIComponent(data.identifier)}&purpose=LOGIN`)
         return
       }
 

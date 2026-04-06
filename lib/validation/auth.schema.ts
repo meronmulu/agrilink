@@ -6,7 +6,16 @@ export const signUpSchema = z
     email: z.string().email('Invalid email').optional().or(z.literal('')),
     phone: z
       .string()
-      .regex(/^(?:\+251|0)(?:7\d{8}|9\d{8})$/, 'Phone must be +2517..., 07..., +2519... or 09...')
+      .regex(
+        /^(?:\+251|0)(?:7\d{8}|9\d{8})$/,
+        'Phone must be +2517..., 07..., +2519... or 09...'
+      )
+      .transform((val) => {
+        if (!val) return val
+        return val.startsWith('+251')
+          ? val
+          : `+251${val.replace(/^0/, '')}`
+      })
       .optional()
       .or(z.literal('')),
     password: z.string().min(6, 'Password must be at least 6 characters'),

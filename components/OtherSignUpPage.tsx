@@ -117,8 +117,7 @@ export default function OtherSignUpPage() {
     try {
       setIsLoading(true)
 
-    // ⏳ Loading toast
-    const loadingToast = toast.loading("Creating profile...")
+    //  Loading toast
 
       const res = await createProfile({
         fullName,
@@ -128,8 +127,7 @@ export default function OtherSignUpPage() {
       console.log("Profile created:", res)
       console.log("Role selected:", role)
 
-    // ✅ Success
-    toast.dismiss(loadingToast)
+    //  Success
     toast.success("Profile created successfully ")
 
     // Redirect based on role

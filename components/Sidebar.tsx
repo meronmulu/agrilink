@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ShoppingBag, MessageSquare, BrainCircuit, Settings, Sprout, DollarSign, BookOpen, Users, ShoppingCart, ListOrdered } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, BrainCircuit, Settings, Sprout, BookOpen, Users, ShoppingCart, ListOrdered } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -16,7 +16,7 @@ export default function Sidebar() {
   const { unreadCount } = useMessage()
   const { user } = useAuth()
   const { t } = useLanguage()
-  console.log("USER ROLE:", user?.role)
+  // console.log("USER ROLE:", user?.role)
 
 
 
