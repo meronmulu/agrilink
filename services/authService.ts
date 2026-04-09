@@ -1,4 +1,4 @@
-import instance from "@/axios"
+import instance from "@/lib/axios/axios"
 import { ForgotPasswordRequest, LoginResponse, RegisterRequest, ResetPasswordRequest, User, VerifyOtpRequest } from "@/types/auth"
 import { signInWithPopup } from "firebase/auth"
 import { auth, googleProvider } from "@/lib/firebase"

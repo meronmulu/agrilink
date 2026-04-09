@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CalendarDays, CheckCircle2, AlertTriangle, Plus, CheckCheck, Loader2 } from 'lucide-react'
 import AddEventModal, { HarvestEvent } from '@/components/AddEventModal'
-import api from '@/axios'
+import api from '@/lib/axios/axios'
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 

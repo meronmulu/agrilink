@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { X, Loader2, CalendarDays } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import api from '@/axios'
+import api from '@/lib/axios/axios'
 
 type EventStatus = 'On Track' | 'Risk of delay' | 'Completed'
 

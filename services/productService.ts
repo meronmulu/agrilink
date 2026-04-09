@@ -1,4 +1,4 @@
-import instance from "@/axios";
+import instance from "@/lib/axios/axios";
 import { CreateProductPayload, Product } from "@/types/product";
 
 

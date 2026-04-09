@@ -1,4 +1,4 @@
-import instance from "@/axios"
+import instance from "@/lib/axios/axios"
 
 //  Add to cart
 export const addToCart = async (data: {

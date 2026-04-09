@@ -5,7 +5,7 @@ import { X, Loader2, Mail, Phone } from 'lucide-react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { useLanguage } from '@/context/LanguageContext'
-import api from '@/axios'
+import api from '@/lib/axios/axios'
 import OTPVerificationModal from './OTPVerificationModal'
 
 interface ForgotPasswordModalProps {

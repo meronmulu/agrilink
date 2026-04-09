@@ -1,4 +1,4 @@
-import instance from "@/axios"
+import instance from "@/lib/axios/axios"
 import { Category, CreateCategoryPayload, CreateSubcategoryPayload, SubCategory } from "@/types/category"
 
 export const getCategories = async (): Promise<Category[]> => {
