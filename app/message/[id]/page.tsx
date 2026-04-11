@@ -82,7 +82,11 @@ export default function TelegramChat() {
   useEffect(() => {
     if (!currentUserId) return
 
-    const socket = io(SOCKET_URL, { transports: ['websocket'] })
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const socket = io(SOCKET_URL, { 
+      transports: ['websocket'],
+      auth: { token }
+    })
     socketRef.current = socket
 
     socket.on('connect', () => {
@@ -121,22 +125,47 @@ export default function TelegramChat() {
       setLoading(true)
       try {
         const data: Conversation[] = await getConversations()
-        const conv = data.find(c => c.id === conversationId)
-
-        if (conv && currentUserId) {
-          const me = currentUserId
-          const other = conv.userOneId === me ? conv.userTwo : conv.userOne
-          setReceiver(other || null)
-
-          const updatedMessages = (conv.messages ?? []).map((m: Message) =>
-            m.senderId !== me ? { ...m, isRead: true } : m
+        
+        // 1. Try to find conversation by ID
+        let conv = data.find(c => String(c.id) === String(conversationId))
+        
+        // 2. If not found, check if conversationId is actually a partnerId (User ID)
+        if (!conv && currentUserId) {
+          const me = String(currentUserId)
+          conv = data.find(c => 
+            (String(c.userOneId) === me && String(c.userTwoId) === String(conversationId)) ||
+            (String(c.userTwoId) === me && String(c.userOneId) === String(conversationId))
           )
-          setMessages(updatedMessages)
+        }
 
-          socketRef.current?.emit('markAsRead', { conversationId, userId: me })
+        if (currentUserId) {
+          const me = String(currentUserId)
+          
+          if (conv) {
+            // Existing conversation found
+            const other = String(conv.userOneId) === me ? conv.userTwo : conv.userOne
+            setReceiver(other || null)
+
+            const msgList = conv.messages || conv.chatMessages || conv.data || []
+            const updatedMessages = msgList.map((m: Message) =>
+              String(m.senderId) !== me ? { ...m, isRead: true } : m
+            )
+            setMessages(updatedMessages)
+            socketRef.current?.emit('markAsRead', { conversationId: conv.id, userId: me })
+          } else {
+            // No conversation found, but we have an ID (likely a Farmer ID from product page)
+            try {
+              const { getUserById } = await import('@/services/authService')
+              const partner = await getUserById(conversationId)
+              setReceiver(partner || null)
+              setMessages([])
+            } catch (e) {
+              console.error("Failed to fetch partner info:", e)
+            }
+          }
         }
       } catch (err) {
-        console.error(err)
+        console.error("Fetch data error:", err)
       } finally {
         setLoading(false)
       }
@@ -149,22 +178,37 @@ export default function TelegramChat() {
   }, [messages])
 
   //  SEND MESSAGE
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!message.trim() || !currentUserId || !receiver) return
 
+    const tempId = `${Date.now()}-${Math.random()}`;
     const payload: Message & { conversationId: string; receiverId: string } = {
-      id: `${Date.now()}-${Math.random()}`,
+      id: tempId,
       senderId: currentUserId,
       message,
-      conversationId,
+      conversationId: messages.length > 0 ? conversationId : "", // If new conversation, ID might be User ID
       receiverId: receiver.id,
       createdAt: new Date().toISOString(),
       isRead: false
     }
 
-    setMessages(prev => [...prev, payload])
-    socketRef.current?.emit('sendMessage', payload)
-    setMessage('')
+    // Optimistically add message
+    setMessages(prev => [...prev, payload]);
+    const currentMsg = message;
+    setMessage('');
+    
+    try {
+      const { sendMessage: sendRest } = await import('@/services/chatService');
+      const res = await sendRest(payload);
+      
+      // If this was a first message, backend should return the new conversation ID
+      if (res?.conversationId && res.conversationId !== conversationId) {
+        router.replace(`/message/${res.conversationId}`)
+      }
+    } catch (error) {
+      console.error("Failed to send message via REST:", error);
+    }
+    
     inputRef.current?.focus()
   }
 

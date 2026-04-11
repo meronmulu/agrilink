@@ -37,7 +37,7 @@ export default function LoginPage() {
       })
 
       if (!user) {
-        toast.error('Login failed')
+        // AuthContext handles failure internally or throws, but just in case
         return
       }
 
