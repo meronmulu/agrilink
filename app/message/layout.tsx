@@ -84,12 +84,12 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
       </div>
 
       {/* Body: Sidebar + Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* App Sidebar (hidden on mobile) */}
         <Sidebar />
 
         {/* Messages Panel */}
-        <div className="flex flex-1 overflow-hidden bg-white">
+        <div className="flex flex-1 min-h-0 overflow-hidden bg-white">
 
           {/* Conversation List Sidebar */}
           <aside
@@ -177,9 +177,9 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
 
           {/* Main Chat Area */}
           <main className={`
-            flex-1 h-full relative bg-[#f3f4f6]
+            flex-1 min-h-0 h-full relative bg-[#f3f4f6]
             ${isInConversation ? 'flex' : 'hidden md:flex'}
-            flex-col
+            flex-col overflow-hidden
           `}>
             {children}
           </main>

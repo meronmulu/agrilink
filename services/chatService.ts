@@ -26,8 +26,8 @@ export const getConversations = async () => {
 	}
 }
 
-// SEND message (Swagger unclear → keep flexible)
-export const sendMessage = async (data: Message & { conversationId: string; receiverId: string }) => {
+// SEND message (accepts FormData or Object)
+export const sendMessage = async (data: any) => {
 	try {
 		console.log("SENDING:", data)
 
