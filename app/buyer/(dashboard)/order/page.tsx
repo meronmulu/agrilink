@@ -27,7 +27,7 @@ export default function BuyerOrdersPage() {
     const fetchOrders = async () => {
       try {
         const data = await getMyOrders()
-        setOrders(data)
+        setOrders(data || [])
       } catch (err) {
         console.error("Failed to fetch orders", err)
       } finally {
