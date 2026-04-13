@@ -15,8 +15,8 @@ export default function Hero() {
 
   const handleGetStarted = () => {
     if (user) {
-      if (user.role === "FARMER") router.push("/farmer/crops");
-      else if (user.role === "BUYER") router.push("/buyer/order");
+      if (user.role === "FARMER") router.push("/farmer");
+      else if (user.role === "BUYER") router.push("/buyer");
       else if (user.role === "ADMIN") router.push("/admin/dashboard");
       else if (user.role === "AGENT") router.push("/agent/dashboard");
     } else {

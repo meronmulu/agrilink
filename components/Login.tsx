@@ -74,32 +74,37 @@ export default function LoginPage() {
     }
   }
 
-  const handleGoogleLogin = async () => {
-    try {
-      const res = await googleSignin()
-      setUser({
-        id: res.user.id,
-        role: res.user.role,
-        email: res.user.email ?? '',
-        phone: res.user.phone ?? ''
-      })
-      localStorage.setItem('token', res.token)
-      localStorage.setItem('user', JSON.stringify(res.user))
-      toast.success('Google login successful')
+ const handleGoogleLogin = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+  e?.preventDefault();
 
-      const roleRoutes: Record<string, string> = {
-        ADMIN: '/admin/dashboard',
-        AGENT: '/agent/dashboard',
-        BUYER: '/buyer',
-        FARMER: '/farmer',
-      }
-      router.push(roleRoutes[res.user.role] || '/')
-    } catch (error: any) {
-      console.error('Google login failed', error)
-      toast.error('Google login failed. Try again.')
+  try {
+    const res = await googleSignin()
+
+    setUser({
+      id: res.user.id,
+      role: res.user.role,
+      email: res.user.email ?? '',
+      phone: res.user.phone ?? ''
+    })
+
+    localStorage.setItem('token', res.token)
+    localStorage.setItem('user', JSON.stringify(res.user))
+    toast.success('Google login successful')
+
+    const roleRoutes: Record<string, string> = {
+      ADMIN: '/admin/dashboard',
+      AGENT: '/agent/dashboard',
+      BUYER: '/buyer',
+      FARMER: '/farmer',
     }
-  }
 
+    router.push(roleRoutes[res.user.role] || '/')
+
+  } catch (error: any) {
+    console.error('Google login failed', error)
+    toast.error('Google login failed. Try again.')
+  }
+}
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <div className="grid lg:grid-cols-2 w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border dark:border-gray-700">

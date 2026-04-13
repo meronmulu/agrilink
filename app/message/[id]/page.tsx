@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { io, Socket } from 'socket.io-client'
-import { getConversations } from '@/services/chatService'
+import { getConversations, sendMessage } from '@/services/chatService'
 
 // shadcn components
 import { Button } from '@/components/ui/button'
@@ -11,20 +11,21 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 // Icons
-import { 
-  SendHorizontal, 
-  Paperclip, 
-  MoreVertical, 
-  Search, 
-  ChevronLeft, 
-  Smile, 
-  CheckCheck 
+import {
+  SendHorizontal,
+  Paperclip,
+  MoreVertical,
+  Search,
+  ChevronLeft,
+  Smile,
+  CheckCheck
 } from 'lucide-react'
 
 import { Conversation, Message } from '@/types/chat'
 import { User } from '@/types/auth'
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000'
+const SOCKET_URL =
+  process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000'
 
 export default function TelegramChat() {
   const { id } = useParams()
@@ -34,6 +35,7 @@ export default function TelegramChat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [message, setMessage] = useState('')
   const [receiver, setReceiver] = useState<User | null>(null)
+
   const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
     if (typeof window === 'undefined') return null
     const userStr = localStorage.getItem('user')
@@ -43,7 +45,7 @@ export default function TelegramChat() {
   const socketRef = useRef<Socket | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
-  //  SOCKET INIT
+  // SOCKET INIT
   useEffect(() => {
     if (!currentUserId) return
 
@@ -55,40 +57,13 @@ export default function TelegramChat() {
       if (conversationId) socket.emit('joinConversation', conversationId)
     })
 
-    //  RECEIVE MESSAGE
     socket.on('receiveMessage', (msg: Message & { conversationId: string }) => {
       if (msg.conversationId === conversationId) {
         setMessages(prev => {
           const exists = prev.some(m => m.id === msg.id)
           if (exists) return prev
-
-          // mark as read instantly if open
-          const updatedMsg =
-            msg.senderId !== currentUserId
-              ? { ...msg, isRead: true }
-              : msg
-
-          return [...prev, updatedMsg]
+          return [...prev, msg]
         })
-
-        // notify backend read
-        if (msg.senderId !== currentUserId) {
-          socket.emit('markAsRead', {
-            conversationId,
-            userId: currentUserId
-          })
-        }
-      }
-    })
-
-    //  RECEIVE READ STATUS
-    socket.on('messagesRead', ({ conversationId: convId, userId }) => {
-      if (convId === conversationId) {
-        setMessages(prev =>
-          prev.map(m =>
-            m.senderId === userId ? { ...m, isRead: true } : m
-          )
-        )
       }
     })
 
@@ -97,58 +72,64 @@ export default function TelegramChat() {
     }
   }, [currentUserId, conversationId])
 
-  //  LOAD DATA
+  // LOAD DATA
   useEffect(() => {
     const fetchData = async () => {
-const data: Conversation[] = await getConversations()
+      const data: Conversation[] = await getConversations()
       const conv = data.find(c => c.id === conversationId)
 
       if (conv && currentUserId) {
         const me = currentUserId
-        const other = conv.userOneId === me ? conv.userTwo : conv.userOne
+        const other =
+          conv.userOneId === me ? conv.userTwo : conv.userOne
 
         setReceiver(other || null)
 
-        // mark messages read locally
-       const updatedMessages = (conv.messages ?? []).map((m: Message) =>
-  m.senderId !== me ? { ...m, isRead: true } : m
-)
+        const msgs =
+          conv.messages ||
+          conv.chatMessages ||
+          conv.data ||
+          []
 
-        setMessages(updatedMessages)
-
-        // notify backend
-        socketRef.current?.emit('markAsRead', {
-          conversationId,
-          userId: me
-        })
+        setMessages(msgs)
       }
     }
 
     fetchData()
   }, [conversationId, currentUserId])
 
- 
+  // AUTO SCROLL
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'auto' })
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  //  SEND MESSAGE
-  const handleSend = () => {
+  // SEND MESSAGE
+  const handleSend = async () => {
     if (!message.trim() || !currentUserId || !receiver) return
 
-    const payload: Message & { conversationId: string; receiverId: string } = {
-      id: `${Date.now()}-${Math.random()}`,
-      senderId: currentUserId,
-      message,
+    const payload = {
       conversationId,
       receiverId: receiver.id,
-      createdAt: new Date().toISOString(),
-      isRead: false
+      message
     }
 
-    setMessages(prev => [...prev, payload])
-    socketRef.current?.emit('sendMessage', payload)
-    setMessage('')
+    try {
+      const saved = await sendMessage(payload)
+
+      setMessages(prev => [
+        ...prev,
+        {
+          ...saved,
+          senderId: currentUserId
+        }
+      ])
+
+      socketRef.current?.emit('sendMessage', saved)
+
+      setMessage('')
+    } catch (error) {
+      console.error('Send message error:', error)
+    }
   }
 
   return (
@@ -157,7 +138,11 @@ const data: Conversation[] = await getConversations()
 
         {/* HEADER */}
         <header className="h-15 bg-white border-b flex items-center px-4 gap-3">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/message')}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/message')}
+          >
             <ChevronLeft />
           </Button>
 
@@ -171,7 +156,6 @@ const data: Conversation[] = await getConversations()
             <h2 className="font-bold text-sm">
               {receiver?.profile?.fullName || receiver?.email}
             </h2>
-            <span className="text-xs text-emerald-500">online</span>
           </div>
 
           <Search className="h-5 w-5 text-gray-400" />
@@ -185,12 +169,19 @@ const data: Conversation[] = await getConversations()
               const isMe = msg.senderId === currentUserId
 
               return (
-                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`px-3 py-1.5 shadow-sm
-                    ${isMe 
-                      ? 'bg-[#e7fecb] rounded-l-xl rounded-tr-xl' 
-                      : 'bg-white rounded-r-xl rounded-tl-xl'}
-                  `}>
+                <div
+                  key={msg.id}
+                  className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`px-3 py-1.5 shadow-sm
+                    ${
+                      isMe
+                        ? 'bg-[#e7fecb] rounded-l-xl rounded-tr-xl'
+                        : 'bg-white rounded-r-xl rounded-tl-xl'
+                    }
+                  `}
+                  >
                     <p className="text-sm pr-10">{msg.message}</p>
 
                     <div className="flex items-center justify-end gap-1 mt-1">
@@ -202,11 +193,7 @@ const data: Conversation[] = await getConversations()
                       </span>
 
                       {isMe && (
-                        <CheckCheck
-                          className={`h-3 w-3 ${
-                            msg.isRead ? 'text-emerald-500' : 'text-gray-400'
-                          }`}
-                        />
+                        <CheckCheck className="h-3 w-3 text-gray-400" />
                       )}
                     </div>
                   </div>
@@ -236,7 +223,6 @@ const data: Conversation[] = await getConversations()
             className="text-emerald-500 cursor-pointer"
           />
         </div>
-
       </main>
     </div>
   )

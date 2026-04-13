@@ -239,14 +239,14 @@ export default function MarketPlace() {
         </div>
 
       ) : (
-
+          
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-7 mx-6 md:mx-10">
           {filteredProducts.map((product) => (
             <Card
               key={product.id}
               className="group flex flex-col rounded-2xl border border-gray-100 bg-white hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden h-full"
             >
-
+             <Link href={`/product/${product.id}`} className="flex-1">
 
               {/* Product Image */}
               <div className="relative h-52 w-full overflow-hidden">
@@ -317,7 +317,7 @@ export default function MarketPlace() {
 
                     <Link href={`/product/${product.id}`} className="flex-1">
                       <Button variant="outline" className="w-full">
-                        {t('view') || 'View'}
+                        {t('market_view_details') || 'View Detail'}
                       </Button>
                     </Link>
 
@@ -326,14 +326,18 @@ export default function MarketPlace() {
                 </div>
 
               </CardContent>
+
+
+               </Link>
             </Card>
+            
           ))}
 
         </div>
-
+      
       )}
 
     </div>
 
   )
-}
+}                   

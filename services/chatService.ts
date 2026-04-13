@@ -14,11 +14,10 @@ export const getUnreadMessageCount = async (userId: string) => {
 };
 
 
+
 export const getConversations = async () => {
 	try {
 		const res = await instance.get(`/chat/conversations`)
-		console.log("CONVERSATIONS API:", res.data)
-
 		return Array.isArray(res.data) ? res.data : []
 	} catch (error) {
 		console.log("GET CONVERSATIONS ERROR:", error)
@@ -26,20 +25,16 @@ export const getConversations = async () => {
 	}
 }
 
-// SEND message (Swagger unclear → keep flexible)
-export const sendMessage = async (data: Message & { conversationId: string; receiverId: string }) => {
+export const sendMessage = async (data: {
+	conversationId: string
+	receiverId: string
+	message: string
+}) => {
 	try {
-		console.log("SENDING:", data)
-
 		const res = await instance.post(`/chat/send`, data)
-
-			console.log(" SUCCESS:", res.data)
 		return res.data
-
 	} catch (error) {
-		console.log("FULL ERROR:", error)
-		console.log(" BACKEND RESPONSE:")
-
+		console.log("SEND MESSAGE ERROR:", error)
 		throw error
 	}
 }
