@@ -33,6 +33,7 @@ export interface LoginResponse {
     role: string
     email?: string
     phone?: string
+    status?: string
   }
 }
 

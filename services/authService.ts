@@ -29,7 +29,8 @@ export const login = async (credentials: { email?: string; phone?: string; passw
         id: res.data.user.id,
         role: res.data.user.role,
         email: res.data.user.email,
-        phone: res.data.user.phone
+        phone: res.data.user.phone,
+        status: res.data.user.status || res.data.status // backend might put it in either place
       };
 
       return {

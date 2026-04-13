@@ -36,6 +36,7 @@ import { createRoleRequest } from "@/services/roleRequestService"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { useCart } from "@/context/CartContext"
+import { useMessage } from "@/context/MessageContext"
 import Image from "next/image"
 
 export default function Header() {
@@ -44,6 +45,7 @@ export default function Header() {
   const { t } = useLanguage()
   const pathname = usePathname()
   const { cartCount } = useCart()
+  const { unreadCount } = useMessage()
 
 
   const dashboardRoute =
@@ -79,7 +81,7 @@ export default function Header() {
     BUYER: [
       { name: t('orders') || "Orders", href: "/buyer/order", icon: ShoppingBag },
       { name: t('cart') || 'Cart', href: '/buyer/cart', icon: ShoppingCart, badge: cartCount },
-      { name: t('messages') || "Messages", href: "/message", icon: MessageSquare, badge: 3 },
+      { name: t('messages') || "Messages", href: "/message", icon: MessageSquare, badge: unreadCount },
       { name: t('market_insights') || "Market Insights", href: "/buyer/insights", icon: BrainCircuit },
     ],
 
@@ -87,7 +89,7 @@ export default function Header() {
       { name: t('my_crops') || 'My Crops', href: '/farmer/crops', icon: Sprout },
       { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
-      { name: t('messages') || 'Messages', href: '/message', icon: MessageSquare, badge: 5 },
+      { name: t('messages') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: t('market_insights') || 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
     ],
 
@@ -154,7 +156,7 @@ export default function Header() {
 
                           <span className="flex-1">{item.name}</span>
 
-                          {item.badge && (
+                          {!!item.badge && item.badge > 0 && (
                             <span className="bg-emerald-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
                               {item.badge}
                             </span>

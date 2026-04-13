@@ -19,6 +19,7 @@ import Footer from '@/components/Footer'
 import { Button } from '@/components/ui/button'
 
 import { getProductById } from '@/services/productService'
+import { getConversations } from '@/services/chatService'
 import { Product } from '@/types/product'
 import { toast } from 'sonner'
 import { addToCart } from '@/services/cartService'
@@ -63,32 +64,35 @@ export default function ProductDetailPage() {
 
   }, [id])
 
-  // const handleSend = async () => {
-  //   try {
-  //     const conversations = await getConversations()
+  const handleSend = async () => {
+    try {
+      const conversations = await getConversations()
 
-  //     const farmerId = product?.farmer?.id
+      const farmerId = product?.farmer?.id
 
-  //     const userData = localStorage.getItem("user")
-  //     const currentUserId = userData ? JSON.parse(userData).id : null
+      const userData = localStorage.getItem("user")
+      const currentUserId = userData ? JSON.parse(userData).id : null
 
-  //     if (!farmerId || !currentUserId) return
+      if (!farmerId || !currentUserId) {
+        if (!currentUserId) router.push('/login')
+        return
+      }
 
-  //     const existing = conversations.find((conv: any) =>
-  //       (conv.userOneId === currentUserId && conv.userTwoId === farmerId) ||
-  //       (conv.userTwoId === currentUserId && conv.userOneId === farmerId)
-  //     )
+      const existing = conversations.find((conv: any) =>
+        (conv.userOneId === currentUserId && conv.userTwoId === farmerId) ||
+        (conv.userTwoId === currentUserId && conv.userOneId === farmerId)
+      )
 
-  //     if (existing) {
-  //       router.push(`/message/${existing.id}`)
-  //     } else {
-  //       router.push(`/message/${farmerId}`)
-  //     }
+      if (existing) {
+        router.push(`/message/${existing.id}`)
+      } else {
+        router.push(`/message/${farmerId}`)
+      }
 
-  //   } catch (err) {
-  //     console.error(err)
-  //   }
-  // }
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   const handleAddToCart = async () => {
     if (!product) return
@@ -348,7 +352,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 <Button
-                  onClick={() => router.push(`/message/${product.farmer?.id}`)}
+                  onClick={handleSend}
                   variant="outline"
                   className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg text-sm h-9"
                 >
