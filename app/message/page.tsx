@@ -1,6 +1,5 @@
 'use client'
 
-import { redirect } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function MessageRootPage() {

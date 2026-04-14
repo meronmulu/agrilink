@@ -112,7 +112,7 @@ export default function Header() {
 
   return (
     <header className="w-full fixed h-16 top-0 left-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-      <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto h-full px-1 flex items-center justify-between">
 
         {/* LEFT SIDE */}
         <div className="flex items-center gap-3">
@@ -174,7 +174,7 @@ export default function Header() {
 
           {/* LOGO */}
           <div
-            className="hidden md:flex items-center space-x-2 cursor-pointer"
+            className="flex items-center space-x-2 cursor-pointer"
             onClick={() => router.push("/")}
           >
             <div className="bg-emerald-500 p-2 rounded-lg">
@@ -186,6 +186,42 @@ export default function Header() {
             </h1>
           </div>
         </div>
+
+        {/* NOT LOGGED IN */}
+        {/* {!user && (
+          <div className="flex md:hidden items-center justify-between gap-4 w-full">
+
+             <div>
+                <div
+            className=" flex items-center space-x-2 cursor-pointer"
+            onClick={() => router.push("/")}
+          >
+            <div className="bg-emerald-500 p-2 rounded-lg">
+              <Flower2 className="text-white w-5 h-5" />
+            </div>
+
+            <h1 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">
+              AgriLink
+            </h1>
+          </div> 
+             </div>
+            <div className="flex items-center gap-3">
+              <LanguageDropdown />
+
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() => router.push("/login")}
+                  className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-4 rounded-lg"
+                >
+                  {t("getStarted") || "Get Started"}
+                </Button>
+              </div>
+
+            </div>
+
+
+          </div>
+        )} */}
 
         {/* NOT LOGGED IN */}
         {!user && (
@@ -206,7 +242,11 @@ export default function Header() {
               <LanguageDropdown />
             </nav>
 
-            <div className="hidden md:flex items-center gap-3">
+            <div className="flex items-center gap-3">
+              <div className="block sm:hidden">
+                <LanguageDropdown />
+              </div>
+              
               <Button
                 onClick={() => router.push("/login")}
                 className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-4 rounded-lg"
@@ -246,7 +286,7 @@ export default function Header() {
                         className="object-cover"
                       />
                     ) : (
-                      <UserIcon className="w-6 h-6 text-white" /> 
+                      <UserIcon className="w-6 h-6 text-white" />
                     )}
                   </div>
                   <div className="text-sm leading-4 text-gray-800 dark:text-white">

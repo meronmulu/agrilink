@@ -1,10 +1,14 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+// context/MessageContext.tsx
+'use client'
+
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { getUnreadMessageCount } from '@/services/chatService';
 import { useAuth } from './AuthContext';
 
 interface MessageContextType {
   unreadCount: number;
   refreshUnread: () => void;
+  markAsRead: () => void;
 }
 
 const MessageContext = createContext<MessageContextType | null>(null);
@@ -20,20 +24,21 @@ export const MessageProvider = ({ children }: { children: React.ReactNode }) => 
     }
   };
 
+  // Add this function to clear the count locally
+  const clearCount = () => setUnreadCount(0);
+
   useEffect(() => {
     refreshUnread();
-    // Optionally, poll every 30s
     const interval = setInterval(refreshUnread, 30000);
     return () => clearInterval(interval);
   }, [user?.id]);
 
   return (
-    <MessageContext.Provider value={{ unreadCount, refreshUnread }}>
+    <MessageContext.Provider value={{ unreadCount, refreshUnread, clearCount }}>
       {children}
     </MessageContext.Provider>
   );
 };
-
 export const useMessage = () => {
   const context = useContext(MessageContext);
   if (!context) throw new Error('useMessage must be used within MessageProvider');

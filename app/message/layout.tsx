@@ -5,11 +5,9 @@ import { useRouter, usePathname } from 'next/navigation'
 import { getConversations } from '@/services/chatService'
 import { getUserById } from '@/services/authService'
 import { Input } from '@/components/ui/input'
-import { Search, MessageSquare } from 'lucide-react'
+import { Search, ChevronLeft, MessageSquare } from 'lucide-react'
 import { Conversation } from '@/types/chat'
 import Image from 'next/image'
-import Header from '@/components/Header'
-import Sidebar from '@/components/Sidebar'
 
 function ConversationSkeleton() {
   return (
@@ -26,18 +24,68 @@ function ConversationSkeleton() {
 export default function MessagesLayout({ children }: { children: React.ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [role, setRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+
   const router = useRouter()
   const pathname = usePathname()
 
-  const isInConversation = pathname !== '/message' && pathname.startsWith('/message/')
+  const isInConversation =
+    pathname !== '/message' && pathname.startsWith('/message/')
+
+ const handleBack = () => {
+    switch (role) {
+      case 'FARMER':
+        router.replace('/farmer/crops')
+        break
+      case 'BUYER':
+        router.replace('/buyer/order')
+        break
+      case 'AGENT':
+        router.replace('/agent/dashboard')
+        break
+      case 'ADMIN':
+        router.replace('/admin/dashboard')
+        break
+      default:
+        router.replace('/')
+    }
+  }
+
+  const getLastMessage = (conv: Conversation) => {
+    if (!conv.messages || conv.messages.length === 0) return null
+
+    const sorted = [...conv.messages].sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() -
+        new Date(b.createdAt).getTime()
+    )
+
+    return sorted[sorted.length - 1]
+  }
+
+  const getLastMessagePreview = (conv: Conversation) => {
+    const lastMsg = getLastMessage(conv)
+    if (!lastMsg) return 'No messages yet'
+    return lastMsg.message
+  }
+
+  const getLastMessageTime = (conv: Conversation) => {
+    const lastMsg = getLastMessage(conv)
+    return lastMsg ? new Date(lastMsg.createdAt).getTime() : 0
+  }
 
   const fetchConversations = async (userId: string | null) => {
     try {
       const data = await getConversations()
+
       const enrichedData = await Promise.all(
         data.map(async (conv: Conversation) => {
-          const partnerId = String(conv.userOneId) === String(userId) ? conv.userTwoId : conv.userOneId
+          const partnerId =
+            String(conv.userOneId) === String(userId)
+              ? conv.userTwoId
+              : conv.userOneId
+
           if (partnerId) {
             try {
               const partner = await getUserById(partnerId)
@@ -46,10 +94,16 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
               console.error('Error fetching partner:', e)
             }
           }
+
           return conv
         })
       )
-      setConversations(enrichedData)
+
+      const sorted = enrichedData.sort(
+        (a, b) => getLastMessageTime(b) - getLastMessageTime(a)
+      )
+
+      setConversations(sorted)
     } catch (err) {
       console.error(err)
     } finally {
@@ -59,6 +113,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
 
   useEffect(() => {
     let userId = null
+
     if (typeof window !== 'undefined') {
       const userStr = localStorage.getItem('user')
       if (userStr) {
@@ -66,73 +121,73 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
           const userObj = JSON.parse(userStr)
           userId = userObj.id
           setCurrentUserId(userId)
+          setRole(userObj.role) 
         } catch (e) {
-          console.error('Error parsing user from localStorage:', e)
+          console.error('Error parsing user:', e)
         }
       }
     }
+
     fetchConversations(userId)
   }, [])
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
-      {/* Top Header */}
-      <div className="flex items-center h-16 shrink-0 border-b border-gray-200 bg-white">
-        <div className="flex-1">
-          <Header />
-        </div>
-      </div>
-
-      {/* Body: Sidebar + Content */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* App Sidebar (hidden on mobile) */}
-        <Sidebar />
-
-        {/* Messages Panel */}
         <div className="flex flex-1 min-h-0 overflow-hidden bg-white">
 
-          {/* Conversation List Sidebar */}
+          {/* Sidebar */}
           <aside
             className={`
-              flex flex-col border-r bg-white
-              w-full md:w-[300px] lg:w-[340px] shrink-0
-              ${isInConversation ? 'hidden md:flex' : 'flex'}
-            `}
+            flex flex-col border-r bg-white
+            w-full md:w-75 lg:w-85 shrink-0
+            ${isInConversation ? 'hidden md:flex' : 'flex'}
+          `}
           >
-            {/* Search Header */}
+
+            {/* Header */}
             <div className="p-4 space-y-3 border-b">
               <div className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-emerald-600" />
-                <h1 className="text-xl font-bold tracking-tight text-gray-800">Messages</h1>
+
+                <ChevronLeft
+                  className="h-5 w-5 text-emerald-600 cursor-pointer"
+                  onClick={handleBack}
+                />
+
+                <h1 className="text-xl font-bold text-gray-800">
+                  Messages
+                </h1>
               </div>
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500/60" />
                 <Input
                   placeholder="Search conversations..."
-                  className="pl-10 bg-gray-50 border-gray-100 rounded-2xl h-10 focus-visible:ring-2 focus-visible:ring-emerald-500/30"
+                  className="pl-10 bg-gray-50 border-gray-100 rounded-2xl h-10"
                 />
               </div>
             </div>
 
-            {/* Conversation List */}
-            <div className="flex-1 overflow-y-auto scrollbar-hide py-2">
+            {/* List */}
+            <div className="flex-1 overflow-y-auto py-2">
+
               {loading ? (
                 <>
                   <ConversationSkeleton />
                   <ConversationSkeleton />
                   <ConversationSkeleton />
-                  <ConversationSkeleton />
-                  <ConversationSkeleton />
                 </>
               ) : conversations.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full py-16 text-gray-400">
+                <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <MessageSquare className="h-10 w-10 mb-3 opacity-30" />
-                  <p className="text-sm">No conversations yet</p>
+                  <p>No conversations yet</p>
                 </div>
               ) : (
                 conversations.map((conv) => {
                   const isActive = pathname.includes(conv.id)
-                  const lastMsg = conv.messages?.[conv.messages.length - 1]
+
+                  const lastMsg = getLastMessage(conv)
+
                   const partnerName =
                     conv.partner?.profile?.fullName ||
                     conv.partner?.email ||
@@ -142,30 +197,37 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
                     <div
                       key={conv.id}
                       onClick={() => router.push(`/message/${conv.id}`)}
-                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all relative mx-2 rounded-2xl mb-1
-                        ${isActive ? 'bg-[#effaf3]' : 'hover:bg-gray-50 active:bg-gray-100'}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer mx-2 rounded-2xl mb-1
+                        ${isActive ? 'bg-[#effaf3]' : 'hover:bg-gray-50'}
                       `}
                     >
                       <div className="relative h-11 w-11 rounded-full overflow-hidden bg-gray-200 shrink-0">
                         <Image
                           src={conv.partner?.profile?.imageUrl || '/default-avatar.png'}
-                          alt={conv.partner?.profile?.fullName || 'User'}
+                          alt="avatar"
                           fill
-                          className="rounded-full object-cover"
+                          className="object-cover"
                         />
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-baseline mb-0.5">
-                          <span className={`font-semibold text-[15px] truncate ${isActive ? 'text-emerald-800' : 'text-gray-900'}`}>
+                        <div className="flex justify-between">
+                          <span className="font-semibold truncate">
                             {partnerName}
                           </span>
-                          <span className={`text-[11px] font-medium shrink-0 ml-1 ${isActive ? 'text-emerald-500' : 'text-gray-400'}`}>
-                            {lastMsg ? new Date(lastMsg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+
+                          <span className="text-[11px] text-gray-400">
+                            {lastMsg
+                              ? new Date(lastMsg.createdAt).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })
+                              : ''}
                           </span>
                         </div>
-                        <p className={`text-[13px] truncate leading-tight ${isActive ? 'text-emerald-700/80' : 'text-gray-500'}`}>
-                          {lastMsg?.message || 'No messages yet'}
+
+                        <p className="text-[13px] text-gray-500 truncate">
+                          {getLastMessagePreview(conv)}
                         </p>
                       </div>
                     </div>
@@ -175,12 +237,14 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
             </div>
           </aside>
 
-          {/* Main Chat Area */}
-          <main className={`
-            flex-1 min-h-0 h-full relative bg-[#f3f4f6]
+          {/* Chat area */}
+          <main
+            className={`
+            flex-1 min-h-0 h-full bg-[#f3f4f6]
             ${isInConversation ? 'flex' : 'hidden md:flex'}
             flex-col overflow-hidden
-          `}>
+          `}
+          >
             {children}
           </main>
         </div>

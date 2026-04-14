@@ -1,32 +1,36 @@
+// components/Sidebar.tsx
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, MessageSquare, BrainCircuit, Settings, Sprout, BookOpen, Users, ShoppingCart, ListOrdered } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, BrainCircuit, Settings, Sprout, BookOpen, Users, ShoppingCart, ListOrdered, Store } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { useMessage } from '@/context/MessageContext'
 import { useLanguage } from '@/context/LanguageContext'
 
+type NavItem = {
+  name: string
+  href: string
+  icon: React.ElementType
+  badge?: number
+}
+
 export default function Sidebar() {
   const pathname = usePathname()
   const { cartCount } = useCart()
-  const { unreadCount } = useMessage()
+  const { unreadCount, markAsRead } = useMessage()
   const { user } = useAuth()
   const { t } = useLanguage()
-  // console.log("USER ROLE:", user?.role)
 
-
-
-
-  type NavItem = {
-    name: string
-    href: string
-    icon: React.ElementType
-    badge?: number
-  }
+  // Clear the message badge whenever the user navigates to the message page
+  useEffect(() => {
+    if (pathname === '/message') {
+      markAsRead()
+    }
+  }, [pathname, markAsRead])
 
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
@@ -47,8 +51,10 @@ export default function Sidebar() {
     AGENT: [
       { name: t('dashboard') || 'Dashboard', href: '/agent/dashboard', icon: LayoutDashboard },
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
-      { name: t('register_farmer') || 'Register Farmer', href: '/agent/register-farmer', icon: Users },
-      // { name: 'Training Modules', href: '/Agent/training', icon: BookOpen },
+      { name: t('nav_orders') || 'Orders', href: '/agent/order', icon: ListOrdered },
+      { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
+      { name: t('nav_marketplace') || 'Market Place', href: '/agent', icon: Store },
+
     ],
 
     ADMIN: [
@@ -63,11 +69,13 @@ export default function Sidebar() {
   const navItems = roleNav[user?.role as keyof typeof roleNav] || []
 
   return (
-<aside className="w-64 h-full border-r border-gray-200 bg-white hidden md:flex flex-col pt-6">     
-   <div className="px-4 space-y-2">
-
+    <aside className="w-64 h-full border-r border-gray-200 bg-white hidden md:flex flex-col pt-6">
+      <div className="px-4 space-y-2">
         {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href)
+          const isActive =
+            item.href === '/agent'
+              ? pathname === '/agent'
+              : pathname.startsWith(item.href)
           const Icon = item.icon
 
           return (
@@ -91,15 +99,19 @@ export default function Sidebar() {
 
               <span className="flex-1">{item.name}</span>
 
+              {/* Show badge if count is > 0 */}
               {item.badge !== undefined && item.badge > 0 && (
-                <span className="bg-emerald-500 text-white text-xs font-bold min-w-5 h-5 px-1 flex items-center justify-center rounded-full">
+                <span className={cn(
+                  "bg-emerald-500 text-white text-xs font-bold min-w-5 h-5 px-1 flex items-center justify-center rounded-full",
+                  // Logic: If this is the message link AND we are currently on the message page, hide it
+                  (item.href === '/message' && pathname === '/message') ? "hidden" : "flex"
+                )}>
                   {item.badge}
                 </span>
               )}
             </Link>
           )
         })}
-
       </div>
     </aside>
   )

@@ -5,8 +5,12 @@ import { useParams, useRouter } from 'next/navigation'
 import { io, Socket } from 'socket.io-client'
 import dynamic from 'next/dynamic'
 
-import { getConversations, sendMessage as sendRest } from '@/services/chatService'
+import {
+  getConversations,
+  sendMessage as sendRest
+} from '@/services/chatService'
 import { useMessage } from '@/context/MessageContext'
+import { getUserById } from '@/services/authService'
 
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -23,7 +27,10 @@ import {
 import { Conversation, Message } from '@/types/chat'
 import { User } from '@/types/auth'
 
-const EmojiPicker = dynamic(() => import('emoji-picker-react'), { ssr: false })
+const EmojiPicker = dynamic(
+  () => import('emoji-picker-react').then(m => m.default),
+  { ssr: false }
+)
 
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000'
@@ -68,10 +75,10 @@ export default function TelegramChat() {
 
     socket.on('connect', () => {
       socket.emit('join', currentUserId)
-      if (conversationId) socket.emit('joinConversation', conversationId)
+      socket.emit('joinConversation', conversationId)
     })
 
-    socket.on('receiveMessage', (msg: any) => {
+    socket.on('receiveMessage', (msg) => {
       if (msg.conversationId === conversationId) {
         setMessages(prev => {
           const exists = prev.some(m => m.id === msg.id)
@@ -82,7 +89,11 @@ export default function TelegramChat() {
               ? { ...msg, isRead: true }
               : msg
 
-          return [...prev, updated]
+          return [...prev, updated].sort(
+            (a, b) =>
+              new Date(a.createdAt).getTime() -
+              new Date(b.createdAt).getTime()
+          )
         })
 
         if (msg.senderId !== currentUserId) {
@@ -92,16 +103,6 @@ export default function TelegramChat() {
           })
           refreshUnread()
         }
-      }
-    })
-
-    socket.on('messagesRead', ({ conversationId: convId, userId }) => {
-      if (convId === conversationId) {
-        setMessages(prev =>
-          prev.map(m =>
-            m.senderId === userId ? { ...m, isRead: true } : m
-          )
-        )
       }
     })
 
@@ -115,110 +116,133 @@ export default function TelegramChat() {
 
       try {
         const data: Conversation[] = await getConversations()
+        const me = String(currentUserId)
 
-        let conv = data.find(c => String(c.id) === String(conversationId))
+        let conv = data.find(
+          c => String(c.id) === String(conversationId)
+        )
 
-        if (!conv && currentUserId) {
-          const me = String(currentUserId)
-          conv = data.find(c =>
-            (String(c.userOneId) === me &&
-              String(c.userTwoId) === String(conversationId)) ||
-            (String(c.userTwoId) === me &&
-              String(c.userOneId) === String(conversationId))
+        if (!conv) {
+          conv = data.find(
+            c =>
+              (String(c.userOneId) === me &&
+                String(c.userTwoId) === String(conversationId)) ||
+              (String(c.userTwoId) === me &&
+                String(c.userOneId) === String(conversationId))
           )
         }
 
-        if (currentUserId && conv) {
-          const me = String(currentUserId)
-
+        if (conv) {
           const other =
-            String(conv.userOneId) === me ? conv.userTwo : conv.userOne
+            String(conv.userOneId) === me
+              ? conv.userTwo
+              : conv.userOne
 
           setReceiver(other || null)
 
-          const msgList =
-            conv.messages || conv.chatMessages || conv.data || []
-
-          const updatedMessages = msgList.map((m: Message) =>
-            String(m.senderId) !== me ? { ...m, isRead: true } : m
+          const sorted = (conv.messages || []).sort(
+            (a, b) =>
+              new Date(a.createdAt).getTime() -
+              new Date(b.createdAt).getTime()
           )
 
-          setMessages(updatedMessages)
-
-          socketRef.current?.emit('markAsRead', {
-            conversationId: conv.id,
-            userId: me
-          })
-
-          setTimeout(() => refreshUnread(), 300)
+          setMessages(sorted)
+          return
         }
+
+        // NEW CHAT
+        const user = await getUserById(conversationId)
+        setReceiver(user)
+        setMessages([])
       } catch (err) {
-        console.error('Fetch error:', err)
+        console.error(err)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchData()
+    if (conversationId && currentUserId) {
+      fetchData()
+    }
   }, [conversationId, currentUserId])
 
-  // AUTO SCROLL
+  // AUTO SCROLL (FIXED)
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const timeout = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end'
+      })
+    }, 80)
+
+    return () => clearTimeout(timeout)
   }, [messages])
 
   // SEND MESSAGE
   const handleSend = async () => {
-    if ((!message.trim() && !attachment) || !currentUserId || !receiver)
+    if (
+      (!message.trim() && !attachment) ||
+      !currentUserId ||
+      !receiver
+    )
       return
 
     const tempId = `${Date.now()}`
 
-    const payload: any = {
+    const payload = {
       id: tempId,
       senderId: currentUserId,
       message,
-      conversationId: messages.length > 0 ? conversationId : undefined,
-      receiverId: receiver.id
+      conversationId:
+        messages.length > 0 ? conversationId : undefined,
+      receiverId: receiver.id,
+      createdAt: new Date().toISOString()
     }
 
-    // optimistic UI
-    setMessages(prev => [...prev, payload])
+    setMessages(prev => {
+      const updated = [...prev, payload]
+      return updated.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() -
+          new Date(b.createdAt).getTime()
+      )
+    })
 
     const currentMsg = message
     setMessage('')
-    const currentAttachment = attachment
     setAttachment(null)
     setShowEmoji(false)
 
     try {
       let finalData: any
 
-      if (currentAttachment) {
+      if (attachment) {
         finalData = new FormData()
         finalData.append('senderId', payload.senderId)
         finalData.append('message', currentMsg || 'Attachment')
         if (payload.conversationId)
           finalData.append('conversationId', payload.conversationId)
         finalData.append('receiverId', payload.receiverId)
-        finalData.append('file', currentAttachment)
+        finalData.append('file', attachment)
       } else {
         finalData = payload
       }
 
       const res = await sendRest(finalData)
 
-      if (res?.conversationId && res.conversationId !== conversationId) {
+      if (
+        res?.conversationId &&
+        res.conversationId !== conversationId
+      ) {
         router.replace(`/message/${res.conversationId}`)
       }
     } catch (error) {
-      console.error('Send error:', error)
+      console.error(error)
     }
 
     inputRef.current?.focus()
   }
 
-  if (loading) return <div className="p-4">Loading...</div>
 
   return (
     <div className="flex flex-col h-full bg-[#e5e7eb]">
@@ -251,18 +275,25 @@ export default function TelegramChat() {
 
       {/* MESSAGES */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
+
+        {loading && messages.length === 0 && (
+          <div className="flex justify-center py-2 mx-auto">
+            <div className="h-5 w-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+
         {messages.map(msg => {
           const isMe = msg.senderId === currentUserId
 
           return (
             <div
               key={msg.id}
-              className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${isMe ? 'justify-end' : 'justify-start'
+                }`}
             >
               <div
-                className={`px-3 py-2 rounded-xl ${
-                  isMe ? 'bg-green-100' : 'bg-white'
-                }`}
+                className={`px-3 py-2 rounded-xl ${isMe ? 'bg-green-100' : 'bg-white'
+                  }`}
               >
                 <p>{msg.message}</p>
 
@@ -275,7 +306,9 @@ export default function TelegramChat() {
                   {isMe && (
                     <CheckCheck
                       className={
-                        msg.isRead ? 'text-green-500' : 'text-gray-400'
+                        msg.isRead
+                          ? 'text-green-500'
+                          : 'text-gray-400'
                       }
                     />
                   )}
@@ -284,6 +317,7 @@ export default function TelegramChat() {
             </div>
           )
         })}
+
         <div ref={bottomRef} />
       </div>
 
@@ -299,8 +333,8 @@ export default function TelegramChat() {
         />
 
         <Paperclip
-          className="cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
+          className="cursor-pointer"
         />
 
         <input
@@ -309,16 +343,18 @@ export default function TelegramChat() {
           placeholder="Message..."
           value={message}
           onChange={e => setMessage(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleSend()}
+          onKeyDown={e =>
+            e.key === 'Enter' && handleSend()
+          }
         />
 
         <Smile
-          className="cursor-pointer"
           onClick={() => setShowEmoji(!showEmoji)}
+          className="cursor-pointer"
         />
 
         {showEmoji && (
-          <div className="absolute bottom-16 right-4">
+          <div className="absolute bottom-16 right-4 z-50">
             <EmojiPicker
               onEmojiClick={(e: any) =>
                 setMessage(prev => prev + e.emoji)

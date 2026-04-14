@@ -78,7 +78,7 @@ export default function ProductDetailPage() {
         return
       }
 
-      const existing = conversations.find((conv: any) =>
+      const existing = conversations.find((conv) =>
         (conv.userOneId === currentUserId && conv.userTwoId === farmerId) ||
         (conv.userTwoId === currentUserId && conv.userOneId === farmerId)
       )

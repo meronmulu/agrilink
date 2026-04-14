@@ -1,10 +1,17 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, User, Phone, Mail, MapPin, Plus, Loader2 } from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Search, Plus, ArrowUpDown, Loader2 } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRouter } from 'next/navigation'
 import { getAgentFarmers, Farmer } from '@/services/agentService'
@@ -12,9 +19,16 @@ import { getAgentFarmers, Farmer } from '@/services/agentService'
 export default function AgentFarmerList() {
   const { t } = useLanguage()
   const router = useRouter()
+
   const [farmers, setFarmers] = useState<Farmer[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
+
+  const [search, setSearch] = useState('')
+  const [sortKey, setSortKey] = useState<keyof Farmer>('fullName')
+  const [sortAsc, setSortAsc] = useState(true)
+  const [page, setPage] = useState(1)
+
+  const pageSize = 6
 
   useEffect(() => {
     const fetchFarmers = async () => {
@@ -22,7 +36,7 @@ export default function AgentFarmerList() {
         const data = await getAgentFarmers()
         setFarmers(data)
       } catch (error) {
-        console.error('Failed to fetch farmers:', error)
+        console.error(error)
       } finally {
         setLoading(false)
       }
@@ -31,150 +45,176 @@ export default function AgentFarmerList() {
     fetchFarmers()
   }, [])
 
-  const filteredFarmers = farmers.filter(farmer =>
-    farmer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    farmer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    farmer.phone?.includes(searchTerm) ||
-    farmer.region.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleSort = (key: keyof Farmer) => {
+    if (sortKey === key) {
+      setSortAsc(!sortAsc)
+    } else {
+      setSortKey(key)
+      setSortAsc(true)
+    }
+  }
+
+  const filteredData = useMemo(() => {
+    return farmers
+      .filter((f) =>
+        `${f.fullName} ${f.email} ${f.phone} ${f.region}`
+          .toLowerCase()
+          .includes(search.toLowerCase())
+      )
+      .sort((a, b) => {
+        const aVal = a[sortKey] ?? ''
+        const bVal = b[sortKey] ?? ''
+
+        if (aVal < bVal) return sortAsc ? -1 : 1
+        if (aVal > bVal) return sortAsc ? 1 : -1
+        return 0
+      })
+  }, [farmers, search, sortKey, sortAsc])
+
+  const totalPages = Math.ceil(filteredData.length / pageSize)
+
+  const paginatedData = filteredData.slice(
+    (page - 1) * pageSize,
+    page * pageSize
   )
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
+
+      {/* HEADER */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('registered_farmers') || 'Registered Farmers'}</h1>
-          <p className="text-gray-500 mt-1">{t('manage_farmers_desc') || 'Manage and monitor farmers registered through your agency.'}</p>
+          <h1 className="text-2xl font-bold">
+            {t('registered_farmers') || 'Registered Farmers'}
+          </h1>
         </div>
-        <Button onClick={() => router.push('/agent/register-farmer')} className="bg-emerald-500 hover:bg-emerald-600">
-          <Plus className="mr-2 h-4 w-4" />
-          {t('register_new_farmer') || 'Register New Farmer'}
+
+        <Button
+          onClick={() => router.push('/agent/register-farmer')}
+          className="bg-emerald-500 hover:bg-emerald-600 py-4"
+        >
+          <Plus className="mr-2 h-4 w-4" py-4 />
+          {t('register_new_farmer') || 'Register'}
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      {/* SEARCH */}
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
         <Input
-          placeholder={t('search_farmers') || "Search farmers by name, email, phone, or region..."}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
+          className="pl-9"
+          placeholder="Search farmers..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setPage(1)
+          }}
         />
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <User className="h-8 w-8 text-emerald-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">{t('total_farmers') || 'Total Farmers'}</p>
-                <p className="text-2xl font-bold text-gray-900">{farmers.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-                <div className="h-3 w-3 bg-green-500 rounded-full"></div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">{t('active_farmers') || 'Active Farmers'}</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {farmers.filter(f => f.status === 'active').length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">{t('this_month') || 'This Month'}</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {farmers.filter(f => new Date(f.registeredDate) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* TABLE */}
+      <div className="rounded-md border bg-white overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('fullName')}>
+                  Name <ArrowUpDown className="ml-1 h-4 w-4" />
+                </Button>
+              </TableHead>
+
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Location</TableHead>
+
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('status')}>
+                  Status <ArrowUpDown className="ml-1 h-4 w-4" />
+                </Button>
+              </TableHead>
+
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('registeredDate')}>
+                  Date <ArrowUpDown className="ml-1 h-4 w-4" />
+                </Button>
+              </TableHead>
+
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {paginatedData.map((farmer) => (
+              <TableRow key={farmer.id}>
+
+                <TableCell className="font-medium">
+                  {farmer.fullName}
+                </TableCell>
+
+                <TableCell>{farmer.email}</TableCell>
+                <TableCell>{farmer.phone}</TableCell>
+
+                <TableCell>
+                  {farmer.region}, {farmer.woreda}
+                </TableCell>
+
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      farmer.status === 'active'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {farmer.status}
+                  </span>
+                </TableCell>
+
+                <TableCell>
+                  {new Date(farmer.registeredDate).toLocaleDateString()}
+                </TableCell>
+
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
-      {/* Farmers List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredFarmers.map((farmer) => (
-          <Card key={farmer.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{farmer.fullName}</CardTitle>
-                <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  farmer.status === 'active'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {farmer.status}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {farmer.email && (
-                <div className="flex items-center text-sm text-gray-600">
-                  <Mail className="h-4 w-4 mr-2" />
-                  {farmer.email}
-                </div>
-              )}
-              {farmer.phone && (
-                <div className="flex items-center text-sm text-gray-600">
-                  <Phone className="h-4 w-4 mr-2" />
-                  {farmer.phone}
-                </div>
-              )}
-              <div className="flex items-center text-sm text-gray-600">
-                <MapPin className="h-4 w-4 mr-2" />
-                {farmer.region}, {farmer.woreda}
-              </div>
-              <div className="pt-2 border-t">
-                <p className="text-xs text-gray-500">
-                  Registered: {new Date(farmer.registeredDate).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  {t('view_profile') || 'View Profile'}
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1">
-                  {t('message') || 'Message'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* PAGINATION */}
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-gray-500">
+          Page {page} of {totalPages || 1}
+        </p>
 
-      {filteredFarmers.length === 0 && (
-        <div className="text-center py-12">
-          <User className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('no_farmers_found') || 'No farmers found'}</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm ? (t('adjust_search') || 'Try adjusting your search terms.') : (t('register_first_farmer') || 'Get started by registering your first farmer.')}
-          </p>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            Prev
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next
+          </Button>
         </div>
-      )}
+      </div>
+
     </div>
   )
 }

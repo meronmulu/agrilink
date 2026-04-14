@@ -35,12 +35,12 @@ export default function AgentDashboard() {
     }, [])
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <Loader2 className="animate-spin text-emerald-500" size={40} />
-            </div>
-        )
-    }
+    return (
+      <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
+      </div>
+    )
+  }
 
     if (!stats) {
         return (
@@ -81,32 +81,7 @@ export default function AgentDashboard() {
                 ))}
             </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button
-                    onClick={() => router.push('/agent/register-farmer')}
-                    className="h-20 bg-emerald-500 hover:bg-emerald-600 flex flex-col items-center justify-center gap-2"
-                >
-                    <UserPlus size={24} />
-                    <span>{t('register_farmer') || 'Register Farmer'}</span>
-                </Button>
-                <Button
-                    onClick={() => router.push('/agent/farmer')}
-                    variant="outline"
-                    className="h-20 border-blue-200 text-blue-600 hover:bg-blue-50 flex flex-col items-center justify-center gap-2"
-                >
-                    <Users size={24} />
-                    <span>{t('view_farmers') || 'View Farmers'}</span>
-                </Button>
-                <Button
-                    onClick={() => router.push('/agent/training')}
-                    variant="outline"
-                    className="h-20 border-purple-200 text-purple-600 hover:bg-purple-50 flex flex-col items-center justify-center gap-2"
-                >
-                    <GraduationCap size={24} />
-                    <span>{t('training_modules') || 'Training Modules'}</span>
-                </Button>
-            </div>
+           
 
             {/* Recent Activity */}
             <Card>

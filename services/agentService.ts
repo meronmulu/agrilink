@@ -15,7 +15,7 @@ export interface Farmer {
   phone?: string
   region: string
   woreda: string
-  status: 'active' | 'inactive'
+  status: 'active' | 'pending'
   registeredDate: string
   profile?: {
     imageUrl?: string
@@ -82,7 +82,7 @@ export const getAgentFarmers = async (): Promise<Farmer[]> => {
         phone: '+251933789012',
         region: 'Amhara',
         woreda: 'Bahir Dar',
-        status: 'inactive',
+        status: 'pending',
         registeredDate: '2024-01-10'
       }
     ]

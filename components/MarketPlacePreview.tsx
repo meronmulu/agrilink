@@ -36,8 +36,8 @@ export default function MarketPlacePreview() {
   },[])
 
   return (
-    <section className="w-full bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="w-full bg-white ">
+      <div className="max-w-7xl mx-auto p-6">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 mt-5 gap-4">
@@ -122,7 +122,7 @@ export default function MarketPlacePreview() {
 
                     <Link href={`/product/${product.id}`} className="flex-1">
                       <Button variant="outline" className="w-full">
-                        View
+                        View Detail
                       </Button>
                     </Link>
 
