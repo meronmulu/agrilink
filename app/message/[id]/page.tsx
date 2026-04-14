@@ -61,53 +61,64 @@ export default function TelegramChat() {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   // SOCKET
-  useEffect(() => {
-    if (!currentUserId) return
+ // SOCKET
+useEffect(() => {
+  if (!currentUserId || !conversationId) return
 
-    const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token')
 
-    const socket = io(SOCKET_URL, {
-      transports: ['websocket'],
-      auth: { token }
-    })
+  // prevent duplicate connections (IMPORTANT FIX)
+  if (socketRef.current) {
+    socketRef.current.disconnect()
+  }
 
-    socketRef.current = socket
+  const socket = io(SOCKET_URL, {
+    transports: ['websocket'],
+    auth: { token }
+  })
 
-    socket.on('connect', () => {
-      socket.emit('join', currentUserId)
-      socket.emit('joinConversation', conversationId)
-    })
+  socketRef.current = socket
 
-    socket.on('receiveMessage', (msg) => {
-      if (msg.conversationId === conversationId) {
-        setMessages(prev => {
-          const exists = prev.some(m => m.id === msg.id)
-          if (exists) return prev
+  socket.on('connect', () => {
+    socket.emit('join', currentUserId)
+    socket.emit('joinConversation', conversationId)
+  })
 
-          const updated =
-            msg.senderId !== currentUserId
-              ? { ...msg, isRead: true }
-              : msg
+  socket.on('receiveMessage', (msg) => {
+    if (msg.conversationId === conversationId) {
+      setMessages(prev => {
+        const exists = prev.some(m => m.id === msg.id)
+        if (exists) return prev
 
-          return [...prev, updated].sort(
-            (a, b) =>
-              new Date(a.createdAt).getTime() -
-              new Date(b.createdAt).getTime()
-          )
+        const updated =
+          msg.senderId !== currentUserId
+            ? { ...msg, isRead: true }
+            : msg
+
+        return [...prev, updated].sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() -
+            new Date(b.createdAt).getTime()
+        )
+      })
+
+      if (msg.senderId !== currentUserId) {
+        socket.emit('markAsRead', {
+          conversationId,
+          userId: currentUserId
         })
 
-        if (msg.senderId !== currentUserId) {
-          socket.emit('markAsRead', {
-            conversationId,
-            userId: currentUserId
-          })
-          refreshUnread()
-        }
+        refreshUnread()
       }
-    })
+    }
+  })
 
-    return () => socket.disconnect()
-  }, [currentUserId, conversationId])
+  return () => {
+    socket.off('connect')
+    socket.off('receiveMessage')
+    socket.disconnect()
+  }
+}, [currentUserId, conversationId, refreshUnread])
 
   // LOAD DATA
   useEffect(() => {
@@ -180,68 +191,74 @@ export default function TelegramChat() {
 
   // SEND MESSAGE
   const handleSend = async () => {
-    if (
-      (!message.trim() && !attachment) ||
-      !currentUserId ||
-      !receiver
-    )
-      return
+  if (
+    (!message.trim() && !attachment) ||
+    !currentUserId ||
+    !receiver
+  )
+    return
 
-    const tempId = `${Date.now()}`
+  const tempId = `${Date.now()}`
 
-    const payload = {
-      id: tempId,
-      senderId: currentUserId,
-      message,
-      conversationId:
-        messages.length > 0 ? conversationId : undefined,
-      receiverId: receiver.id,
-      createdAt: new Date().toISOString()
-    }
-
-    setMessages(prev => {
-      const updated = [...prev, payload]
-      return updated.sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() -
-          new Date(b.createdAt).getTime()
-      )
-    })
-
-    const currentMsg = message
-    setMessage('')
-    setAttachment(null)
-    setShowEmoji(false)
-
-    try {
-      let finalData: any
-
-      if (attachment) {
-        finalData = new FormData()
-        finalData.append('senderId', payload.senderId)
-        finalData.append('message', currentMsg || 'Attachment')
-        if (payload.conversationId)
-          finalData.append('conversationId', payload.conversationId)
-        finalData.append('receiverId', payload.receiverId)
-        finalData.append('file', attachment)
-      } else {
-        finalData = payload
-      }
-
-      const res = await sendRest(finalData)
-
-      if (
-        res?.conversationId &&
-        res.conversationId !== conversationId
-      ) {
-        router.replace(`/message/${res.conversationId}`)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-
-    inputRef.current?.focus()
+  const payload = {
+    id: tempId,
+    senderId: currentUserId,
+    message,
+    conversationId:
+      messages.length > 0 ? conversationId : undefined,
+    receiverId: receiver.id,
+    createdAt: new Date().toISOString()
   }
+
+  setMessages(prev => {
+    const updated = [...prev, payload]
+    return updated.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() -
+        new Date(b.createdAt).getTime()
+    )
+  })
+
+  const currentMsg = message
+  setMessage('')
+  setAttachment(null)
+  setShowEmoji(false)
+
+  try {
+    let finalData: FormData | typeof payload
+
+    if (attachment) {
+      const formData = new FormData()
+
+      formData.append('senderId', payload.senderId)
+      formData.append('message', currentMsg || 'Attachment')
+
+      if (payload.conversationId) {
+        formData.append('conversationId', payload.conversationId)
+      }
+
+      formData.append('receiverId', payload.receiverId)
+      formData.append('file', attachment)
+
+      finalData = formData
+    } else {
+      finalData = payload
+    }
+
+    const res = await sendRest(finalData)
+
+    if (
+      res?.conversationId &&
+      res.conversationId !== conversationId
+    ) {
+      router.replace(`/message/${res.conversationId}`)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+
+  inputRef.current?.focus()
+}
 
 
   return (
@@ -356,7 +373,7 @@ export default function TelegramChat() {
         {showEmoji && (
           <div className="absolute bottom-16 right-4 z-50">
             <EmojiPicker
-              onEmojiClick={(e: any) =>
+              onEmojiClick={(e) =>
                 setMessage(prev => prev + e.emoji)
               }
             />
