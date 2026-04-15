@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginInput } from '@/lib/validation/auth.schema'
+import Cookies from 'js-cookie'
 
 export default function LoginPage() {
   const { t } = useLanguage()
@@ -73,38 +74,44 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
+  const handleGoogleLogin = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
 
- const handleGoogleLogin = async (e?: React.MouseEvent<HTMLButtonElement>) => {
-  e?.preventDefault();
+    try {
+      const res = await googleSignin()
 
-  try {
-    const res = await googleSignin()
+      // 1. Set the user in Context
+      setUser({
+        id: res.user.id,
+        role: res.user.role,
+        email: res.user.email ?? '',
+        phone: res.user.phone ?? ''
+      })
 
-    setUser({
-      id: res.user.id,
-      role: res.user.role,
-      email: res.user.email ?? '',
-      phone: res.user.phone ?? ''
-    })
+      // 2. SAVE TO COOKIES (Crucial for Middleware)
+      Cookies.set('token', res.token, { expires: 7 })
+      Cookies.set('user-role', res.user.role, { expires: 7 })
 
-    localStorage.setItem('token', res.token)
-    localStorage.setItem('user', JSON.stringify(res.user))
-    toast.success('Google login successful')
+      // 3. Keep localStorage for client-side backup
+      localStorage.setItem('token', res.token)
+      localStorage.setItem('user', JSON.stringify(res.user))
 
-    const roleRoutes: Record<string, string> = {
-      ADMIN: '/admin/dashboard',
-      AGENT: '/agent/dashboard',
-      BUYER: '/buyer',
-      FARMER: '/farmer',
+      toast.success('Google login successful')
+
+      const roleRoutes: Record<string, string> = {
+        ADMIN: '/admin/dashboard',
+        AGENT: '/agent/dashboard',
+        BUYER: '/buyer',
+        FARMER: '/farmer',
+      }
+
+      router.push(roleRoutes[res.user.role] || '/')
+
+    } catch (error: any) {
+      console.error('Google login failed', error)
+      toast.error('Google login failed. Try again.')
     }
-
-    router.push(roleRoutes[res.user.role] || '/')
-
-  } catch (error: any) {
-    console.error('Google login failed', error)
-    toast.error('Google login failed. Try again.')
   }
-}
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <div className="grid lg:grid-cols-2 w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border dark:border-gray-700">

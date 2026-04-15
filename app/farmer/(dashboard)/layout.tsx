@@ -11,7 +11,7 @@ export default function FarmerDashboardLayout({
     children: React.ReactNode
 }) {
     return (
-        <ProtectedRoute roles={["FARMER"]}>
+        // <ProtectedRoute roles={["FARMER"]}>
             <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
                 {/* Top Navbar */}
                 <div className="flex items-center h-16 shrink-0 border-b border-gray-200 bg-white">
@@ -33,6 +33,6 @@ export default function FarmerDashboardLayout({
                     </main>
                 </div>
             </div>
-        </ProtectedRoute>
+        // </ProtectedRoute>
     )
 }

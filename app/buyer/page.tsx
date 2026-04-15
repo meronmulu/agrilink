@@ -6,7 +6,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function page() {
   return (
-    <ProtectedRoute roles={ ["BUYER"]}>
+    // <ProtectedRoute roles={ ["BUYER"]}>
     <div className="min-h-screen flex flex-col">
           <Header />
           <main className="flex-1">
@@ -14,6 +14,6 @@ export default function page() {
           </main>
           <Footer />    
   </div>
-  </ProtectedRoute>
+  // </ProtectedRoute>
   )
 }

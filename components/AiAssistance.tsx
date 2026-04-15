@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Plus, Send, Bot, User } from 'lucide-react'
+import { Send, Bot, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -59,11 +59,11 @@ export default function AiAssistant() {
     } catch (error) {
       setMessages(prev => [
         ...prev,
-        { 
-          role: 'ai', 
-          text: t('ai_failed_response') || ' Failed to get response. Please try again.', 
+        {
+          role: 'ai',
+          text: t('ai_failed_response') || ' Failed to get response. Please try again.',
           timestamp: new Date(),
-          isError: true 
+          isError: true
         }
       ])
       console.log(error)
@@ -72,7 +72,7 @@ export default function AiAssistant() {
     }
   }
 
-  
+
 
   const formatTime = (date: Date) => {
     return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -93,12 +93,11 @@ export default function AiAssistant() {
 
       {/* Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent 
-          className={`flex flex-col transition-all duration-300 ${
-            expanded 
-              ? 'w-[95vw] max-w-[95vw] h-screen max-h-screen' 
+        <DialogContent
+          className={`flex flex-col transition-all duration-300 ${expanded
+              ? 'w-[95vw] max-w-[95vw] h-screen max-h-screen'
               : 'w-[90vw] max-w-[90vw] sm:max-w-2xl h-screen max-h-screen'
-          } p-0 gap-0 rounded-xl overflow-hidden`}
+            } p-0 gap-0 rounded-xl overflow-hidden`}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b bg-linear-to-r from-emerald-500 to-teal-500">
@@ -112,37 +111,48 @@ export default function AiAssistant() {
                 </DialogTitle>
               </div>
             </div>
-         
+
           </div>
 
           {/* Chat Messages */}
           <div className="flex-1 overflow-y-auto p-4 bg-linear-to-b from-gray-50 to-gray-100">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center">
-                
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+
+                {/* <h3 className="text-lg font-semibold text-gray-700 mb-2">
                   {t('ai_welcome') || 'Welcome to AI Assistant!'}
-                </h3>
+                </h3> */}
                 <p className="text-sm text-gray-500 max-w-md">
-                  {t('ai_description') || "Ask me anything - I'm here to help you with questions, tasks, or just a friendly conversation."}
+                  {"Ask me anything - I'm here to help you with questions, tasks, or just a friendly conversation."}
                 </p>
-                <div className="flex gap-2 mt-6">
-                  <Button 
-                    variant="outline" 
+                 <div>
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => setInput(t('ai_what_can_help_input') || "What can you help me with?")}
-                    className="text-xs"
+                    className="text-xs mt-6"
                   >
                     {t('ai_what_can_help') || 'What can you help with?'}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                 </div>
+                <div className="flex gap-2 mt-2">
+                  
+                  <Button
+                    variant="outline"
                     size="sm"
-                    onClick={() => setInput(t('ai_give_tip_input') || "Give me a quick tip")}
+                    onClick={() => setInput( "When is the best time to plant maize in my region?")}
                     className="text-xs"
                   >
-                    {t('ai_give_tip') || 'Give me a tip'}
+                    When is the best time to plant maize in my region?
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setInput( "What fertilizer should I use for clay soil?")}
+                    className="text-xs"
+                  >
+                    What fertilizer should I use for clay soil?                  
+                    </Button>
                 </div>
               </div>
             )}
@@ -154,11 +164,10 @@ export default function AiAssistant() {
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
                 >
                   <div className={`flex gap-2 max-w-[80%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                      msg.role === 'user' 
-                        ? 'bg-emerald-500' 
+                    <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${msg.role === 'user'
+                        ? 'bg-emerald-500'
                         : 'bg-linear-to-r from-emerald-500 to-teal-500'
-                    }`}>
+                      }`}>
                       {msg.role === 'user' ? (
                         <User className="w-4 h-4 text-white" />
                       ) : (
@@ -167,21 +176,19 @@ export default function AiAssistant() {
                     </div>
                     <div>
                       <div
-                        className={`px-4 py-2 rounded-2xl shadow-sm ${
-                          msg.role === 'user'
+                        className={`px-4 py-2 rounded-2xl shadow-sm ${msg.role === 'user'
                             ? 'bg-linear-to-r from-emerald-500 to-teal-500 text-white'
                             : msg.isError
-                            ? 'bg-red-50 border border-red-200 text-red-700'
-                            : 'bg-white border border-gray-200 text-gray-700'
-                        }`}
+                              ? 'bg-red-50 border border-red-200 text-red-700'
+                              : 'bg-white border border-gray-200 text-gray-700'
+                          }`}
                       >
                         <p className="text-sm whitespace-pre-wrap wrap-break-word">
                           {msg.text}
                         </p>
                       </div>
-                      <p className={`text-xs mt-1 ${
-                        msg.role === 'user' ? 'text-right text-gray-400' : 'text-left text-gray-400'
-                      }`}>
+                      <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-right text-gray-400' : 'text-left text-gray-400'
+                        }`}>
                         {formatTime(msg.timestamp)}
                       </p>
                     </div>
@@ -211,7 +218,7 @@ export default function AiAssistant() {
 
           {/* Input Area */}
           <div className="border-t bg-white p-4">
-           
+
             <div className="flex gap-2">
               <input
                 ref={inputRef}
@@ -222,15 +229,15 @@ export default function AiAssistant() {
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                 disabled={loading}
               />
-              <Button 
-                onClick={handleSend} 
+              <Button
+                onClick={handleSend}
                 disabled={loading || !input.trim()}
                 className="bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl px-6 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
               >
                 <Send className="w-4 h-4" />
               </Button>
             </div>
-           
+
           </div>
         </DialogContent>
       </Dialog>

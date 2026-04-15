@@ -9,7 +9,7 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     return (
-            <ProtectedRoute roles={ ["ADMIN"]}>
+            // <ProtectedRoute roles={ ["ADMIN"]}>
 
             <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
                 {/* Top Navbar */}
@@ -31,7 +31,7 @@ export default function AdminLayout({
                     </main>
                 </div>
             </div>
-           </ProtectedRoute>
+        //    </ProtectedRoute>
 
     )
 }

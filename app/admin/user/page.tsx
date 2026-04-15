@@ -104,34 +104,6 @@ export default function AdminUsersPage() {
     }
   }
 
-  // UPDATE PASSWORD
-  const handleUpdatePassword = async () => {
-    if (!selectedUserId) return
-
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match")
-      return
-    }
-
-    try {
-      await updateUserPassword(selectedUserId, {
-        currentPassword,
-        newPassword,
-        confirmNewPassword: confirmPassword
-      })
-
-      toast.success("Password updated successfully")
-
-      setEditOpen(false)
-      setCurrentPassword("")
-      setNewPassword("")
-      setConfirmPassword("")
-    } catch (error) {
-      console.log(error)
-      toast.error("Failed to update password")
-
-    }
-  }
 
   //  FILTER + SORT (NEWEST FIRST)
   const filteredUsers = users
@@ -322,16 +294,7 @@ export default function AdminUsersPage() {
 
                           <DropdownMenuContent align="end">
 
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedUserId(user.id)
-                                setEditOpen(true)
-                              }}
-                            >
-                              <Pencil size={14} className="mr-2" />
-                              Update Password
-                            </DropdownMenuItem>
-
+                            
                             <DropdownMenuItem
                               onClick={() => {
                                 setDeleteId(user.id)
@@ -407,41 +370,7 @@ export default function AdminUsersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* EDIT PASSWORD DIALOG */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
-          <DialogTitle>Update Password</DialogTitle>
-
-          <div className="space-y-3">
-            <Input
-              type="password"
-              placeholder="Current Password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="New Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
-            <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '
-              onClick={handleUpdatePassword}>
-              Update
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+     
 
     </div>
   )
