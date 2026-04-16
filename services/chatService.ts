@@ -1,7 +1,11 @@
 import instance from "@/lib/axios/axios"
 import { Conversation, Message } from "@/types/chat";
 
-
+type SendMessagePayload = {
+  conversationId?: string
+  receiverId: string
+  message: string
+}
 // Returns the number of unread messages for the current user
 export const getUnreadMessageCount = async (userId: string) => {
 	const conversations = await getConversations();
@@ -25,16 +29,21 @@ export const getConversations = async () => {
 	}
 }
 
-export const sendMessage = async (data: {
-	conversationId: string
-	receiverId: string
-	message: string
-}) => {
-	try {
-		const res = await instance.post(`/chat/send`, data)
-		return res.data
-	} catch (error) {
-		console.log("SEND MESSAGE ERROR:", error)
-		throw error
-	}
+export const sendMessage = async (
+  data: SendMessagePayload | FormData
+) => {
+  try {
+    const isFormData = data instanceof FormData
+
+    const res = await instance.post('/chat/send', data, {
+      headers: isFormData
+        ? { 'Content-Type': 'multipart/form-data' }
+        : { 'Content-Type': 'application/json' }
+    })
+
+    return res.data
+  } catch (error) {
+    console.log("SEND MESSAGE ERROR:", error)
+    throw error
+  }
 }
