@@ -14,7 +14,6 @@ export const register = async (userData: RegisterRequest): Promise<User> => {
     throw error
   }
 }
-
 export const login = async (credentials: { email?: string; phone?: string; password: string }): Promise<LoginResponse> => {
   try {
     console.log("Sending login request:", credentials);
@@ -59,7 +58,6 @@ export const login = async (credentials: { email?: string; phone?: string; passw
     throw error;
   }
 };
-
 export const verifyOtp = async (data: VerifyOtpRequest) => {
   try {
     const res = await instance.post("/auth/verify-otp", data)
@@ -70,7 +68,6 @@ export const verifyOtp = async (data: VerifyOtpRequest) => {
     throw error
   }
 }
-
 export const resendOtp = async (identifier: string, purpose: string) => {
   try {
     const res = await instance.post("/auth/resend-otp", { identifier, purpose })
@@ -80,8 +77,6 @@ export const resendOtp = async (identifier: string, purpose: string) => {
     throw error
   }
 }
-
-
 export const forgotPassword = async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
   try {
     console.log("Forgot Password Request:", data)
@@ -93,7 +88,6 @@ export const forgotPassword = async (data: ForgotPasswordRequest): Promise<{ mes
     throw error
   }
 }
-
 export const resetPassword = async (data: ResetPasswordRequest): Promise<{ message: string }> => {
   try {
     console.log("Reset Password Request:", data)
@@ -105,7 +99,6 @@ export const resetPassword = async (data: ResetPasswordRequest): Promise<{ messa
     throw error
   }
 }
-
 export const googleSignin = async () => {
   try {
     // Open Google login popup
@@ -128,7 +121,6 @@ export const googleSignin = async () => {
     throw error;
   }
 };
-
 export const getUsers= async (): Promise<User[]> => {
   try {
     const res = await instance.get("/user")
@@ -149,8 +141,6 @@ export const deleteUser = async (id: string) => {
     throw error
   }
 }
-
-
 export const getUserById = async (id: string) => {
   try {
     const res = await instance.get(`/user/${id}`)
@@ -162,8 +152,6 @@ export const getUserById = async (id: string) => {
     throw error
   }
 }
-
-
 export const registerFarmer = async (userData: RegisterRequest): Promise<User> => {
   try {
     const res = await instance.post<User>("/auth/create-farmer", userData)
@@ -185,7 +173,6 @@ export const getMyFarmer= async (): Promise<User[]> => {
     return []
   }
 }
-
 export const getAgents = async (): Promise<User[]> => {
   try {
     const users = await getUsers()
@@ -196,9 +183,6 @@ export const getAgents = async (): Promise<User[]> => {
     return []
   }
 }
-
-
-//Get farmers by agent ID (ADMIN use)
 export const getAgentFarmers = async (
   agentId: number | string
 ): Promise<User[]> => {

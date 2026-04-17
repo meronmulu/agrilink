@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import {
   getUsers,
   deleteUser,
-  updateUserPassword
 } from "@/services/authService"
 
 import { User } from "@/types/auth"
@@ -30,7 +29,7 @@ import {
 } from "@/components/ui/pagination"
 
 import {
-  Loader2, Pencil, Trash2, MoreHorizontal, Search
+  Loader2, Trash2, MoreHorizontal, Search
 } from "lucide-react"
 
 import {
@@ -61,14 +60,7 @@ export default function AdminUsersPage() {
   const [open, setOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  // EDIT PASSWORD
-  const [editOpen, setEditOpen] = useState(false)
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
-
-  const [currentPassword, setCurrentPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-
+  
   // PAGINATION
   const [currentPage, setCurrentPage] = useState(1)
   const usersPerPage = 10
