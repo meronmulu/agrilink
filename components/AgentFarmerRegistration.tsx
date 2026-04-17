@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from './ui/input'
 import { useLanguage } from '@/context/LanguageContext'
-import { register } from '@/services/authService'
+import { registerFarmer } from '@/services/authService'
 import { toast } from 'sonner'
 
 export default function AgentFarmerRegistration() {
@@ -16,9 +16,7 @@ export default function AgentFarmerRegistration() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  //  Fixed role
   const role = "FARMER"
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,40 +24,44 @@ export default function AgentFarmerRegistration() {
     setIsLoading(true)
 
     try {
-      //  Validation: at least email OR phone
-      if (!email.trim() && !phone.trim()) {
+      const trimmedEmail = email.trim()
+      const trimmedPhone = phone.trim()
+
+      // At least one required
+      if (!trimmedEmail && !trimmedPhone) {
         toast.error("Please provide at least email or phone.")
-        setIsLoading(false)
         return
       }
 
       if (!password) {
         toast.error("Password is required.")
-        setIsLoading(false)
         return
       }
 
       if (password !== confirmPassword) {
         toast.error("Passwords do not match.")
-        setIsLoading(false)
         return
       }
 
-      //  API Call
-      const user = await register({
-        email,
-        phone,
+      //  Build payload (NO EMPTY STRINGS)
+      const payload: any = {
         password,
         confirmPassword,
         role
-      })
+      }
+
+      if (trimmedEmail) payload.email = trimmedEmail
+      if (trimmedPhone) payload.phone = trimmedPhone
+
+      console.log("FINAL PAYLOAD ", payload)
+
+      const user = await registerFarmer(payload)
 
       if (user) {
-        toast.success("Account created successfully ")
+        toast.success("Account created successfully")
 
-        const identifier = email || phone
+        const identifier = trimmedEmail || trimmedPhone
 
-        // Redirect to OTP
         router.push(
           `/verify-otp?identifier=${encodeURIComponent(identifier)}&purpose=SIGNUP&role=${role}`
         )
@@ -93,9 +95,11 @@ export default function AgentFarmerRegistration() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
 
-      {/* Role (Fixed) */}
+      {/* Role */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">{t('role') || 'Role'}</label>
+        <label className="text-sm font-medium text-gray-700">
+          {t('role') || 'Role'}
+        </label>
         <div className="h-11 flex items-center px-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600">
           {t('farmer') || 'Farmer'}
         </div>
@@ -103,76 +107,70 @@ export default function AgentFarmerRegistration() {
 
       {/* Email */}
       <div className="space-y-2">
-        <label htmlFor="email" className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium text-gray-700">
           {t('email_optional') || 'Email (Optional)'}
         </label>
         <Input
-          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder={t('you_example_optional') || "you@example.com (optional)"}
-          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+          placeholder="you@example.com"
+          className="h-11 rounded-xl"
         />
       </div>
 
       {/* Phone */}
       <div className="space-y-2">
-        <label htmlFor="phone" className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium text-gray-700">
           {t('phone') || 'Phone'}
         </label>
         <Input
-          id="phone"
           type="text"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="+251... "
-          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+          placeholder="+251..."
+          className="h-11 rounded-xl"
         />
       </div>
 
       {/* Password */}
       <div className="space-y-2">
-        <label htmlFor="password" className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium text-gray-700">
           {t('password') || 'Password'}
         </label>
         <Input
-          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
-          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+          className="h-11 rounded-xl"
         />
       </div>
 
       {/* Confirm Password */}
       <div className="space-y-2">
-        <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium text-gray-700">
           {t('confirm_password') || 'Confirm Password'}
         </label>
         <Input
-          id="confirmPassword"
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="••••••••"
-          className="h-11 pl-3 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500 w-full"
+          className="h-11 rounded-xl"
         />
       </div>
-
-      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       {/* Submit */}
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full h-11 mt-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium flex items-center justify-center disabled:opacity-50"
+        className="w-full h-11 mt-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center disabled:opacity-50"
       >
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          t('create_farmer_account') || "Create Farmer Account"
+          "Create Farmer Account"
         )}
       </button>
 

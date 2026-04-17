@@ -1,82 +1,83 @@
 'use client'
-
-import React, { useState, useEffect, useMemo } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { getMyFarmer } from "@/services/authService"
+import { User } from "@/types/auth"
+import { useLanguage } from "@/context/LanguageContext"
+import { Card, CardContent } from "@/components/ui/card"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Search, Plus, ArrowUpDown, Loader2 } from 'lucide-react'
-import { useLanguage } from '@/context/LanguageContext'
-import { useRouter } from 'next/navigation'
-import { getAgentFarmers, Farmer } from '@/services/agentService'
+  Table, TableBody, TableCell, TableHead,
+  TableHeader, TableRow
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import {
+  Pagination, PaginationContent, PaginationItem,
+  PaginationLink, PaginationNext, PaginationPrevious
+} from "@/components/ui/pagination"
+import { Loader2, Search, Plus } from "lucide-react"
+import {
+  Select, SelectContent, SelectItem,
+  SelectTrigger, SelectValue
+} from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import Image from "next/image"
+import { Button } from "./ui/button"
 
-export default function AgentFarmerList() {
+export default function AdminUsersPage() {
   const { t } = useLanguage()
   const router = useRouter()
 
-  const [farmers, setFarmers] = useState<Farmer[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
 
-  const [search, setSearch] = useState('')
-  const [sortKey, setSortKey] = useState<keyof Farmer>('fullName')
-  const [sortAsc, setSortAsc] = useState(true)
-  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState("")
+  const [roleFilter, setRoleFilter] = useState("ALL")
+  const [statusFilter, setStatusFilter] = useState("ALL")
 
-  const pageSize = 6
+  const [currentPage, setCurrentPage] = useState(1)
+  const usersPerPage = 10
 
   useEffect(() => {
-    const fetchFarmers = async () => {
-      try {
-        const data = await getAgentFarmers()
-        setFarmers(data)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchFarmers()
+    loadUsers()
   }, [])
 
-  const handleSort = (key: keyof Farmer) => {
-    if (sortKey === key) {
-      setSortAsc(!sortAsc)
-    } else {
-      setSortKey(key)
-      setSortAsc(true)
+  const loadUsers = async () => {
+    setLoading(true)
+    try {
+      const data = await getMyFarmer()
+      setUsers(data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const filteredData = useMemo(() => {
-    return farmers
-      .filter((f) =>
-        `${f.fullName} ${f.email} ${f.phone} ${f.region}`
-          .toLowerCase()
-          .includes(search.toLowerCase())
-      )
-      .sort((a, b) => {
-        const aVal = a[sortKey] ?? ''
-        const bVal = b[sortKey] ?? ''
+  const filteredUsers = users
+    .slice()
+    .sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return bTime - aTime
+    })
+    .filter((user) => {
+      const matchesSearch =
+        user.profile?.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+        user.email?.toLowerCase().includes(search.toLowerCase()) ||
+        user.phone?.includes(search)
 
-        if (aVal < bVal) return sortAsc ? -1 : 1
-        if (aVal > bVal) return sortAsc ? 1 : -1
-        return 0
-      })
-  }, [farmers, search, sortKey, sortAsc])
+      const matchesRole =
+        roleFilter === "ALL" || user.role === roleFilter
 
-  const totalPages = Math.ceil(filteredData.length / pageSize)
+      const matchesStatus =
+        statusFilter === "ALL" || user.status === statusFilter
 
-  const paginatedData = filteredData.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  )
+      return matchesSearch && matchesRole && matchesStatus
+    })
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
+  const startIndex = (currentPage - 1) * usersPerPage
+  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + usersPerPage)
 
   if (loading) {
     return (
@@ -87,134 +88,185 @@ export default function AgentFarmerList() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 space-y-6">
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">
-            {t('registered_farmers') || 'Registered Farmers'}
+          <h1 className="text-2xl font-bold tracking-tight">
+            {'Farmer Management'}
           </h1>
+          <p className="text-sm text-gray-500">
+            {'Manage farmers, roles, and account status'}
+          </p>
         </div>
 
-        <Button
-          onClick={() => router.push('/agent/register-farmer')}
-          className="bg-emerald-500 hover:bg-emerald-600 py-4"
-        >
-          <Plus className="mr-2 h-4 w-4" py-4 />
-          {t('register_new_farmer') || 'Register'}
-        </Button>
+        <div className="flex gap-2 flex-wrap">
+          <div className="relative">
+            <Input
+              placeholder={t('search_users') || "Search users..."}
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setCurrentPage(1)
+              }}
+              className="pl-9 w-72"
+            />
+            <Search className="absolute left-2 top-2 h-4 w-4" />
+          </div>
+
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => {
+              setStatusFilter(value)
+              setCurrentPage(1)
+            }}
+          >
+            <SelectTrigger className="w-40 bg-white">
+              <SelectValue placeholder={t('status') || "Status"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">{t('all_status') || 'All Status'}</SelectItem>
+              <SelectItem value="ACTIVE">{t('active') || 'Active'}</SelectItem>
+              <SelectItem value="PENDING">{t('pending') || 'Pending'}</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button
+            onClick={() => router.push('/agent/register-farmer')}
+            className="bg-emerald-500 hover:bg-emerald-600"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            {t('register_new_farmer') || 'Register'}
+          </Button>
+        </div>
+
       </div>
 
-      {/* SEARCH */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-        <Input
-          className="pl-9"
-          placeholder="Search farmers..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value)
-            setPage(1)
-          }}
-        />
-      </div>
+
+
+      {/* TABLE remains same */}
 
       {/* TABLE */}
-      <div className="rounded-md border bg-white overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
+      <Card>
+        <CardContent className="p-4">
+          <div className="overflow-x-auto">
 
-              <TableHead>
-                <Button variant="ghost" onClick={() => handleSort('fullName')}>
-                  Name <ArrowUpDown className="ml-1 h-4 w-4" />
-                </Button>
-              </TableHead>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="pl-6">{ 'Farmer'}</TableHead>
+                  <TableHead>{t('email') || 'Email'}</TableHead>
+                  <TableHead>{t('phone') || 'Phone'}</TableHead>
+                  <TableHead>{t('status') || 'Status'}</TableHead>
+                </TableRow>
+              </TableHeader>
 
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Location</TableHead>
+              <TableBody>
+                {paginatedUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-10">
+                      No users found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  paginatedUsers.map((user) => (
+                    <TableRow key={user.id} className="hover:bg-gray-50">
 
-              <TableHead>
-                <Button variant="ghost" onClick={() => handleSort('status')}>
-                  Status <ArrowUpDown className="ml-1 h-4 w-4" />
-                </Button>
-              </TableHead>
+                      <TableCell className="pl-6">
+                        <div className="flex items-center gap-3">
 
-              <TableHead>
-                <Button variant="ghost" onClick={() => handleSort('registeredDate')}>
-                  Date <ArrowUpDown className="ml-1 h-4 w-4" />
-                </Button>
-              </TableHead>
+                          <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
+                            <Image
+                              src={user.profile?.imageUrl || "/placeholder.png"}
+                              alt={user.profile?.fullName || "User"}
+                              fill
+                              unoptimized
+                              className="object-cover"
+                            />
+                          </div>
 
-            </TableRow>
-          </TableHeader>
+                          <span className="font-medium text-gray-900 capitalize">
+                            {user.profile?.fullName || "No Name"}
+                          </span>
 
-          <TableBody>
-            {paginatedData.map((farmer) => (
-              <TableRow key={farmer.id}>
+                        </div>
+                      </TableCell>
 
-                <TableCell className="font-medium">
-                  {farmer.fullName}
-                </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.phone || "-"}</TableCell>
 
-                <TableCell>{farmer.email}</TableCell>
-                <TableCell>{farmer.phone}</TableCell>
+                     
 
-                <TableCell>
-                  {farmer.region}, {farmer.woreda}
-                </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={
+                            user.status === "ACTIVE"
+                              ? "bg-green-100 text-green-600"
+                              : user.status === "PENDING"
+                                ? "bg-yellow-100 text-yellow-600"
+                                : "bg-gray-200 text-gray-600"
+                          }
+                        >
+                          {user.status}
+                        </Badge>
+                      </TableCell>
 
-                <TableCell>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      farmer.status === 'active'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {farmer.status}
-                  </span>
-                </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
 
-                <TableCell>
-                  {new Date(farmer.registeredDate).toLocaleDateString()}
-                </TableCell>
-
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* PAGINATION */}
       <div className="flex justify-between items-center">
         <p className="text-sm text-gray-500">
-          Page {page} of {totalPages || 1}
+          Showing {filteredUsers.length === 0 ? 0 : startIndex + 1} -{" "}
+          {Math.min(startIndex + usersPerPage, filteredUsers.length)} of{" "}
+          {filteredUsers.length}
         </p>
 
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Prev
-          </Button>
+        <Pagination>
+          <PaginationContent>
 
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </Button>
-        </div>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() =>
+                  setCurrentPage((p) => Math.max(p - 1, 1))
+                }
+              />
+            </PaginationItem>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  isActive={currentPage === i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+              />
+            </PaginationItem>
+
+          </PaginationContent>
+        </Pagination>
       </div>
 
     </div>
   )
 }
+
+
+
+

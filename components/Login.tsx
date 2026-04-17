@@ -52,7 +52,7 @@ export default function LoginPage() {
 
       const roleRoutes: Record<string, string> = {
         ADMIN: '/admin/dashboard',
-        AGENT: '/agent/dashboard',
+        AGENT: '/agent/farmer',
         BUYER: '/buyer',
         FARMER: '/farmer',
       }

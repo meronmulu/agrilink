@@ -19,6 +19,8 @@ import {
   Users,
   ShoppingCart,
   ListOrdered,
+  Store,
+  Signature,
 } from "lucide-react"
 
 import LanguageDropdown from "./LanguageDropdown"
@@ -85,15 +87,18 @@ export default function Header() {
       { name: t('messages') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: t('market_insights') || 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
     ],
-    AGENT: [
-      { name: t('dashboard') || "Dashboard", href: "/agent/dashboard", icon: LayoutDashboard },
-      { name: t('register_farmer') || "Register Farmer", href: "/agent/register-farmer", icon: Users },
+   AGENT: [
+      { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
+      { name: t('nav_orders') || 'Orders', href: '/agent/order', icon: ListOrdered },
+      { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
+      { name:  'Market Place', href: '/MarketInsight', icon: Store },
+
     ],
     ADMIN: [
       { name: t('dashboard') || "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
       { name: t('user_management') || "User Management", href: "/admin/user", icon: Users },
-      { name: t('products') || "Products", href: "/admin/products", icon: BookOpen },
-      { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Settings },
+      { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
+      { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Signature},
       { name: t('categories') || "Categories", href: "/admin/category", icon: Settings },
     ],
   }
@@ -107,7 +112,7 @@ export default function Header() {
         {/* LEFT SIDE: LOGO & MOBILE MENU */}
         <div className="flex items-center gap-3">
           {/* Only show Mobile Menu if NOT loading and user exists */}
-          {!loading && user && (
+          {user && (
             <div className="block md:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -153,15 +158,9 @@ export default function Header() {
           </div>
         </div>
 
-        {/* MIDDLE/RIGHT SECTION: LOADING STATE SKELETON */}
-        {loading && (
-          <div className="flex items-center gap-4">
-            <div className="h-8 w-24 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />
-          </div>
-        )}
-
+       
         {/* GUEST SECTION (NOT LOGGED IN) */}
-        {!loading && !user && (
+        {!user && (
           <>
             <nav className="hidden md:flex items-center gap-6 text-gray-600 dark:text-gray-300 font-medium mx-auto">
               <p className="hover:text-emerald-500 cursor-pointer">{t("market")}</p>
@@ -184,7 +183,7 @@ export default function Header() {
         )}
 
         {/* USER SECTION (LOGGED IN) */}
-        {!loading && user && (
+        {user && (
           <div className="flex items-center gap-4">
             {user.role === "BUYER" && (
               <Button

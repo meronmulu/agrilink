@@ -1,13 +1,12 @@
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
+import MarketPlace from '@/components/MarketPlace'
 
 export default function page() {
   return (
       <div className="min-h-screen ">
                 <Header />
-              <p className='py-20 '>
-                market insight page
-              </p>  
+                   <MarketPlace/> 
 
                 <Footer/>
         

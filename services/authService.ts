@@ -163,26 +163,52 @@ export const getUserById = async (id: string) => {
   }
 }
 
-export const updateUserPassword = async (
-  id: string,
-  data: {
-    currentPassword: string
-    newPassword: string
-    confirmNewPassword: string
-  }
-) => {
+
+export const registerFarmer = async (userData: RegisterRequest): Promise<User> => {
   try {
-    const res = await instance.patch(
-      `/user/update-password/${id}`, 
-      data
-    )
+    const res = await instance.post<User>("/auth/create-farmer", userData)
+    console.log(res)
     return res.data
   } catch (error) {
-    console.log("UPDATE PASSWORD ERROR:", error)
+    console.log(error)
     throw error
+  }
+}
+export const getMyFarmer= async (): Promise<User[]> => {
+  try {
+    const res = await instance.get("/user/My-Farmers")
+    console.log(res.data)
+    return res.data
+    
+  } catch (error) {
+    console.error("Get users error:", error)
+    return []
+  }
+}
+
+export const getAgents = async (): Promise<User[]> => {
+  try {
+    const users = await getUsers()
+    console.log(users)
+    return users.filter((user) => user.role === "AGENT")
+  } catch (error) {
+    console.error("Get agents error:", error)
+    return []
   }
 }
 
 
+//Get farmers by agent ID (ADMIN use)
+export const getAgentFarmers = async (
+  agentId: number | string
+): Promise<User[]> => {
+  try {
+    const res = await instance.get(`/user/Agent-Farmers/${agentId}`)
+    console.log("Agent Farmers:", res.data)
 
-
+    return res.data.data || res.data
+  } catch (error) {
+    console.error("Get agent farmers error:", error)
+    return []
+  }
+}

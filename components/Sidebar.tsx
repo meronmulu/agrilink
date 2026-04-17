@@ -4,7 +4,7 @@
 import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, MessageSquare, BrainCircuit, Settings, Sprout, BookOpen, Users, ShoppingCart, ListOrdered, Store } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, BrainCircuit, Settings, Sprout, BookOpen, Users, ShoppingCart, ListOrdered, Store, Signature } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -25,7 +25,6 @@ export default function Sidebar() {
   const { user } = useAuth()
   const { t } = useLanguage()
 
-  // Clear the message badge whenever the user navigates to the message page
   useEffect(() => {
     if (pathname === '/message') {
       markAsRead()
@@ -49,20 +48,22 @@ export default function Sidebar() {
     ],
 
     AGENT: [
-      { name: t('dashboard') || 'Dashboard', href: '/agent/dashboard', icon: LayoutDashboard },
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
       { name: t('nav_orders') || 'Orders', href: '/agent/order', icon: ListOrdered },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: t('nav_marketplace') || 'Market Place', href: '/agent', icon: Store },
+      { name:  'Market Place', href: '/MarketInsight', icon: Store },
 
     ],
 
     ADMIN: [
       { name: t('dashboard') || 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
       { name: t('user_management') || 'User Management', href: '/admin/user', icon: Users },
-      { name: t('products') || 'Products', href: '/admin/products', icon: BookOpen },
-      { name: t('agent_approval') || 'Agent Approval', href: '/admin/agent-approval', icon: Settings },
+      { name:  'Agent Management', href: '/admin/agent-farmer', icon: Users },
+      { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
+      { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Signature},
       { name: t('categories') || 'Categories', href: '/admin/catagory', icon: Settings },
+      { name:  'Market Place', href: '/MarketInsight', icon: Store },
+
     ],
   }
 
