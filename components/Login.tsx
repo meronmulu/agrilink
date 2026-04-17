@@ -100,14 +100,14 @@ export default function LoginPage() {
 
       const roleRoutes: Record<string, string> = {
         ADMIN: '/admin/dashboard',
-        AGENT: '/agent/dashboard',
+        AGENT: '/agent/farmer',
         BUYER: '/buyer',
         FARMER: '/farmer',
       }
 
       router.push(roleRoutes[res.user.role] || '/')
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Google login failed', error)
       toast.error('Google login failed. Try again.')
     }

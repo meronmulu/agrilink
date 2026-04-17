@@ -21,7 +21,15 @@ export function proxy(request: NextRequest) {
 
   // 3. Define Public Routes
   // Add any path that should be visible without logging in
-  const isPublicRoute = pathname === '/' || pathname === '/login' || pathname === '/register'
+  const isPublicRoute = 
+   pathname === '/' ||
+  pathname === '/login' ||
+  pathname === '/register' ||
+  pathname === '/signup' ||
+  pathname === '/forgotPassword' ||
+  pathname === '/verify-otp' ||
+  pathname === '/resetPassword' 
+
 
   // 4. Redirect Logic: No token = Go to Home/Login
   if (!token && !isPublicRoute) {

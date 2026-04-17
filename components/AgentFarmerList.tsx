@@ -1,29 +1,43 @@
+
 'use client'
+
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { getMyFarmer } from "@/services/authService"
 import { User } from "@/types/auth"
 import { useLanguage } from "@/context/LanguageContext"
+
 import { Card, CardContent } from "@/components/ui/card"
 import {
-  Table, TableBody, TableCell, TableHead,
-  TableHeader, TableRow
+  Table, TableBody, TableCell,
+  TableHead, TableHeader, TableRow
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import {
-  Pagination, PaginationContent, PaginationItem,
-  PaginationLink, PaginationNext, PaginationPrevious
+  Pagination, PaginationContent,
+  PaginationItem, PaginationLink,
+  PaginationNext, PaginationPrevious
 } from "@/components/ui/pagination"
-import { Loader2, Search, Plus } from "lucide-react"
 import {
-  Select, SelectContent, SelectItem,
-  SelectTrigger, SelectValue
+  Select, SelectContent,
+  SelectItem, SelectTrigger,
+  SelectValue
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import Image from "next/image"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 
-export default function AdminUsersPage() {
+import {
+  Loader2,
+  Search,
+  Plus,
+  Users,
+  CheckCircle,
+  Clock3
+} from "lucide-react"
+
+import Image from "next/image"
+
+export default function FarmerManagementPage() {
   const { t } = useLanguage()
   const router = useRouter()
 
@@ -31,11 +45,10 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true)
 
   const [search, setSearch] = useState("")
-  const [roleFilter, setRoleFilter] = useState("ALL")
   const [statusFilter, setStatusFilter] = useState("ALL")
-
   const [currentPage, setCurrentPage] = useState(1)
-  const usersPerPage = 10
+
+  const usersPerPage = 7
 
   useEffect(() => {
     loadUsers()
@@ -46,8 +59,8 @@ export default function AdminUsersPage() {
     try {
       const data = await getMyFarmer()
       setUsers(data)
-    } catch (err) {
-      console.error(err)
+    } catch (error) {
+      console.error(error)
     } finally {
       setLoading(false)
     }
@@ -66,14 +79,15 @@ export default function AdminUsersPage() {
         user.email?.toLowerCase().includes(search.toLowerCase()) ||
         user.phone?.includes(search)
 
-      const matchesRole =
-        roleFilter === "ALL" || user.role === roleFilter
-
       const matchesStatus =
         statusFilter === "ALL" || user.status === statusFilter
 
-      return matchesSearch && matchesRole && matchesStatus
+      return matchesSearch && matchesStatus
     })
+
+  const totalFarmers = users.length
+  const activeFarmers = users.filter(u => u.status === "ACTIVE").length
+  const pendingFarmers = users.filter(u => u.status === "PENDING").length
 
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
   const startIndex = (currentPage - 1) * usersPerPage
@@ -88,30 +102,85 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-6 bg-gray-50 min-h-screen space-y-6">
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {'Farmer Management'}
+          <h1 className="text-3xl font-bold text-gray-800">
+            Farmer Management
           </h1>
-          <p className="text-sm text-gray-500">
-            {'Manage farmers, roles, and account status'}
+          <p className="text-gray-500">
+            Manage all registered farmers and statuses
           </p>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
-          <div className="relative">
+        <Button
+          onClick={() => router.push('/agent/register-farmer')}
+          className="bg-emerald-500 hover:bg-emerald-600 h-10"
+        >
+          <Plus className="mr-2 h-6 w-4" />
+          Register Farmer
+        </Button>
+      </div>
+
+      {/* DASHBOARD CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <Card className="shadow-sm rounded-xl ">
+          <CardContent className="p-5 flex justify-between items-center">
+            <div>
+              <p className="text-gray-500 text-sm">Total Farmers</p>
+              <h2 className="text-3xl font-bold">{totalFarmers}</h2>
+            </div>
+            <div className="p-3 rounded-full bg-emerald-100">
+              <Users className="text-emerald-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm rounded-xl ">
+          <CardContent className="p-5 flex justify-between items-center">
+            <div>
+              <p className="text-gray-500 text-sm">Active Farmers</p>
+              <h2 className="text-3xl font-bold">{activeFarmers}</h2>
+            </div>
+            <div className="p-3 rounded-full bg-green-100">
+              <CheckCircle className="text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm rounded-xl ">
+          <CardContent className="p-5 flex justify-between items-center">
+            <div>
+              <p className="text-gray-500 text-sm">Pending Farmers</p>
+              <h2 className="text-3xl font-bold">{pendingFarmers}</h2>
+            </div>
+            <div className="p-3 rounded-full bg-yellow-100">
+              <Clock3 className="text-yellow-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+      </div>
+
+      {/* FILTERS */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder={t('search_users') || "Search users..."}
+              placeholder={
+                t('search_users') || 'Search farmers...'
+              }
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
                 setCurrentPage(1)
               }}
-              className="pl-9 w-72"
+              className="pl-10"
             />
-            <Search className="absolute left-2 top-2 h-4 w-4" />
           </div>
 
           <Select
@@ -121,141 +190,116 @@ export default function AdminUsersPage() {
               setCurrentPage(1)
             }}
           >
-            <SelectTrigger className="w-40 bg-white">
-              <SelectValue placeholder={t('status') || "Status"} />
+            <SelectTrigger className="w-full md:w-48">
+              <SelectValue placeholder="Filter status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">{t('all_status') || 'All Status'}</SelectItem>
-              <SelectItem value="ACTIVE">{t('active') || 'Active'}</SelectItem>
-              <SelectItem value="PENDING">{t('pending') || 'Pending'}</SelectItem>
+              <SelectItem value="ALL">
+                All Status
+              </SelectItem>
+              <SelectItem value="ACTIVE">
+                Active
+              </SelectItem>
+              <SelectItem value="PENDING">
+                Pending
+              </SelectItem>
             </SelectContent>
           </Select>
+        </CardContent>
+      </Card>
 
-          <Button
-            onClick={() => router.push('/agent/register-farmer')}
-            className="bg-emerald-500 hover:bg-emerald-600"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('register_new_farmer') || 'Register'}
-          </Button>
-        </div>
-
-      </div>
-
-
-
-      {/* TABLE remains same */}
 
       {/* TABLE */}
-      <Card>
+      <Card className="shadow-sm rounded-xl ">
         <CardContent className="p-4">
-          <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Farmer</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
 
-            <Table>
-              <TableHeader>
+            <TableBody>
+              {paginatedUsers.length === 0 ? (
                 <TableRow>
-                  <TableHead className="pl-6">{ 'Farmer'}</TableHead>
-                  <TableHead>{t('email') || 'Email'}</TableHead>
-                  <TableHead>{t('phone') || 'Phone'}</TableHead>
-                  <TableHead>{t('status') || 'Status'}</TableHead>
+                  <TableCell colSpan={4} className="text-center py-10 text-gray-500">
+                    No farmers found
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
+              ) : (
+                paginatedUsers.map((user) => (
+                  <TableRow key={user.id} className="hover:bg-gray-50 transition">
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
+                          <Image
+                            src={user.profile?.imageUrl || "/placeholder.png"}
+                            alt={user.profile?.fullName || "Farmer"}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
+                        <span className="font-medium">
+                          {user.profile?.fullName || "No Name"}
+                        </span>
+                      </div>
+                    </TableCell>
 
-              <TableBody>
-                {paginatedUsers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10">
-                      No users found
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone || "-"}</TableCell>
+                    <TableCell>{user.profile?.kebele?.name}</TableCell>
+
+                    <TableCell>
+                      <Badge
+                        className={
+                          user.status === "ACTIVE"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }
+                      >
+                        {user.status}
+                      </Badge>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  paginatedUsers.map((user) => (
-                    <TableRow key={user.id} className="hover:bg-gray-50">
-
-                      <TableCell className="pl-6">
-                        <div className="flex items-center gap-3">
-
-                          <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
-                            <Image
-                              src={user.profile?.imageUrl || "/placeholder.png"}
-                              alt={user.profile?.fullName || "User"}
-                              fill
-                              unoptimized
-                              className="object-cover"
-                            />
-                          </div>
-
-                          <span className="font-medium text-gray-900 capitalize">
-                            {user.profile?.fullName || "No Name"}
-                          </span>
-
-                        </div>
-                      </TableCell>
-
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.phone || "-"}</TableCell>
-
-                     
-
-                      <TableCell>
-                        <Badge
-                          className={
-                            user.status === "ACTIVE"
-                              ? "bg-green-100 text-green-600"
-                              : user.status === "PENDING"
-                                ? "bg-yellow-100 text-yellow-600"
-                                : "bg-gray-200 text-gray-600"
-                          }
-                        >
-                          {user.status}
-                        </Badge>
-                      </TableCell>
-
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-
-          </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
       {/* PAGINATION */}
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-500">
-          Showing {filteredUsers.length === 0 ? 0 : startIndex + 1} -{" "}
-          {Math.min(startIndex + usersPerPage, filteredUsers.length)} of{" "}
-          {filteredUsers.length}
-        </p>
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        
 
         <Pagination>
           <PaginationContent>
 
             <PaginationItem>
               <PaginationPrevious
-                onClick={() =>
-                  setCurrentPage((p) => Math.max(p - 1, 1))
-                }
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               />
             </PaginationItem>
 
-            {[...Array(totalPages)].map((_, i) => (
-              <PaginationItem key={i}>
+            {[...Array(totalPages)].map((_, index) => (
+              <PaginationItem key={index}>
                 <PaginationLink
-                  isActive={currentPage === i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
+                  isActive={currentPage === index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
                 >
-                  {i + 1}
+                  {index + 1}
                 </PaginationLink>
               </PaginationItem>
             ))}
 
             <PaginationItem>
               <PaginationNext
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(p + 1, totalPages))
-                }
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               />
             </PaginationItem>
 
@@ -266,7 +310,3 @@ export default function AdminUsersPage() {
     </div>
   )
 }
-
-
-
-

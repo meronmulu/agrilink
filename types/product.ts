@@ -11,7 +11,6 @@ export type Product = {
   description?: string
   image?: string
   createdAt: string
-
   subCategory?: SubCategory
   farmer?: User 
 }

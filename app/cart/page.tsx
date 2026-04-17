@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import {
   Loader2,
   Trash2,
-  ShoppingBag,
   Plus,
   Minus,
   ShoppingCart
@@ -23,6 +22,7 @@ import {
 import { CartItem } from '@/types/cart'
 import { checkoutOrder } from '@/services/orderService'
 import { toast } from 'sonner'
+import Image from 'next/image'
 
 export default function CartPage() {
   const { t } = useLanguage()
@@ -35,7 +35,9 @@ export default function CartPage() {
   const fetchCart = async () => {
     try {
       const data = await getCart()
+      console.log(data)
       setCart(data)
+      
     } catch (err) {
       console.error(err)
       toast.error(t('failed_to_load_cart') || 'Failed to load cart') // TODO: Add to locales
@@ -81,11 +83,11 @@ export default function CartPage() {
         prev.filter(item => item.product.id !== productId)
       )
 
-      toast.success(t('product_removed_from_cart') || 'Product removed from cart') // TODO: Add to locales
+      toast.success(t('product_removed_from_cart') || 'Product removed from cart') 
     } catch (err) {
       console.error(err)
       fetchCart()
-      toast.error(t('remove_failed') || 'Remove failed') // TODO: Add to locales
+      toast.error(t('remove_failed') || 'Remove failed') 
     } finally {
       setUpdatingItems(prev => {
         const newSet = new Set(prev)
@@ -102,40 +104,40 @@ export default function CartPage() {
     try {
       await clearCart()
       setCart([])
-      toast.success(t('cart_cleared') || 'Cart cleared') // TODO: Add to locales
+      toast.success(t('cart_cleared') || 'Cart cleared') 
     } catch (err) {
       console.error(err)
-      toast.error(t('failed_to_clear_cart') || 'Failed to clear cart') // TODO: Add to locales
+      toast.error(t('failed_to_clear_cart') || 'Failed to clear cart') // 
     }
   }
 
 
   const handleCheckout = async () => {
-  try {
-    setCheckingOut(true)
+    try {
+      setCheckingOut(true)
 
-    const checkoutData = {
-      items: cart.map(item => ({
-        productId: item.product.id,
-        amount: item.amount
-      }))
+      const checkoutData = {
+        items: cart.map(item => ({
+          productId: item.product.id,
+          amount: item.amount
+        }))
+      }
+
+      const res = await checkoutOrder(checkoutData)
+
+      toast.success(t('order_created_redirecting') || 'Order created, redirecting...') // TODO: Add to locales
+
+      if (res?.paymentUrl) {
+        window.location.href = res.paymentUrl
+      }
+
+    } catch (error) {
+      console.log(error)
+      toast.error(t('checkout_error') || 'Checkout error') // TODO: Add to locales
+    } finally {
+      setCheckingOut(false)
     }
-
-    const res = await checkoutOrder(checkoutData)
-
-    toast.success(t('order_created_redirecting') || 'Order created, redirecting...') // TODO: Add to locales
-
-    if (res?.paymentUrl) {
-      window.location.href = res.paymentUrl
-    }
-
-  } catch (error) {
-    console.log(error)
-    toast.error(t('checkout_error') || 'Checkout error') // TODO: Add to locales
-  } finally {
-    setCheckingOut(false)
   }
-}
 
 
   const subtotal = cart.reduce(
@@ -161,7 +163,6 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-600" size={40} />
-        <span className="ml-4 text-emerald-600 font-medium">{t('loading') || 'Loading...'}</span> {/* TODO: Add to locales */}
       </div>
     )
   }
@@ -192,18 +193,29 @@ export default function CartPage() {
                   <div className="flex gap-6">
 
                     {/* IMAGE */}
-                    <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <ShoppingBag className="text-emerald-600" />
+                    <div className="relative w-16 h-20 rounded-md overflow-hidden border">
+
+                      <Image
+                        src={item.product.image || "/placeholder.png"}
+                        alt={item.product.name}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+
                     </div>
 
                     {/* DETAILS */}
                     <div className="flex-1">
-                      <h3 className="font-semibold">
+                      <h3 className="font-semibold text-xl">
                         {item.product.name}
                       </h3>
 
                       <p className="text-sm text-gray-500">
-                        ETB {item.product.price.toLocaleString()}
+                       {item.product.price.toLocaleString()} ETB
+                      </p>
+                      <p className="text-sm text-gray-500">
+                       {item.product.amount} in stock
                       </p>
 
                       {/* QUANTITY */}

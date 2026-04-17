@@ -83,7 +83,6 @@ export default function BuyerOrdersPage() {
                 <TableHead>{t('total_price') || 'Total Price'}</TableHead>
                 <TableHead>{t('status') || 'Status'}</TableHead>
                 <TableHead>{t('date') || 'Date'}</TableHead>
-                {/* <TableHead>Payment</TableHead> */}
               </TableRow>
             </TableHeader>
 
@@ -95,13 +94,17 @@ export default function BuyerOrdersPage() {
                     <TableCell>
                       <div className="flex items-center gap-3">
 
-                        <Image
-                          src={item.product?.image }
-                          alt={item.product?.name }
-                          width={40}
-                          height={40}
-                          className="rounded-md object-cover border"
-                        />
+                        <div className="relative w-12 h-12 rounded-md overflow-hidden border">
+
+                          <Image
+                            src={item.product?.image || "/placeholder.png"}
+                            alt={item.product?.name}
+                            fill
+                            unoptimized
+                            className="object-cover"
+                          />
+
+                        </div>
 
                         <span className="font-medium text-gray-800">
                           {item.product?.name}

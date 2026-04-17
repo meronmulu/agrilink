@@ -1,3 +1,4 @@
+
 'use client'
 
 import React, { useState } from 'react'
@@ -6,6 +7,7 @@ import { Input } from './ui/input'
 import { useLanguage } from '@/context/LanguageContext'
 import { registerFarmer } from '@/services/authService'
 import { toast } from 'sonner'
+import { signUpSchema } from '@/lib/validation/auth.schema'
 
 export default function AgentFarmerRegistration() {
   const { t } = useLanguage()
@@ -15,6 +17,7 @@ export default function AgentFarmerRegistration() {
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [errors, setErrors] = useState<any>({})
   const [isLoading, setIsLoading] = useState(false)
 
   const role = "FARMER"
@@ -22,158 +25,144 @@ export default function AgentFarmerRegistration() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setErrors({})
 
     try {
-      const trimmedEmail = email.trim()
-      const trimmedPhone = phone.trim()
-
-      // At least one required
-      if (!trimmedEmail && !trimmedPhone) {
-        toast.error("Please provide at least email or phone.")
-        return
-      }
-
-      if (!password) {
-        toast.error("Password is required.")
-        return
-      }
-
-      if (password !== confirmPassword) {
-        toast.error("Passwords do not match.")
-        return
-      }
-
-      //  Build payload (NO EMPTY STRINGS)
-      const payload: any = {
+      const result = signUpSchema.safeParse({
+        email: email || undefined,
+        phone: phone || undefined,
         password,
         confirmPassword,
         role
+      })
+
+      if (!result.success) {
+        const fieldErrors: any = {}
+
+        result.error.issues.forEach((err) => {
+          const field = err.path[0]
+          if (field) fieldErrors[field] = err.message
+        })
+
+        setErrors(fieldErrors)
+        toast.error(result.error.issues[0].message)
+        return
       }
 
-      if (trimmedEmail) payload.email = trimmedEmail
-      if (trimmedPhone) payload.phone = trimmedPhone
+      const validData = result.data
 
-      console.log("FINAL PAYLOAD ", payload)
+      const payload: any = {
+        role: validData.role,
+        password: validData.password,
+        confirmPassword: validData.confirmPassword
+      }
+
+      if (validData.email) payload.email = validData.email
+      if (validData.phone) payload.phone = validData.phone
 
       const user = await registerFarmer(payload)
 
       if (user) {
-        toast.success("Account created successfully")
+        toast.success("Farmer created successfully")
 
-        const identifier = trimmedEmail || trimmedPhone
+        const identifier = validData.email || validData.phone
 
         router.push(
-          `/verify-otp?identifier=${encodeURIComponent(identifier)}&purpose=SIGNUP&role=${role}`
+          `/verify-otp?identifier=${encodeURIComponent(identifier!)}&purpose=SIGNUP&role=${role}`
         )
       }
 
-    } catch (error: any) {
-      console.log("Registration error:", error)
-
-      if (error?.response?.status === 504) {
-        toast.warning("Server timeout. OTP may still be sent.")
-      } else if (error?.response?.status === 409) {
-        toast.error("This email or phone number is already registered.")
-      } else if (error?.response?.status === 400) {
-        toast.error(
-          error?.response?.data?.message ||
-          "Invalid input. Please check your details."
-        )
-      } else {
-        toast.error(
-          error?.response?.data?.message ||
-          error.message ||
-          "Registration failed. Please try again."
-        )
-      }
-
+    } catch (error) {
+      console.log(error)
+      toast.error("Registration failed")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
 
-      {/* Role */}
+      {/* ROLE */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium">
           {t('role') || 'Role'}
         </label>
-        <div className="h-11 flex items-center px-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600">
-          {t('farmer') || 'Farmer'}
+        <div className="h-11 flex items-center px-3 rounded-xl border bg-gray-50">
+          Farmer
         </div>
       </div>
 
-      {/* Email */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          {t('email_optional') || 'Email (Optional)'}
-        </label>
+      {/* EMAIL */}
+      <div className="space-y-1">
+        <label className="text-sm font-medium">Email (Optional)</label>
         <Input
-          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="h-11 rounded-xl"
+          placeholder="example@email.com"
+          className={`h-11 rounded-xl ${errors.email ? "border-red-500" : ""}`}
         />
+        {errors.email && (
+          <p className="text-sm text-red-500">{errors.email}</p>
+        )}
       </div>
 
-      {/* Phone */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          {t('phone') || 'Phone'}
-        </label>
+      {/* PHONE */}
+      <div className="space-y-1">
+        <label className="text-sm font-medium">Phone</label>
         <Input
-          type="text"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="+251..."
-          className="h-11 rounded-xl"
+          placeholder="Enter phone number"
+          className={`h-11 rounded-xl ${errors.phone ? "border-red-500" : ""}`}
         />
+        {errors.phone && (
+          <p className="text-sm text-red-500">{errors.phone}</p>
+        )}
       </div>
 
-      {/* Password */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          {t('password') || 'Password'}
-        </label>
+      {/* PASSWORD */}
+      <div className="space-y-1">
+        <label className="text-sm font-medium">Password</label>
         <Input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-          className="h-11 rounded-xl"
+          placeholder="••••••"
+          className={`h-11 rounded-xl ${errors.password ? "border-red-500" : ""}`}
         />
+        {errors.password && (
+          <p className="text-sm text-red-500">{errors.password}</p>
+        )}
       </div>
 
-      {/* Confirm Password */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          {t('confirm_password') || 'Confirm Password'}
-        </label>
+      {/* CONFIRM PASSWORD */}
+      <div className="space-y-1">
+        <label className="text-sm font-medium">Confirm Password</label>
         <Input
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="••••••••"
-          className="h-11 rounded-xl"
+          placeholder="••••••"
+          className={`h-11 rounded-xl ${errors.confirmPassword ? "border-red-500" : ""}`}
         />
+        {errors.confirmPassword && (
+          <p className="text-sm text-red-500">
+            {errors.confirmPassword}
+          </p>
+        )}
       </div>
 
-      {/* Submit */}
+      {/* SUBMIT */}
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full h-11 mt-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center disabled:opacity-50"
+        className="w-full h-11 rounded-xl bg-emerald-600 text-white"
       >
-        {isLoading ? (
-          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        ) : (
-          "Create Farmer Account"
-        )}
+        {isLoading ? "Loading..." : "Create Farmer Account"}
       </button>
 
     </form>
   )
 }
+

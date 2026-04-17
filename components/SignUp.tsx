@@ -123,7 +123,7 @@ export default function SignUpPage() {
           className='h-9'
 
           type="text"
-          placeholder="+2517... / 07..."
+          placeholder="Enter phone number"
           {...register('phone')}
         />
         {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}

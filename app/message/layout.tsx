@@ -42,7 +42,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
         router.replace('/buyer/order')
         break
       case 'AGENT':
-        router.replace('/agent/dashboard')
+        router.replace('/agent/farmer')
         break
       case 'ADMIN':
         router.replace('/admin/dashboard')

@@ -7,6 +7,7 @@ export interface CartItem {
   createdAt: string
   updatedAt: string
   product: {
+    image: string
     id: string
     name: string
     price: number

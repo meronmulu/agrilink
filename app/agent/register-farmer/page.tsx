@@ -1,34 +1,36 @@
 'use client'
 
 import AgentFarmerRegistration from '@/components/AgentFarmerRegistration'
-import OtherSignUpPage from '@/components/OtherSignUpPage'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function RegisterFarmerPage() {
     const { t } = useLanguage()
+    
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        
+        <div className="min-h-screen flex flex-col items-center justify-start md:justify-center bg-gray-50 p-4 md:p-8 pt-8 md:pt-4">
             
             {/* Card */}
-            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md border p-6 md:p-10">
+            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 
                 {/* Header */}
-                <div className="mb-6 text-center">
-                    <h1 className="text-2xl font-bold text-gray-900">
-                        {t('registration_portal') || 'Registration Portal'}
+                <div className="mb-8 text-center">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                        {t('registration_farmer') || 'Registration Farmer'}
                     </h1>
-                    <p className="mt-2 text-sm text-gray-600">
-                        {t('registration_portal_desc') || 'Complete the steps to register a farmer and create an account.'}
+                    <p className="text-gray-500 mt-2 text-sm">
+                        Please fill in the details below to create a new farmer account.
                     </p>
                 </div>
 
                 {/* Content */}
-                <div>
+                <div className="w-full">
                     <AgentFarmerRegistration />
                 </div>
 
             </div>
 
+            <div className="h-10 md:hidden" />
         </div>
     )
 }
