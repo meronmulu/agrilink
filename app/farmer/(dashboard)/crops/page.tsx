@@ -1,10 +1,10 @@
 'use client'
 
-import { Search, Plus, Sprout, Pencil, Trash2, Layers, XCircle, ChevronDown, Loader2 } from 'lucide-react'
+import { Search, Plus, Sprout, Pencil, Trash2, Layers, ChevronDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { getMyProducts, deleteProducts } from '@/services/productService'
 import { Product } from '@/types/product'
@@ -19,7 +19,18 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
 
 export default function MyCropsPage() {
@@ -35,10 +46,8 @@ export default function MyCropsPage() {
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null)
   const [search, setSearch] = useState("")
 
-  // Delete dialog state
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  // Fetch crops
   useEffect(() => {
     const fetchCrops = async () => {
       try {
@@ -53,7 +62,6 @@ export default function MyCropsPage() {
     fetchCrops()
   }, [])
 
-  // Fetch categories
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -68,35 +76,23 @@ export default function MyCropsPage() {
     fetchData()
   }, [])
 
-  
-
-  //  DELETE FUNCTION
   const handleDelete = async () => {
     if (!deleteId) return
 
     try {
       await deleteProducts(deleteId)
 
-      // remove from UI
       setCrops((prev) => prev.filter((crop) => crop.id !== deleteId))
 
-      toast.success(t('crop_deleted_successfully')) // TODO: Add to locales
-
-
+      toast.success(t('crop_deleted_successfully'))
 
       setDeleteId(null)
     } catch (error) {
       console.error("Delete failed:", error)
 
-      toast.error(
-        // error?.response?.data?.message ||
-        // error?.message ||
-        t('something_went_wrong') // TODO: Add to locales
-      )
+      toast.error(t('something_went_wrong'))
     }
   }
-
- 
 
   const filteredCrops = crops
     .filter((crop) => {
@@ -108,10 +104,9 @@ export default function MyCropsPage() {
 
       return matchSearch && matchCategory && matchSubCategory
     })
-    .sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    })
-
+    .sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
 
   if (loading) {
     return (
@@ -120,14 +115,15 @@ export default function MyCropsPage() {
       </div>
     )
   }
+
   return (
     <div className="flex flex-col gap-8 pb-10">
 
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">{t('my_crops')}</h1> {/* TODO: Add to locales */}
-          <p className="text-gray-500">{t('manage_your_listings')}</p> {/* TODO: Add to locales */}
+          <h1 className="text-3xl font-bold">{t('my_crops')}</h1>
+          <p className="text-gray-500">{t('manage_your_listings')}</p>
         </div>
 
         <Link href="/farmer/crops/add-crop">
@@ -145,7 +141,7 @@ export default function MyCropsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <Input
             placeholder={t('search_placeholder')}
-            className="pl-10 "
+            className="pl-10"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -163,7 +159,6 @@ export default function MyCropsPage() {
 
           <DropdownMenuContent className="w-56">
 
-            {/* Reset Filter */}
             <DropdownMenuItem onClick={() => setSelectedSubCategory(null)}>
               {t('all_categories')}
             </DropdownMenuItem>
@@ -200,27 +195,28 @@ export default function MyCropsPage() {
       </div>
 
       {/* Crops */}
-      {
-        filteredCrops.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-lg font-medium text-gray-600">
-              {t('no_products_in_category')}
-            </p>
-            <p className="text-sm text-gray-400 mt-2">
-              {t('try_selecting_another_category')}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {filteredCrops.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <p className="text-lg font-medium text-gray-600">
+            {t('no_products_in_category')}
+          </p>
+          <p className="text-sm text-gray-400 mt-2">
+            {t('try_selecting_another_category')}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-            {filteredCrops.map((crop) => {
-              const sub = subcategories.find((s) => s.id === crop.subCategoryId)
+          {filteredCrops.map((crop) => {
+            const sub = subcategories.find((s) => s.id === crop.subCategoryId)
 
-              return (
-                <div
-                  key={crop.id}
-                  className="bg-white rounded-2xl border overflow-hidden shadow-sm"
-                >
+            return (
+              <div
+                key={crop.id}
+                className="bg-white rounded-2xl border overflow-hidden shadow-sm"
+              >
+
+                <Link href={`/farmer/crops/${crop.id}`} className="flex-1">
 
                   {/* Image */}
                   <div className="relative aspect-4/3 bg-gray-100">
@@ -240,19 +236,27 @@ export default function MyCropsPage() {
                     {/* Buttons */}
                     <div className="absolute top-3 right-3 flex gap-2">
 
-            <Link href={`/farmer/crops/${crop.id}`}>
-            <button className="p-2 bg-white rounded-full shadow" title={t('edit_crop')}>
-              <Pencil size={16} />
-            </button>
-            </Link>
+                      <Link href={`/farmer/crops/${crop.id}/edit`}>
+                        <button
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-2 bg-white rounded-full shadow"
+                          title={t('edit_crop')}
+                        >
+                          <Pencil size={16} />
+                        </button>
+                      </Link>
 
-            <button
-            onClick={() => setDeleteId(crop.id)}
-            className="p-2 bg-white rounded-full text-red-600 shadow"
-            title={t('delete_crop')}
-            >
-            <Trash2 size={16} />
-            </button>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          setDeleteId(crop.id)
+                        }}
+                        className="p-2 bg-white rounded-full text-red-600 shadow"
+                        title={t('delete_crop')}
+                      >
+                        <Trash2 size={16} />
+                      </button>
 
                     </div>
                   </div>
@@ -277,15 +281,15 @@ export default function MyCropsPage() {
                     </div>
                   </div>
 
-                </div>
-              )
-            })}
+                </Link>
+              </div>
+            )
+          })}
 
-          </div>
-        )
-      }
+        </div>
+      )}
 
-      {/*  DELETE DIALOG */}
+      {/* DELETE DIALOG */}
       <Dialog open={!!deleteId} onOpenChange={(open) => {
         if (!open) setDeleteId(null)
       }}>

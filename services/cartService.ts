@@ -9,7 +9,7 @@ export const addToCart = async (data: {
 
     const res = await instance.post("/cart", data)
 
-    console.log("ADD TO CART RESPONSE:", res.data)
+    // console.log("ADD TO CART RESPONSE:", res.data)
 
     return res.data
   } catch (error) {
@@ -24,7 +24,7 @@ export const getCart = async () => {
 
     const res = await instance.get("/cart")
 
-    console.log(" FETCH CART RESPONSE:", res.data)
+    // console.log(" FETCH CART RESPONSE:", res.data)
 
     return res.data
   } catch (error) {
@@ -42,7 +42,7 @@ export const updateCart = async (data: {
 
     const res = await instance.patch("/cart", data)
 
-    console.log("UPDATE CART RESPONSE:", res.data)
+    // console.log("UPDATE CART RESPONSE:", res.data)
 
     return res.data
   } catch (error) {
@@ -57,7 +57,7 @@ export const removeCartItem = async (productId: string) => {
 
     const res = await instance.delete(`/cart/${productId}`)
 
-    console.log("REMOVE ITEM RESPONSE:", res.data)
+    // console.log("REMOVE ITEM RESPONSE:", res.data)
 
     return res.data
   } catch (error) {

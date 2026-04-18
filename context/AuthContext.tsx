@@ -70,15 +70,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const logout = () => {
-    // 3. Clear everything
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    Cookies.remove('token')
-    Cookies.remove('user-role')
-    
-    setUser(null)
-    router.replace('/')
-  }
+  // 1. Clear LocalStorage
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+
+  // 2. Clear Cookies with explicit path (IMPORTANT)
+  Cookies.remove('token', { path: '/' })
+  Cookies.remove('user-role', { path: '/' })
+
+  // 3. Clear State
+  setUser(null)
+
+   router.replace('/') 
+}
+  
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, setUser }}>

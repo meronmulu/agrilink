@@ -24,23 +24,38 @@ import { checkoutOrder } from '@/services/orderService'
 import { toast } from 'sonner'
 import Image from 'next/image'
 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
+
 export default function CartPage() {
   const { t } = useLanguage()
+
   const [cart, setCart] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
   const [checkingOut, setCheckingOut] = useState(false)
 
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const fetchCart = async () => {
     try {
       const data = await getCart()
-      console.log(data)
       setCart(data)
-      
-    } catch (err) {
-      console.error(err)
-      toast.error(t('failed_to_load_cart') || 'Failed to load cart') // TODO: Add to locales
+    } catch {
+      toast.error(t('failed_to_load_cart') || 'Failed to load cart')
     } finally {
       setLoading(false)
     }
@@ -50,114 +65,66 @@ export default function CartPage() {
     fetchCart()
   }, [])
 
-
   const handleUpdate = async (productId: string, amount: number) => {
     if (amount < 1) return
-
-    setUpdatingItems(prev => new Set(prev).add(productId))
-
     try {
       await updateCart({ productId, amount })
       await fetchCart()
-      toast.success(t('quantity_updated_successfully') || 'Quantity updated successfully') // TODO: Add to locales
-    } catch (err) {
-      console.error(err)
-      toast.error(t('update_failed') || 'Update failed') // TODO: Add to locales
-    } finally {
-      setUpdatingItems(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(productId)
-        return newSet
-      })
+    } catch {
+      toast.error(t('update_failed') || 'Update failed')
     }
   }
 
-
-  const handleRemove = async (productId: string) => {
-    setUpdatingItems(prev => new Set(prev).add(productId))
+  const handleRemove = async () => {
+    if (!selectedId) return
 
     try {
-      await removeCartItem(productId)
-
-      setCart(prev =>
-        prev.filter(item => item.product.id !== productId)
-      )
-
-      toast.success(t('product_removed_from_cart') || 'Product removed from cart') 
-    } catch (err) {
-      console.error(err)
-      fetchCart()
-      toast.error(t('remove_failed') || 'Remove failed') 
+      await removeCartItem(selectedId)
+      setCart(prev => prev.filter(i => i.product.id !== selectedId))
+      toast.success(t('product_removed_from_cart') || 'Removed')
+    } catch {
+      toast.error(t('remove_failed') || 'Remove failed')
     } finally {
-      setUpdatingItems(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(productId)
-        return newSet
-      })
+      setSelectedId(null)
+      setIsDialogOpen(false)
     }
   }
 
-
   const handleClear = async () => {
-    if (!confirm(t('clear_cart_confirm') || 'Are you sure you want to clear your cart?')) return // TODO: Add to locales
-
     try {
       await clearCart()
       setCart([])
-      toast.success(t('cart_cleared') || 'Cart cleared') 
-    } catch (err) {
-      console.error(err)
-      toast.error(t('failed_to_clear_cart') || 'Failed to clear cart') // 
+      toast.success(t('cart_cleared') || 'Cart cleared')
+    } catch {
+      toast.error(t('failed_to_clear_cart') || 'Failed')
     }
   }
-
 
   const handleCheckout = async () => {
     try {
       setCheckingOut(true)
 
-      const checkoutData = {
+      const res = await checkoutOrder({
         items: cart.map(item => ({
           productId: item.product.id,
           amount: item.amount
         }))
-      }
-
-      const res = await checkoutOrder(checkoutData)
-
-      toast.success(t('order_created_redirecting') || 'Order created, redirecting...') // TODO: Add to locales
+      })
 
       if (res?.paymentUrl) {
         window.location.href = res.paymentUrl
       }
-
-    } catch (error) {
-      console.log(error)
-      toast.error(t('checkout_error') || 'Checkout error') // TODO: Add to locales
+    } catch {
+      toast.error(t('checkout_error') || 'Checkout error')
     } finally {
       setCheckingOut(false)
     }
   }
 
-
   const subtotal = cart.reduce(
     (sum, item) => sum + item.product.price * item.amount,
     0
   )
-
-  const total = subtotal
-
-
-  const orderedCart = [...cart].sort((a, b) => {
-    if (a.createdAt && b.createdAt) {
-      return (
-        new Date(b.createdAt).getTime() -
-        new Date(a.createdAt).getTime()
-      )
-    }
-    return b.id.localeCompare(a.id)
-  })
-
 
   if (loading) {
     return (
@@ -167,66 +134,78 @@ export default function CartPage() {
     )
   }
 
-
   return (
-    <div className="min-h-screen bg-gray-50 ">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 py-10">
+      <div className="max-w-6xl mx-auto px-4">
 
-        {/* HEADER */}
-        <h1 className="text-2xl font-bold mb-8">{t('shopping_cart') || 'Shopping Cart'}</h1> {/* TODO: Add to locales */}
+        <h1 className="text-2xl font-bold mb-6">
+          {t('shopping_cart') || 'Shopping Cart'}
+        </h1>
+
+        {/* DELETE DIALOG (GLOBAL) */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Remove item</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to remove this item from your cart?
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleRemove}
+              >
+                Remove
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {cart.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow p-12 text-center">
+          <Card className="text-center p-10">
             <ShoppingCart className="mx-auto mb-4 text-gray-400" size={50} />
-            <h2 className="text-xl font-semibold mb-2">{t('your_cart_is_empty') || 'Your cart is empty'}</h2> {/* TODO: Add to locales */}
-          </div>
+            <p>{t('your_cart_is_empty') || 'Your cart is empty'}</p>
+          </Card>
         ) : (
-          <div className="grid lg:grid-cols-12 gap-8">
+          <div className="grid lg:grid-cols-12 gap-6">
 
-            {/* CART ITEMS */}
-            <div className="lg:col-span-8 bg-white rounded-2xl shadow overflow-hidden self-start">
-              {orderedCart.map(item => (
-                <div
-                  key={item.id}
-                  className="p-6 border-b hover:bg-gray-50 transition"
-                >
-                  <div className="flex gap-6">
+            {/* ITEMS */}
+            <div className="lg:col-span-8 space-y-4">
+              {cart.map(item => (
+                <Card key={item.id}>
+                  <CardContent className="p-5 flex gap-5 items-center">
 
-                    {/* IMAGE */}
-                    <div className="relative w-16 h-20 rounded-md overflow-hidden border">
-
+                    <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
                       <Image
                         src={item.product.image || "/placeholder.png"}
                         alt={item.product.name}
                         fill
-                        unoptimized
                         className="object-cover"
                       />
-
                     </div>
 
-                    {/* DETAILS */}
                     <div className="flex-1">
-                      <h3 className="font-semibold text-xl">
-                        {item.product.name}
-                      </h3>
-
+                      <h3 className="font-semibold">{item.product.name}</h3>
                       <p className="text-sm text-gray-500">
-                       {item.product.price.toLocaleString()} ETB
-                      </p>
-                      <p className="text-sm text-gray-500">
-                       {item.product.amount} in stock
+                        ETB {item.product.price}
                       </p>
 
-                      {/* QUANTITY */}
-                      <div className="flex items-center gap-3 mt-3">
+                      <div className="flex items-center gap-2 mt-2">
                         <Button
-                          size="sm"
-                          variant="ghost"
+                          size="icon"
+                          variant="outline"
                           onClick={() =>
                             handleUpdate(item.product.id, item.amount - 1)
                           }
-                          disabled={item.amount <= 1}
                         >
                           <Minus size={14} />
                         </Button>
@@ -234,8 +213,8 @@ export default function CartPage() {
                         <span>{item.amount}</span>
 
                         <Button
-                          size="sm"
-                          variant="ghost"
+                          size="icon"
+                          variant="outline"
                           onClick={() =>
                             handleUpdate(item.product.id, item.amount + 1)
                           }
@@ -245,65 +224,68 @@ export default function CartPage() {
                       </div>
                     </div>
 
-                    {/* ACTIONS */}
-                    <div className="text-right">
+                    <div className="text-right space-y-2">
                       <p className="font-bold text-emerald-600">
-                        ETB {(item.product.price * item.amount).toLocaleString()}
+                        ETB {item.product.price * item.amount}
                       </p>
 
                       <Button
                         variant="ghost"
-                        className="text-red-500 mt-2"
-                        onClick={() => handleRemove(item.product.id)}
+                        className="text-red-500"
+                        onClick={() => {
+                          setSelectedId(item.product.id)
+                          setIsDialogOpen(true)
+                        }}
                       >
                         <Trash2 size={16} />
                       </Button>
                     </div>
 
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
 
             {/* SUMMARY */}
-            <div className="lg:col-span-4 bg-white rounded-2xl shadow p-6 h-fit">
-              <h2 className="font-semibold mb-4">{t('order_summary') || 'Order Summary'}</h2> {/* TODO: Add to locales */}
+            <div className="lg:col-span-4">
+              <Card className='py-2'>
+                <CardHeader>
+                  <CardTitle>Order Summary</CardTitle>
+                </CardHeader>
 
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>{t('items') || 'Items'}</span>
-                <span>{cart.length}</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>{t('subtotal') || 'Subtotal'}</span>
-                <span>ETB {subtotal.toLocaleString()}</span>
-              </div>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span>ETB {subtotal}</span>
+                  </div>
 
-              <div className="flex justify-between text-lg font-bold border-t pt-4">
-                <span>{t('total') || 'Total'}</span>
-                <span className="text-emerald-600">
-                  ETB {total.toLocaleString()}
-                </span>
-              </div>
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>Total</span>
+                    <span className="text-emerald-600">
+                      ETB {subtotal}
+                    </span>
+                  </div>
 
-              <Button
-                className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700"
-                onClick={handleCheckout}
-                disabled={checkingOut}
-              >
-                {checkingOut ? (
-                  <Loader2 className="animate-spin mx-auto" />
-                ) : (
-                  t('proceed_to_checkout') || 'Proceed to Checkout'
-                )}
-              </Button>
+                  <Button
+                    className="w-full mt-4 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+                    onClick={handleCheckout}
+                  >
+                    {checkingOut ? (
+                      <Loader2 className="animate-spin mx-auto" />
+                    ) : (
+                      'Checkout'
+                    )}
+                  </Button>
 
-              <Button
-                variant="outline"
-                className="w-full mt-3"
-                onClick={handleClear}
-              >
-                {t('clear_cart') || 'Clear Cart'}
-              </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleClear}
+                  >
+                    Clear Cart
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
 
           </div>

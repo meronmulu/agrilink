@@ -42,7 +42,7 @@ import Image from "next/image"
 
 export default function Header() {
   // 1. Added 'loading' here to prevent the flicker
-  const { user, logout, loading } = useAuth() 
+  const { user, logout } = useAuth() 
   const router = useRouter()
   const { t } = useLanguage()
   const pathname = usePathname()
