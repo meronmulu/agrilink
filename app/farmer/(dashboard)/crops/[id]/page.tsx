@@ -102,7 +102,7 @@ export default function CropDetailPage() {
               {images.map((img, i) => (
                 <div
                   key={i}
-                  onClick={() => setSelectedImage(img)}
+                  onClick={() => setSelectedImage(img || "/placeholder.png")}
                   className="relative h-16 w-16 border rounded-md overflow-hidden cursor-pointer hover:border-emerald-500"
                 >
                   <Image
