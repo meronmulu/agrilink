@@ -5,60 +5,111 @@
 </head>
 <body>
 
-<h2>Simple Chat Test</h2>
+<h2>AgriLink Messenger Debugger</h2>
+<p>Paste your Auth Token from the main app to connect securely.</p>
 
-<label>User ID:</label>
-<input id="userId" placeholder="userA" />
-<button onclick="join()">Join</button>
+<label>Auth Token:</label>
+<input id="token" placeholder="Paste JWT Token here..." style="width: 300px;" />
+<br><br>
+
+<label>My User ID:</label>
+<input id="userId" placeholder="My ID" />
+<button onclick="join()">Connect & Join</button>
 
 <br><br>
 
 <label>Receiver ID:</label>
-<input id="receiverId" placeholder="userB" />
-
+<input id="receiverId" placeholder="Receiver ID" />
 <br><br>
 
-<input id="message" placeholder="Type message..." />
+<label>Conversation ID (optional for new chats):</label>
+<input id="convId" placeholder="Conversation ID" />
+<br><br>
+
+<input id="message" placeholder="Type message..." style="width: 250px;" />
 <button onclick="sendMessage()">Send</button>
 
 <h3>Messages</h3>
-<ul id="messages"></ul>
+<ul id="messages" style="background:#f4f4f4; padding:10px; height:200px; overflow-y:scroll; list-style:none;"></ul>
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
 <script>
- const socket = io("http://localhost:3000", {
-  transports: ["websocket"]
-});
-
-  socket.on("connect", () => {
-    console.log("Connected:", socket.id);
-  });
+  let socket;
 
   function join() {
+    const token = document.getElementById("token").value;
     const userId = document.getElementById("userId").value;
-    socket.emit("join", userId);
-    alert("Joined as " + userId);
-  }
+    const convId = document.getElementById("convId").value;
+    
+    if (socket) {
+      socket.disconnect();
+    }
 
-  function sendMessage() {
-    const senderId = document.getElementById("userId").value;
-    const receiverId = document.getElementById("receiverId").value;
-    const message = document.getElementById("message").value;
+    // Connect to production backend
+    socket = io("https://agrilink-1-x6ph.onrender.com", {
+      transports: ["websocket"],
+      auth: {
+        token: token
+      }
+    });
 
-    socket.emit("sendMessage", {
-      senderId: senderId,
-      receiverId: receiverId,
-      message: message
+    socket.on("connect", () => {
+      console.log("Connected:", socket.id);
+      socket.emit("join", userId);
+      if (convId) {
+        socket.emit("joinConversation", convId);
+      }
+      alert("Connected and joined as " + userId);
+    });
+    
+    socket.on("connect_error", (err) => {
+      console.error(err.message);
+      alert("Connection failed: " + err.message);
+    });
+
+    socket.on("receiveMessage", (msg) => {
+      const li = document.createElement("li");
+      const time = new Date(msg.createdAt || Date.now()).toLocaleTimeString();
+      li.innerHTML = `<strong>${msg.senderId}</strong> <em>(${time})</em>: ${msg.message}`;
+      const ul = document.getElementById("messages");
+      ul.appendChild(li);
+      ul.scrollTop = ul.scrollHeight;
     });
   }
 
-  socket.on("receiveMessage", (msg) => {
-    const li = document.createElement("li");
-    li.textContent = msg.senderId + ": " + msg.message;
-    document.getElementById("messages").appendChild(li);
-  });
+  // NOTE: This sends via Socket. The app uses REST for sending, so this is just for pure socket testing.
+  function sendMessage() {
+    if (!socket || !socket.connected) {
+      alert("Please connect first!");
+      return;
+    }
+    const senderId = document.getElementById("userId").value;
+    const receiverId = document.getElementById("receiverId").value;
+    const convId = document.getElementById("convId").value;
+    const message = document.getElementById("message").value;
 
+    const payload = {
+      id: Date.now().toString(),
+      senderId: senderId,
+      receiverId: receiverId,
+      conversationId: convId || "",
+      message: message,
+      createdAt: new Date().toISOString()
+    };
+
+    socket.emit("sendMessage", payload);
+    
+    // Optimistically add to UI
+    const li = document.createElement("li");
+    const time = new Date().toLocaleTimeString();
+    li.innerHTML = `<strong style="color:green;">Me</strong> <em>(${time})</em>: ${message}`;
+    const ul = document.getElementById("messages");
+    ul.appendChild(li);
+    ul.scrollTop = ul.scrollHeight;
+    
+    document.getElementById("message").value = "";
+  }
 </script>
 
 </body>

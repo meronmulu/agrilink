@@ -191,74 +191,44 @@ useEffect(() => {
 
   // SEND MESSAGE
   const handleSend = async () => {
-  if (
-    (!message.trim() && !attachment) ||
-    !currentUserId ||
-    !receiver
-  )
-    return
-
-  const tempId = `${Date.now()}`
-
-  const payload = {
-    id: tempId,
-    senderId: currentUserId,
-    message,
-    conversationId:
-      messages.length > 0 ? conversationId : undefined,
-    receiverId: receiver.id,
-    createdAt: new Date().toISOString()
-  }
-
-  setMessages(prev => {
-    const updated = [...prev, payload]
-    return updated.sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() -
-        new Date(b.createdAt).getTime()
-    )
-  })
-
-  const currentMsg = message
-  setMessage('')
-  setAttachment(null)
-  setShowEmoji(false)
-
-  try {
-    let finalData: FormData | typeof payload
-
-    if (attachment) {
-      const formData = new FormData()
-
-      formData.append('senderId', payload.senderId)
-      formData.append('message', currentMsg || 'Attachment')
-
-      if (payload.conversationId) {
-        formData.append('conversationId', payload.conversationId)
-      }
-
-      formData.append('receiverId', payload.receiverId)
-      formData.append('file', attachment)
-
-      finalData = formData
-    } else {
-      finalData = payload
-    }
-
-    const res = await sendRest(finalData)
-
     if (
-      res?.conversationId &&
-      res.conversationId !== conversationId
-    ) {
-      router.replace(`/message/${res.conversationId}`)
-    }
-  } catch (error) {
-    console.error(error)
-  }
+      (!message.trim() && !attachment) ||
+      !currentUserId ||
+      !receiver
+    )
+      return
 
-  inputRef.current?.focus()
-}
+    const tempId = `${Date.now()}`
+
+    const payload = {
+      id: tempId,
+      senderId: currentUserId,
+      message: message || "Attachment",
+      conversationId: messages.length > 0 ? conversationId : undefined,
+      receiverId: receiver.id,
+      createdAt: new Date().toISOString()
+    }
+
+    // Optimistic update
+    setMessages(prev => {
+      const updated = [...prev, payload as any]
+      return updated.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() -
+          new Date(b.createdAt).getTime()
+      )
+    })
+
+    // Emit via active socket
+    if (socketRef.current) {
+      socketRef.current.emit('sendMessage', payload)
+    }
+
+    setMessage('')
+    setAttachment(null)
+    setShowEmoji(false)
+    inputRef.current?.focus()
+  }
 
 
   return (
