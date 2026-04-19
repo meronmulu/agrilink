@@ -18,10 +18,37 @@ import { Loader2, Package } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 
+import { Input } from "@/components/ui/input"
+
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination"
+
 export default function BuyerOrdersPage() {
   const { t } = useLanguage()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+
+  // ✅ FILTER STATES
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('ALL')
+
+  // ✅ PAGINATION
+  const [page, setPage] = useState(1)
+  const pageSize = 7
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -38,6 +65,7 @@ export default function BuyerOrdersPage() {
     fetchOrders()
   }, [])
 
+  // STATUS STYLE
   const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
       case "paid":
@@ -51,6 +79,40 @@ export default function BuyerOrdersPage() {
     }
   }
 
+  // ✅ FILTER LOGIC (NO DATE FILTER)
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = order.items.some(item =>
+      item.product?.name?.toLowerCase().includes(search.toLowerCase())
+    )
+
+    const matchesStatus =
+      statusFilter === 'ALL' || order.status === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
+
+  // FLATTEN
+  const allRows = filteredOrders.flatMap(order =>
+    order.items.map(item => ({
+      order,
+      item
+    }))
+  )
+
+  // RESET PAGE ON FILTER CHANGE
+  useEffect(() => {
+    setPage(1)
+  }, [search, statusFilter])
+
+  // PAGINATION
+  const totalPages = Math.ceil(allRows.length / pageSize)
+
+  const paginatedRows = allRows.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  )
+
+  // LOADING
   if (loading) {
     return (
       <div className="h-[70vh] flex items-center justify-center">
@@ -59,110 +121,138 @@ export default function BuyerOrdersPage() {
     )
   }
 
-  if (orders.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
-        <Package className="w-10 h-10 mb-3" />
-        <p>{t('no_orders_yet') || 'No orders yet'}</p>
-      </div>
-    )
-  }
+  // EMPT
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">{t('my_orders') || 'My Orders'}</h1>
+    <div className="p-6 max-w-6xl mx-auto space-y-4">
 
-      <Card className=" ">
+      {/* TITLE */}
+      <h1 className="text-2xl font-bold">
+        {t('my_orders') || 'My Orders'}
+      </h1>
+
+      {/* FILTER CARD */}
+      <Card>
+        <CardContent className="p-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between flex-wrap">
+
+          {/* SEARCH */}
+          <Input
+            placeholder="Search product..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full md:w-96"
+          />
+
+          {/* STATUS */}
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full md:w-44">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Status</SelectItem>
+              <SelectItem value="PAID">Paid</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
+            </SelectContent>
+          </Select>
+
+         
+
+        </CardContent>
+      </Card>
+
+      {/* TABLE */}
+      <Card>
         <CardContent className="p-4">
-          <div className="overflow-x-auto">        <Table>
+          <Table>
+
             <TableHeader>
               <TableRow>
-                <TableHead>{t('product') || 'Product'}</TableHead>
-                <TableHead>{t('quantity') || 'Quantity'}</TableHead>
-                <TableHead>{t('price') || 'Price'}</TableHead>
-                <TableHead>{t('total_price') || 'Total Price'}</TableHead>
-                <TableHead>{t('status') || 'Status'}</TableHead>
-                <TableHead>{t('date') || 'Date'}</TableHead>
+                <TableHead>Product</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {orders.flatMap((order) =>
-                order.items.map((item) => (
-                  <TableRow key={item.id}>
+              {paginatedRows.map(({ order, item }) => (
+                <TableRow key={item.id}>
 
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-
-                        <div className="relative w-12 h-12 rounded-md overflow-hidden border">
-
-                          <Image
-                            src={item.product?.image || "/placeholder.png"}
-                            alt={item.product?.name}
-                            fill
-                            unoptimized
-                            className="object-cover"
-                          />
-
-                        </div>
-
-                        <span className="font-medium text-gray-800">
-                          {item.product?.name}
-                        </span>
-
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-md overflow-hidden border">
+                        <Image
+                          src={item.product?.image || "/placeholder.png"}
+                          alt={item.product?.name}
+                          fill
+                          className="object-cover"
+                        />
                       </div>
-                    </TableCell>
+                      {item.product?.name}
+                    </div>
+                  </TableCell>
 
-                    {/* QUANTITY */}
-                    <TableCell>{item.amount}</TableCell>
+                  <TableCell>{item.amount}</TableCell>
 
-                    {/* PRICE */}
-                    <TableCell>{item.priceAtOrder} ETB</TableCell>
+                  <TableCell>{item.priceAtOrder} ETB</TableCell>
 
-                    {/* TOTAL PRICE */}
-                    <TableCell className="font-medium">
-                      {item.amount * item.priceAtOrder} ETB
-                    </TableCell>
+                  <TableCell>
+                    {item.amount * item.priceAtOrder} ETB
+                  </TableCell>
 
-                    {/* STATUS */}
-                    <TableCell>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs ${getStatusStyle(
-                          order.status
-                        )}`}
-                      >
-                        {order.status}
-                      </span>
-                    </TableCell>
+                  <TableCell>
+                    <span className={`px-3 py-1 rounded-full text-xs ${getStatusStyle(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </TableCell>
 
-                    {/* DATE */}
-                    <TableCell>
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </TableCell>
+                  <TableCell>
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </TableCell>
 
-                    {/* PAYMENT */}
-                    {/* <TableCell>
-                      {order.status === "PENDING" && order.paymentUrl ? (
-                        <a
-                          href={order.paymentUrl}
-                          target="_blank"
-                          className="text-blue-600 underline text-sm"
-                        >
-                          Pay Now
-                        </a>
-                      ) : (
-                        <span className="text-gray-400 text-sm">—</span>
-                      )}
-                    </TableCell> */}
-
-                  </TableRow>
-                ))
-              )}
+                </TableRow>
+              ))}
             </TableBody>
+
           </Table>
-          </div>
+
+          {/* PAGINATION */}
+          <Pagination className="mt-4">
+            <PaginationContent>
+
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setPage(p => Math.max(p - 1, 1))}
+                  className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    isActive={page === i + 1}
+                    onClick={() => setPage(i + 1)}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+                  className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+
+            </PaginationContent>
+          </Pagination>
+
         </CardContent>
       </Card>
+
     </div>
   )
 }

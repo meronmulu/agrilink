@@ -56,14 +56,11 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("ALL")
   const [statusFilter, setStatusFilter] = useState("ALL")
 
-  // DELETE
   const [open, setOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  
-  // PAGINATION
   const [currentPage, setCurrentPage] = useState(1)
-  const usersPerPage = 10
+  const usersPerPage = 7
 
   useEffect(() => {
     loadUsers()
@@ -73,7 +70,6 @@ export default function AdminUsersPage() {
     setLoading(true)
     try {
       const data = await getUsers()
-      console.log("FRONTEND DATA:", data)
       setUsers(data)
     } catch (err) {
       console.error(err)
@@ -82,7 +78,6 @@ export default function AdminUsersPage() {
     }
   }
 
-  // DELETE
   const handleDelete = async () => {
     if (!deleteId) return
 
@@ -96,8 +91,7 @@ export default function AdminUsersPage() {
     }
   }
 
-
-  //  FILTER + SORT (NEWEST FIRST)
+  // FILTER
   const filteredUsers = users
     .slice()
     .sort((a, b) => {
@@ -105,7 +99,7 @@ export default function AdminUsersPage() {
       const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
       return bTime - aTime
     })
-    .filter((user) => {
+    .filter(user => {
       const matchesSearch =
         user.profile?.fullName?.toLowerCase().includes(search.toLowerCase()) ||
         user.email?.toLowerCase().includes(search.toLowerCase()) ||
@@ -121,8 +115,13 @@ export default function AdminUsersPage() {
     })
 
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
+
   const startIndex = (currentPage - 1) * usersPerPage
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + usersPerPage)
+
+  const paginatedUsers = filteredUsers.slice(
+    startIndex,
+    startIndex + usersPerPage
+  )
 
   if (loading) {
     return (
@@ -136,216 +135,186 @@ export default function AdminUsersPage() {
     <div className="p-4 space-y-6">
 
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {t('user_management') || 'User Management'}
-          </h1>
-          <p className="text-sm text-gray-500">
-            {t('manage_users') || 'Manage users, roles, and account status'}
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold">
+          {t('user_management') || 'User Management'}
+        </h1>
+        <p className="text-sm text-gray-500">
+          Manage users, roles, and status
+        </p>
+      </div>
 
-
-        {/* FILTERS */}
-        <div className="flex gap-2 flex-wrap">
+      {/* FILTER CARD */}
+      <Card>
+        <CardContent className="p-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
 
           {/* SEARCH */}
           <div className="relative">
             <Input
-              placeholder={t('search_users') || "Search users..."}
+              placeholder="Search users..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
                 setCurrentPage(1)
               }}
-              className="pl-9 w-72"
+              className="pl-9 w-96"
             />
-            <Search className="absolute left-2 top-2 h-4 w-4 " />
+            <Search className="absolute left-2 top-2 h-4 w-4" />
           </div>
 
-          {/* ROLE FILTER */}
-          <Select
-            value={roleFilter}
-            onValueChange={(value) => {
-              setRoleFilter(value)
-              setCurrentPage(1)
-            }}
-          >
-            <SelectTrigger className="w-40 bg-white">
-              <SelectValue placeholder={t('role') || "Role"} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">{t('all_roles') || 'All Roles'}</SelectItem>
-              <SelectItem value="ADMIN">Admin</SelectItem>
-              <SelectItem value="AGENT">Agent</SelectItem>
-              <SelectItem value="BUYER">Buyer</SelectItem>
-              <SelectItem value="FARMER">Farmer</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex gap-3 flex-wrap">
 
-          {/* STATUS FILTER */}
-          <Select
-            value={statusFilter}
-            onValueChange={(value) => {
-              setStatusFilter(value)
-              setCurrentPage(1)
-            }}
-          >
-            <SelectTrigger className="w-40 bg-white">
-              <SelectValue placeholder={t('status') || "Status"} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">{t('all_status') || 'All Status'}</SelectItem>
-              <SelectItem value="ACTIVE">{t('active') || 'Active'}</SelectItem>
-              <SelectItem value="PENDING">{t('pending') || 'Pending'}</SelectItem>
-            </SelectContent>
-          </Select>
+            {/* ROLE */}
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Roles</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="AGENT">Agent</SelectItem>
+                <SelectItem value="BUYER">Buyer</SelectItem>
+                <SelectItem value="FARMER">Farmer</SelectItem>
+              </SelectContent>
+            </Select>
 
-        </div>
-      </div>
-
-      {/* TABLE */}
-      <Card className=" ">
-        <CardContent className="p-4">
-          <div className="overflow-x-auto">
-
-            <Table>
-              <TableHeader className="">
-                <TableRow className="">
-                  <TableHead className="pl-6">{t('user') || 'User'}</TableHead>
-                  <TableHead>{t('email') || 'Email'}</TableHead>
-                  <TableHead>{t('phone') || 'Phone'}</TableHead>
-                  <TableHead>{t('role') || 'Role'}</TableHead>
-                  <TableHead>{t('status') || 'Status'}</TableHead>
-                  <TableHead className="text-right pr-6">{t('actions') || 'Actions'}</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {paginatedUsers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-10">
-                      No users found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  paginatedUsers.map((user) => (
-                    <TableRow key={user.id} className="hover:bg-gray-50">
-
-                      <TableCell className="pl-6">
-                        <div className="flex items-center gap-3">
-
-                          {/* Avatar */}
-                          <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
-                            <Image
-                              src={user.profile?.imageUrl || "/placeholder.png"}
-                              alt={user.profile?.fullName || "User"}
-                              fill
-                              unoptimized
-                              className="object-cover"
-                            />
-                          </div>
-
-                          {/* Name */}
-                          <span className="font-medium text-gray-900 capitalize">
-                            {user.profile?.fullName || "No Name"}
-                          </span>
-
-                        </div>
-                      </TableCell>
-
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.phone || "-"}</TableCell>
-
-                      <TableCell>
-                        <Badge variant="secondary">{user.role}</Badge>
-                      </TableCell>
-
-                      <TableCell>
-                        <Badge
-                          className={
-                            user.status === "ACTIVE"
-                              ? "bg-green-100 text-green-600"
-                              : user.status === "PENDING"
-                                ? "bg-yellow-100 text-yellow-600"
-                                : "bg-gray-200 text-gray-600"
-                          }
-                        >
-                          {user.status}
-                        </Badge>
-                      </TableCell>
-
-                      <TableCell className="text-right pr-6">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button size="icon" variant="ghost">
-                              <MoreHorizontal size={18} />
-                            </Button>
-                          </DropdownMenuTrigger>
-
-                          <DropdownMenuContent align="end">
-
-                            
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setDeleteId(user.id)
-                                setOpen(true)
-                              }}
-                              className="text-red-600"
-                            >
-                              <Trash2 size={14} className="mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+            {/* STATUS */}
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+              </SelectContent>
+            </Select>
 
           </div>
         </CardContent>
       </Card>
 
+      {/* TABLE */}
+      <Card>
+        <CardContent className="p-4 overflow-x-auto">
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {paginatedUsers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-10">
+                    No users found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedUsers.map(user => (
+                  <TableRow key={user.id}>
+
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
+                          <Image
+                            src={user.profile?.imageUrl || "/placeholder.png"}
+                            alt="user"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        {user.profile?.fullName || "No Name"}
+                      </div>
+                    </TableCell>
+
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone || "-"}</TableCell>
+
+                    <TableCell>
+                      <Badge variant={"secondary"}>{user.role}</Badge>
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge className={
+                        user.status === "ACTIVE"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-gray-200 text-gray-600"
+                      }>
+                        {user.status}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal size={18} />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDeleteId(user.id)
+                              setOpen(true)
+                            }}
+                            className="text-red-600"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+
+        </CardContent>
+      </Card>
 
       {/* PAGINATION */}
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-500">
-          Showing {startIndex + 1} -{" "}
-          {Math.min(startIndex + usersPerPage, filteredUsers.length)} of{" "}
-          {filteredUsers.length}
-        </p>
+      <Pagination>
+        <PaginationContent>
 
-        <Pagination>
-          <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+            />
+          </PaginationItem>
 
-            <PaginationItem>
-              <PaginationPrevious onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} />
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <PaginationItem key={i}>
+              <PaginationLink
+                isActive={currentPage === i + 1}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </PaginationLink>
             </PaginationItem>
+          ))}
 
-            {[...Array(totalPages)].map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  isActive={currentPage === i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage(p => Math.min(p + 1, totalPages))
+              }
+            />
+          </PaginationItem>
 
-            <PaginationItem>
-              <PaginationNext onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} />
-            </PaginationItem>
-
-          </PaginationContent>
-        </Pagination>
-      </div>
+        </PaginationContent>
+      </Pagination>
 
       {/* DELETE DIALOG */}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -356,13 +325,15 @@ export default function AdminUsersPage() {
           </DialogDescription>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-     
 
     </div>
   )

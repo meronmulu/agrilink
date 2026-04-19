@@ -51,7 +51,7 @@ export default function Sidebar() {
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
       { name: t('nav_orders') || 'Orders', href: '/agent/order', icon: ListOrdered },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Place', href: '/MarketInsight', icon: Store },
+      { name:  'Market Place', href: '/MarketPlace', icon: Store },
 
     ],
 
@@ -62,7 +62,7 @@ export default function Sidebar() {
       { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
       { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Signature},
       { name: t('categories') || 'Categories', href: '/admin/catagory', icon: Settings },
-      { name:  'Market Place', href: '/MarketInsight', icon: Store },
+      { name:  'Market Place', href: '/MarketPlace', icon: Store },
 
     ],
   }

@@ -7,7 +7,6 @@ export default function page() {
       <div className="min-h-screen ">
                 <Header />
                    <MarketPlace/> 
-
                 <Footer/>
         
     </div>
