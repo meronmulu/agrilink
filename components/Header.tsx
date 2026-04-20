@@ -15,7 +15,6 @@ import {
   BrainCircuit,
   Settings,
   Sprout,
-  BookOpen,
   Users,
   ShoppingCart,
   ListOrdered,
@@ -33,21 +32,22 @@ import {
 } from "./ui/dropdown-menu"
 
 import { useAuth } from "@/context/AuthContext"
-import { createRoleRequest } from "@/services/roleRequestService"
 import { cn } from "@/lib/utils"
-import { toast } from "sonner"
 import { useCart } from "@/context/CartContext"
 import { useMessage } from "@/context/MessageContext"
 import Image from "next/image"
 
 export default function Header() {
-  // 1. Added 'loading' here to prevent the flicker
-  const { user, logout } = useAuth() 
+  // ✅ FIX: include loading
+  const { user, logout, loading } = useAuth()
+
   const router = useRouter()
   const { t } = useLanguage()
   const pathname = usePathname()
   const { cartCount } = useCart()
   const { unreadCount } = useMessage()
+
+  if (loading) return null
 
   const dashboardRoute =
     user?.role === "FARMER"
@@ -56,15 +56,9 @@ export default function Header() {
         ? "/buyer/order"
         : "/"
 
-  const handleRoleRequest = async () => {
-    try {
-      await createRoleRequest();
-      toast.success("Role request submitted successfully");
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to send request");
-    }
-  };
+  const handleRoleRequest = () => {
+    router.push("/ask-agent")
+  }
 
   type NavItem = {
     name: string
@@ -87,18 +81,17 @@ export default function Header() {
       { name: t('messages') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: t('market_insights') || 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
     ],
-   AGENT: [
+    AGENT: [
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
       { name: t('nav_orders') || 'Orders', href: '/agent/order', icon: ListOrdered },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Place', href: '/MarketInsight', icon: Store },
-
+      { name: 'Market Place', href: '/MarketInsight', icon: Store },
     ],
     ADMIN: [
       { name: t('dashboard') || "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
       { name: t('user_management') || "User Management", href: "/admin/user", icon: Users },
       { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
-      { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Signature},
+      { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Signature },
       { name: t('categories') || "Categories", href: "/admin/category", icon: Settings },
     ],
   }
@@ -109,15 +102,14 @@ export default function Header() {
     <header className="w-full fixed h-16 top-0 left-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="max-w-7xl mx-auto h-full px-1 flex items-center justify-between">
 
-        {/* LEFT SIDE: LOGO & MOBILE MENU */}
+        {/* LEFT SIDE */}
         <div className="flex items-center gap-3">
-          {/* Only show Mobile Menu if NOT loading and user exists */}
           {user && (
             <div className="block md:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="p-2 rounded-lg hover:bg-gray-100">
-                    <Menu className="w-5 h-5 text-gray-800 dark:text-gray-200" />
+                    <Menu className="w-5 h-5" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56 ml-4">
@@ -133,10 +125,10 @@ export default function Header() {
                             isActive ? "bg-emerald-50 text-emerald-800" : "text-gray-600 hover:bg-gray-50"
                           )}
                         >
-                          <Icon size={18} className={isActive ? "text-emerald-600" : "text-gray-400"} />
+                          <Icon size={18} />
                           <span className="flex-1">{item.name}</span>
                           {!!item.badge && item.badge > 0 && (
-                            <span className="bg-emerald-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                            <span className="bg-emerald-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                               {item.badge}
                             </span>
                           )}
@@ -149,89 +141,72 @@ export default function Header() {
             </div>
           )}
 
-          {/* LOGO */}
           <div className="hidden md:flex items-center space-x-2 cursor-pointer" onClick={() => router.push("/")}>
             <div className="bg-emerald-500 p-2 rounded-lg">
               <Flower2 className="text-white w-5 h-5" />
             </div>
-            <h1 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">AgriLink</h1>
+            <h1 className="text-lg font-semibold">AgriLink</h1>
           </div>
         </div>
 
-       
-        {/* GUEST SECTION (NOT LOGGED IN) */}
+        {/* GUEST */}
         {!user && (
           <>
-            <nav className="hidden md:flex items-center gap-6 text-gray-600 dark:text-gray-300 font-medium mx-auto">
-              <p className="hover:text-emerald-500 cursor-pointer">{t("market")}</p>
-              <p className="hover:text-emerald-500 cursor-pointer">{t("howItWorks")}</p>
-              <p className="hover:text-emerald-500 cursor-pointer">{t("aboutUs")}</p>
+            <nav className="hidden md:flex items-center gap-6 mx-auto">
+              <p>{t("market")}</p>
+              <p>{t("howItWorks")}</p>
+              <p>{t("aboutUs")}</p>
               <LanguageDropdown />
             </nav>
+
             <div className="flex items-center gap-3">
-              <div className="block sm:hidden">
-                <LanguageDropdown />
-              </div>
-              <Button
-                onClick={() => router.push("/login")}
-                className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-4 rounded-lg"
-              >
+              <Button className="bg-linear-to-r from-emerald-600 to-teal-600
+                  hover:from-emerald-700 hover:to-teal-700 text-white" onClick={() => router.push("/login")}>
                 {t("getStarted") || "Get Started"}
               </Button>
             </div>
           </>
         )}
 
-        {/* USER SECTION (LOGGED IN) */}
+        {/* USER */}
         {user && (
           <div className="flex items-center gap-4">
             {user.role === "BUYER" && (
-              <Button
-                onClick={handleRoleRequest}
-                className="hidden sm:flex bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 rounded-lg"
-              >
+              <Button onClick={handleRoleRequest}>
                 {t('ask_to_agent') || 'Ask to agent'}
               </Button>
             )}
 
             <LanguageDropdown />
 
-            {/* USER MENU DROPDOWN */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-2 cursor-pointer">
                   <div className="relative h-8 w-8 rounded-full overflow-hidden bg-emerald-500 flex items-center justify-center">
                     {user.profile?.imageUrl ? (
-                      <Image src={user.profile.imageUrl} alt="Profile" fill className="object-cover" />
+                      <Image src={user.profile.imageUrl} alt="Profile" fill />
                     ) : (
                       <UserIcon className="w-6 h-6 text-white" />
                     )}
                   </div>
-                  <div className="hidden sm:block text-sm leading-4 text-gray-800 dark:text-white">
-                    <p className="font-medium">{user.profile?.fullName || 'User'}</p>
-                    <p className="text-emerald-600 text-xs">{user.role.charAt(0) + user.role.slice(1).toLowerCase()}</p>
+                  <div className="hidden sm:block text-sm">
+                    <p>{user.profile?.fullName || 'User'}</p>
+                    <p className="text-xs text-emerald-600">{user.role}</p>
                   </div>
                 </div>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end" className="w-48">
-                {(user.role === "BUYER" || user.role === "FARMER") && (
-                  <DropdownMenuItem asChild>
-                    <Link href={dashboardRoute}>{t('dashboard') || 'Dashboard'}</Link>
-                  </DropdownMenuItem>
-                )}
+              <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href={`/profile/${user.id}`}>{t('profile') || 'Profile'}</Link>
+                  <Link href={`/profile/${user.id}`}>Profile</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={logout} className="flex items-center gap-2 text-red-500">
-                  <LogOut size={16} />
-                  {t('logout') || 'Logout'}
+                <DropdownMenuItem onClick={logout} className="text-red-500 hover:bg-red-50">
+                  <LogOut size={16} /> Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         )}
-
       </div>
     </header>
   )

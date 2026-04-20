@@ -1,8 +1,13 @@
 import instance from "@/lib/axios/axios"
 
-export const createRoleRequest = async () => {
+export const createRoleRequest = async (data: FormData) => {
   try {
-    const res = await instance.post("/role-request")
+    const res = await instance.post("/role-request", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+   console.log(res.data)
     return res.data
   } catch (error) {
     console.log("Role request error:", error)

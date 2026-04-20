@@ -1,7 +1,9 @@
 'use client'
+import { Loader2 } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 type Lang = 'en' | 'am' | 'om';
+
 type Ctx = {
   lang: Lang;
   setLang: (l: Lang) => void;
@@ -11,20 +13,42 @@ type Ctx = {
 
 export const LanguageContext = createContext<Ctx | undefined>(undefined);
 
-// Simple in-memory cache for loaded locales
+// ✅ Memory cache
 const localeCache: Record<string, Record<string, string> | null> = {
   en: null,
   am: null,
   om: null,
 };
 
+// ✅ Load with cache + localStorage fallback
 async function loadLocaleFile(lang: Lang) {
+  // 1. Memory cache
   if (localeCache[lang]) return localeCache[lang]!;
-  // fetch from public/locales/
-  const response = await fetch(`/locales/${lang}.json`);
-  const data = await response.json();
-  localeCache[lang] = data;
-  return data;
+
+  // 2. localStorage cache
+  const stored = typeof window !== 'undefined' && localStorage.getItem(`locale-${lang}`);
+  if (stored) {
+    const parsed = JSON.parse(stored);
+    localeCache[lang] = parsed;
+    return parsed;
+  }
+
+  // 3. Fetch from public
+  try {
+    const res = await fetch(`/locales/${lang}.json`);
+    const data = await res.json();
+
+    localeCache[lang] = data;
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`locale-${lang}`, JSON.stringify(data));
+    }
+
+    return data;
+  } catch (e) {
+    console.error('Failed to load locale:', e);
+    return {};
+  }
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
@@ -32,48 +56,58 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === 'undefined') return 'en';
     return (localStorage.getItem('lang') as Lang) || 'en';
   });
-  const [translations, setTranslations] = useState<Record<string, string> | null>(null);
+
+  const [translations, setTranslations] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
+
     const fetchTranslations = async () => {
       setLoading(true);
-      try {
-        const data = await loadLocaleFile(lang);
-        if (!mounted) return;
-        setTranslations(data);
-      } catch {
-        if (!mounted) return;
-        setTranslations(null);
-      } finally {
-        if (mounted) setLoading(false);
-      }
+
+      const data = await loadLocaleFile(lang);
+
+      if (!mounted) return;
+
+      setTranslations(data);
+      setLoading(false);
     };
+
     fetchTranslations();
+
     return () => {
       mounted = false;
     };
   }, [lang]);
 
   useEffect(() => {
-    localStorage.setItem('lang', lang);
-    window.dispatchEvent(new Event('languageChange'));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lang', lang);
+      window.dispatchEvent(new Event('languageChange'));
+    }
   }, [lang]);
 
   const setLang = (l: Lang) => setLangState(l);
 
   const t = useMemo(
     () => (key: string) => {
-      if (!translations) return key;
-      return translations[key] ?? key;
+      return translations[key] || key;
     },
     [translations]
   );
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t, loading }}>
-      {children}
+      {loading ? (
+        <div className="h-screen flex items-center justify-center">
+          <div className="min-h-screen flex items-center justify-center">
+            <Loader2 className="animate-spin text-emerald-600" size={40} />
+          </div>
+        </div>
+      ) : (
+        children
+      )}
     </LanguageContext.Provider>
   );
 }

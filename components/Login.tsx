@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import Image from 'next/image'
 import { Lock, Eye, EyeOff, User } from 'lucide-react'
@@ -14,6 +13,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginInput } from '@/lib/validation/auth.schema'
 import Cookies from 'js-cookie'
+import { Button } from './ui/button'
 
 export default function LoginPage() {
   const { t } = useLanguage()
@@ -195,7 +195,7 @@ export default function LoginPage() {
               </div>
 
               {/* LOGIN BUTTON */}
-              <button
+              <Button
                 type="submit"
                 disabled={isLoading}
                 className="w-full h-10 rounded-lg bg-linear-to-r from-emerald-600 to-teal-600
@@ -203,7 +203,7 @@ export default function LoginPage() {
                   disabled:opacity-50 flex items-center justify-center"
               >
                 {isLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : t('login_signin_btn')}
-              </button>
+              </Button>
 
               {/* GOOGLE LOGIN */}
               <button

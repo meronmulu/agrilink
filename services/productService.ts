@@ -19,10 +19,12 @@ export const addProducts = async (data: CreateProductPayload) => {
     formData.append("image", data.image)
 
     const res = await instance.post("/product", formData)
-
+    console.log("add product response:", res.data)
     return res.data
   } catch (error) {
     console.log(" ERROR:", error)
+     console.log("STATUS:", error?.response?.status)
+    console.log("ERROR DATA:", error?.response?.data)
     throw error
   }
 }
