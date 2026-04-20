@@ -49,7 +49,7 @@ export default function Header() {
 
   if (loading) return null
 
-  const dashboardRoute =
+    const dashboardRoute =
     user?.role === "FARMER"
       ? "/farmer/crops"
       : user?.role === "BUYER"
@@ -172,7 +172,8 @@ export default function Header() {
         {user && (
           <div className="flex items-center gap-4">
             {user.role === "BUYER" && (
-              <Button onClick={handleRoleRequest}>
+              <Button className="bg-linear-to-r from-emerald-600 to-teal-600
+                  hover:from-emerald-700 hover:to-teal-700 text-white" onClick={handleRoleRequest}>
                 {t('ask_to_agent') || 'Ask to agent'}
               </Button>
             )}
@@ -184,24 +185,30 @@ export default function Header() {
                 <div className="flex items-center gap-2 cursor-pointer">
                   <div className="relative h-8 w-8 rounded-full overflow-hidden bg-emerald-500 flex items-center justify-center">
                     {user.profile?.imageUrl ? (
-                      <Image src={user.profile.imageUrl} alt="Profile" fill />
+                      <Image src={user.profile.imageUrl} alt="Profile" fill className="object-cover" />
                     ) : (
                       <UserIcon className="w-6 h-6 text-white" />
                     )}
                   </div>
-                  <div className="hidden sm:block text-sm">
-                    <p>{user.profile?.fullName || 'User'}</p>
-                    <p className="text-xs text-emerald-600">{user.role}</p>
+                  <div className="hidden sm:block text-sm leading-4 text-gray-800 dark:text-white">
+                    <p className="font-medium">{user.profile?.fullName || 'User'}</p>
+                    <p className="text-emerald-600 text-xs">{user.role.charAt(0) + user.role.slice(1).toLowerCase()}</p>
                   </div>
                 </div>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-48">
+                {(user.role === "BUYER" || user.role === "FARMER") && (
+                  <DropdownMenuItem asChild>
+                    <Link href={dashboardRoute}>{t('dashboard') || 'Dashboard'}</Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
-                  <Link href={`/profile/${user.id}`}>Profile</Link>
+                  <Link href={`/profile/${user.id}`}>{t('profile') || 'Profile'}</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={logout} className="text-red-500 hover:bg-red-50">
-                  <LogOut size={16} /> Logout
+                <DropdownMenuItem onClick={logout} className="flex items-center gap-2 text-red-500">
+                  <LogOut size={16} />
+                  {t('logout') || 'Logout'}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
