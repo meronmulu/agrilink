@@ -23,8 +23,8 @@ export const addProducts = async (data: CreateProductPayload) => {
     return res.data
   } catch (error) {
     console.log(" ERROR:", error)
-     console.log("STATUS:", error?.response?.status)
-    console.log("ERROR DATA:", error?.response?.data)
+    //  console.log("STATUS:", error?.response?.status)
+    // console.log("ERROR DATA:", error?.response?.data)
     throw error
   }
 }
