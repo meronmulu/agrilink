@@ -246,10 +246,9 @@ export default function MarketPlace() {
               key={product.id}
               className="group flex flex-col rounded-2xl border border-gray-100 bg-white hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden h-full"
             >
-             <Link href={`/product/${product.id}`} className="flex-1">
 
               {/* Product Image */}
-              <div className="relative h-52 w-full overflow-hidden">
+              <Link href={`/product/${product.id}`} className="relative h-52 w-full overflow-hidden block">
 
                 <Image
                   src={product.image || "/placeholder.png"}
@@ -269,7 +268,7 @@ export default function MarketPlace() {
                   </div>
                 )}
 
-              </div>
+              </Link>
 
               <CardContent className="px-3  pt-1">
 
@@ -327,8 +326,6 @@ export default function MarketPlace() {
 
               </CardContent>
 
-
-               </Link>
             </Card>
             
           ))}
