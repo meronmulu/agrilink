@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/pagination'
 
 import { User } from '@/types/auth'
-import { Loader2 } from 'lucide-react'
+import { Link, Loader2, Plus } from 'lucide-react'
 import Image from 'next/image'
 
 export default function AgentsPage() {
@@ -179,7 +179,8 @@ export default function AgentsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
+      <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
+        <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Agents Management
         </h1>
@@ -187,6 +188,11 @@ export default function AgentsPage() {
           View and manage all agents with their assigned farmers and locations
         </p>
       </div>
+          <Button onClick={() =>router.push(`/admin/agent-approval`)} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-5">
+           Request Roles
+          </Button>
+      </div>
+      
       <Card className="">
         <CardContent className="p-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
 

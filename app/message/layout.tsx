@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { getConversations } from '@/services/chatService'
 import { getUserById } from '@/services/authService'
@@ -26,6 +26,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [role, setRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const router = useRouter()
   const pathname = usePathname()
@@ -33,7 +34,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
   const isInConversation =
     pathname !== '/message' && pathname.startsWith('/message/')
 
- const handleBack = () => {
+  const handleBack = () => {
     switch (role) {
       case 'FARMER':
         router.replace('/farmer/crops')
@@ -121,7 +122,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
           const userObj = JSON.parse(userStr)
           userId = userObj.id
           setCurrentUserId(userId)
-          setRole(userObj.role) 
+          setRole(userObj.role)
         } catch (e) {
           console.error('Error parsing user:', e)
         }
@@ -131,6 +132,23 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
     fetchConversations(userId)
   }, [])
 
+  // ✅ FILTER LOGIC (optimized with useMemo)
+  const filteredConversations = useMemo(() => {
+    if (!searchTerm.trim()) return conversations
+
+    return conversations.filter((conv) => {
+      const name =
+        conv.partner?.profile?.fullName?.toLowerCase() || ''
+      const email =
+        conv.partner?.email?.toLowerCase() || ''
+
+      return (
+        name.includes(searchTerm.toLowerCase()) ||
+        email.includes(searchTerm.toLowerCase())
+      )
+    })
+  }, [searchTerm, conversations])
+
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
       <div className="flex flex-1 min-h-0 overflow-hidden">
@@ -139,30 +157,31 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
           {/* Sidebar */}
           <aside
             className={`
-            flex flex-col border-r bg-white
-            w-full md:w-75 lg:w-85 shrink-0
-            ${isInConversation ? 'hidden md:flex' : 'flex'}
-          `}
+              flex flex-col border-r bg-white
+              w-full md:w-75 lg:w-85 shrink-0
+              ${isInConversation ? 'hidden md:flex' : 'flex'}
+            `}
           >
 
             {/* Header */}
             <div className="p-4 space-y-3 border-b">
               <div className="flex items-center gap-2">
-
                 <ChevronLeft
                   className="h-5 w-5 text-emerald-600 cursor-pointer"
                   onClick={handleBack}
                 />
-
                 <h1 className="text-xl font-bold text-gray-800">
                   Messages
                 </h1>
               </div>
 
+              {/* ✅ SEARCH INPUT */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500/60" />
                 <Input
-                  placeholder="Search conversations..."
+                  placeholder="Search by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 bg-gray-50 border-gray-100 rounded-2xl h-10"
                 />
               </div>
@@ -177,15 +196,18 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
                   <ConversationSkeleton />
                   <ConversationSkeleton />
                 </>
-              ) : conversations.length === 0 ? (
+              ) : filteredConversations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <MessageSquare className="h-10 w-10 mb-3 opacity-30" />
-                  <p>No conversations yet</p>
+                  <p>
+                    {searchTerm
+                      ? 'No matching conversations'
+                      : 'No conversations yet'}
+                  </p>
                 </div>
               ) : (
-                conversations.map((conv) => {
+                filteredConversations.map((conv) => {
                   const isActive = pathname.includes(conv.id)
-
                   const lastMsg = getLastMessage(conv)
 
                   const partnerName =
@@ -203,7 +225,10 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
                     >
                       <div className="relative h-11 w-11 rounded-full overflow-hidden bg-gray-200 shrink-0">
                         <Image
-                          src={conv.partner?.profile?.imageUrl || '/default-avatar.png'}
+                          src={
+                            conv.partner?.profile?.imageUrl ||
+                            '/default-avatar.png'
+                          }
                           alt="avatar"
                           fill
                           className="object-cover"
@@ -218,7 +243,9 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
 
                           <span className="text-[11px] text-gray-400">
                             {lastMsg
-                              ? new Date(lastMsg.createdAt).toLocaleTimeString([], {
+                              ? new Date(
+                                  lastMsg.createdAt
+                                ).toLocaleTimeString([], {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                 })
@@ -240,10 +267,10 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
           {/* Chat area */}
           <main
             className={`
-            flex-1 min-h-0 h-full bg-[#f3f4f6]
-            ${isInConversation ? 'flex' : 'hidden md:flex'}
-            flex-col overflow-hidden
-          `}
+              flex-1 min-h-0 h-full bg-[#f3f4f6]
+              ${isInConversation ? 'flex' : 'hidden md:flex'}
+              flex-col overflow-hidden
+            `}
           >
             {children}
           </main>

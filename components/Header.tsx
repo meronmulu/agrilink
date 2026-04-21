@@ -57,7 +57,7 @@ export default function Header() {
         : "/"
 
   const handleRoleRequest = () => {
-    router.push("/ask-agent")
+    router.push("/ask-request")
   }
 
   type NavItem = {
@@ -91,8 +91,9 @@ export default function Header() {
       { name: t('dashboard') || "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
       { name: t('user_management') || "User Management", href: "/admin/user", icon: Users },
       { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
-      { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Signature },
       { name: t('categories') || "Categories", href: "/admin/category", icon: Settings },
+      { name:  'Market Place', href: '/MarketPlace', icon: Store },
+      
     ],
   }
 
@@ -174,7 +175,7 @@ export default function Header() {
             {user.role === "BUYER" && (
               <Button className="bg-linear-to-r from-emerald-600 to-teal-600
                   hover:from-emerald-700 hover:to-teal-700 text-white" onClick={handleRoleRequest}>
-                {t('ask_to_agent') || 'Ask to agent'}
+                 Request Role
               </Button>
             )}
 

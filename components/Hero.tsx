@@ -62,12 +62,7 @@ export default function Hero() {
 
 
 
-            <Button
-              variant="outline"
-              className="border-white hover:bg-white text-black px-6 py-6 text-base rounded-lg"
-            >
-              {t('hero_btn_view')}
-            </Button>
+           
           </div>
 
         </div>

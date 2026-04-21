@@ -83,7 +83,15 @@ export const getKebeles = async (woredaId: string): Promise<Kebele[]> => {
   }
 }
 
-
+export const getAllKebeles = async (): Promise<Kebele[]> => {
+  try {
+    const res = await instance.get(`/kebeles/`)
+    return res.data
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}
 
 export const createProfile = async (data: {
   fullName: string

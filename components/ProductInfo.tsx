@@ -40,7 +40,6 @@ export default function ProductDetailPage() {
 
   const [cartLoading, setCartLoading] = useState(false)
   const [buyLoading, setBuyLoading] = useState(false)
-  const [checkingOut, setCheckingOut] = useState(false)
 
 
   useEffect(() => {
@@ -148,14 +147,10 @@ export default function ProductDetailPage() {
       setBuyLoading(false)
     }
   }
-  if (loading) {
+ if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-white">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="animate-spin text-emerald-500" size={40} />
-        </div>
-        <Footer />
+      <div className="h-[70vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-500" size={32} />
       </div>
     )
   }

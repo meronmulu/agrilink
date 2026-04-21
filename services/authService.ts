@@ -121,12 +121,14 @@ export const googleSignin = async () => {
     throw error;
   }
 };
-export const getUsers= async (): Promise<User[]> => {
+export const getUsers = async (): Promise<User[]> => {
   try {
     const res = await instance.get("/user")
-    // console.log(res.data)
+
+    console.log("FULL RESPONSE:", res)
+  console.log("DATA ONLY:", res.data)
+
     return res.data
-    
   } catch (error) {
     console.error("Get users error:", error)
     return []

@@ -198,6 +198,9 @@ export default function CartPage() {
                       <p className="text-sm text-gray-500">
                         ETB {item.product.price}
                       </p>
+                      <p className="text-sm text-gray-500">
+                        ETB {item.product.amount}
+                      </p>
 
                       <div className="flex items-center gap-2 mt-2">
                         <Button

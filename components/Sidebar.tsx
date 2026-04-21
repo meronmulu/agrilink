@@ -60,7 +60,6 @@ export default function Sidebar() {
       { name: t('user_management') || 'User Management', href: '/admin/user', icon: Users },
       { name:  'Agent Management', href: '/admin/agent-farmer', icon: Users },
       { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
-      { name: t('agent_approval') || "Agent Approval", href: "/admin/agent-approval", icon: Signature},
       { name: t('categories') || 'Categories', href: '/admin/catagory', icon: Settings },
       { name:  'Market Place', href: '/MarketPlace', icon: Store },
 

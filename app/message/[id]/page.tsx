@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic'
 
 import {
   getConversations,
-  sendMessage as sendRest
 } from '@/services/chatService'
 import { useMessage } from '@/context/MessageContext'
 import { getUserById } from '@/services/authService'
@@ -32,8 +31,7 @@ const EmojiPicker = dynamic(
   { ssr: false }
 )
 
-const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000'
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function Chat() {
   const { id } = useParams()
@@ -45,61 +43,44 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [message, setMessage] = useState('')
   const [showEmoji, setShowEmoji] = useState(false)
-  const [attachment, setAttachment] = useState<File | null>(null)
   const [receiver, setReceiver] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const [currentUserId] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null
-    const userStr = localStorage.getItem('user')
-    return userStr ? JSON.parse(userStr).id : null
-  })
+  const currentUserId = typeof window !== 'undefined'
+    ? JSON.parse(localStorage.getItem('user') || '{}')?.id
+    : null
 
   const socketRef = useRef<Socket | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  // SOCKET
- // SOCKET
-useEffect(() => {
-  if (!currentUserId || !conversationId) return
+  // ================= SOCKET =================
+  useEffect(() => {
+    if (!currentUserId || !conversationId) return
 
-  const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token')
 
-  // prevent duplicate connections (IMPORTANT FIX)
-  if (socketRef.current) {
-    socketRef.current.disconnect()
-  }
+    // cleanup old socket
+    if (socketRef.current) {
+      socketRef.current.disconnect()
+    }
 
-  const socket = io(SOCKET_URL, {
-    transports: ['websocket'],
-    auth: { token }
-  })
+    const socket = io(SOCKET_URL, {
+      transports: ['websocket'],
+      auth: { token }
+    })
 
-  socketRef.current = socket
+    socketRef.current = socket
 
-  socket.on('connect', () => {
-    socket.emit('join', currentUserId)
-    socket.emit('joinConversation', conversationId)
-  })
+    const handleReceiveMessage = (msg: any) => {
+      if (msg.conversationId !== conversationId) return
 
-  socket.on('receiveMessage', (msg) => {
-    if (msg.conversationId === conversationId) {
       setMessages(prev => {
         const exists = prev.some(m => m.id === msg.id)
         if (exists) return prev
 
-        const updated =
-          msg.senderId !== currentUserId
-            ? { ...msg, isRead: true }
-            : msg
-
-        return [...prev, updated].sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() -
-            new Date(b.createdAt).getTime()
-        )
+        return [...prev, msg]
       })
 
       if (msg.senderId !== currentUserId) {
@@ -111,16 +92,21 @@ useEffect(() => {
         refreshUnread()
       }
     }
-  })
 
-  return () => {
-    socket.off('connect')
-    socket.off('receiveMessage')
-    socket.disconnect()
-  }
-}, [currentUserId, conversationId, refreshUnread])
+    socket.on('connect', () => {
+      socket.emit('join', currentUserId)
+      socket.emit('joinConversation', conversationId)
+    })
 
-  // LOAD DATA
+    socket.on('receiveMessage', handleReceiveMessage)
+
+    return () => {
+      socket.off('receiveMessage', handleReceiveMessage)
+      socket.disconnect()
+    }
+  }, [currentUserId, conversationId, refreshUnread])
+
+  // ================= LOAD DATA =================
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
@@ -129,28 +115,11 @@ useEffect(() => {
         const data: Conversation[] = await getConversations()
         const me = String(currentUserId)
 
-        let conv = data.find(
+        const conv = data.find(
           c => String(c.id) === String(conversationId)
         )
 
-        if (!conv) {
-          conv = data.find(
-            c =>
-              (String(c.userOneId) === me &&
-                String(c.userTwoId) === String(conversationId)) ||
-              (String(c.userTwoId) === me &&
-                String(c.userOneId) === String(conversationId))
-          )
-        }
-
         if (conv) {
-          const other =
-            String(conv.userOneId) === me
-              ? conv.userTwo
-              : conv.userOne
-
-          setReceiver(other || null)
-
           const sorted = (conv.messages || []).sort(
             (a, b) =>
               new Date(a.createdAt).getTime() -
@@ -158,13 +127,18 @@ useEffect(() => {
           )
 
           setMessages(sorted)
-          return
-        }
 
-        // NEW CHAT
-        const user = await getUserById(conversationId)
-        setReceiver(user)
-        setMessages([])
+          const other =
+            String(conv.userOneId) === me
+              ? conv.userTwo
+              : conv.userOne
+
+          setReceiver(other || null)
+        } else {
+          const user = await getUserById(conversationId)
+          setReceiver(user)
+          setMessages([])
+        }
       } catch (err) {
         console.error(err)
       } finally {
@@ -177,70 +151,40 @@ useEffect(() => {
     }
   }, [conversationId, currentUserId])
 
-  // AUTO SCROLL (FIXED)
+  // ================= AUTO SCROLL =================
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      bottomRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end'
-      })
-    }, 80)
-
-    return () => clearTimeout(timeout)
+    bottomRef.current?.scrollIntoView({
+      behavior: 'smooth'
+    })
   }, [messages])
 
-  // SEND MESSAGE
-  const handleSend = async () => {
-    if (
-      (!message.trim() && !attachment) ||
-      !currentUserId ||
-      !receiver
-    )
-      return
-
-    const tempId = `${Date.now()}`
+  // ================= SEND MESSAGE =================
+  const handleSend = () => {
+    if (!message.trim() || !receiver || !socketRef.current) return
 
     const payload = {
-      id: tempId,
+      id: `${Date.now()}`,
       senderId: currentUserId,
-      message: message || "Attachment",
-      conversationId: messages.length > 0 ? conversationId : undefined,
       receiverId: receiver.id,
+      conversationId,
+      message,
       createdAt: new Date().toISOString()
     }
 
-    // Optimistic update
-    setMessages(prev => {
-      const updated = [...prev, payload as any]
-      return updated.sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() -
-          new Date(b.createdAt).getTime()
-      )
-    })
-
-    // Emit via active socket
-    if (socketRef.current) {
-      socketRef.current.emit('sendMessage', payload)
-    }
+    // ONLY emit — DO NOT add locally
+    socketRef.current.emit('sendMessage', payload)
 
     setMessage('')
-    setAttachment(null)
     setShowEmoji(false)
     inputRef.current?.focus()
   }
-
 
   return (
     <div className="flex flex-col h-full bg-[#e5e7eb]">
 
       {/* HEADER */}
       <header className="h-14 bg-white border-b flex items-center px-3 gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.push('/message')}
-        >
+        <Button variant="ghost" size="icon" onClick={() => router.push('/message')}>
           <ChevronLeft />
         </Button>
 
@@ -262,9 +206,8 @@ useEffect(() => {
 
       {/* MESSAGES */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-
         {loading && messages.length === 0 && (
-          <div className="flex justify-center py-2 mx-auto">
+          <div className="flex justify-center">
             <div className="h-5 w-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
@@ -275,13 +218,9 @@ useEffect(() => {
           return (
             <div
               key={msg.id}
-              className={`flex ${isMe ? 'justify-end' : 'justify-start'
-                }`}
+              className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
             >
-              <div
-                className={`px-3 py-2 rounded-xl ${isMe ? 'bg-green-100' : 'bg-white'
-                  }`}
-              >
+              <div className={`px-3 py-2 rounded-xl ${isMe ? 'bg-green-100' : 'bg-white'}`}>
                 <p>{msg.message}</p>
 
                 <div className="text-xs text-gray-400 flex justify-end gap-1">
@@ -291,13 +230,7 @@ useEffect(() => {
                   })}
 
                   {isMe && (
-                    <CheckCheck
-                      className={
-                        msg.isRead
-                          ? 'text-green-500'
-                          : 'text-gray-400'
-                      }
-                    />
+                    <CheckCheck className="text-gray-400" />
                   )}
                 </div>
               </div>
@@ -310,19 +243,14 @@ useEffect(() => {
 
       {/* INPUT */}
       <div className="p-3 bg-white border-t flex items-center gap-2">
+
         <input
           ref={fileInputRef}
           type="file"
           hidden
-          onChange={e =>
-            e.target.files && setAttachment(e.target.files[0])
-          }
         />
 
-        <Paperclip
-          onClick={() => fileInputRef.current?.click()}
-          className="cursor-pointer"
-        />
+        <Paperclip className="cursor-pointer" />
 
         <input
           ref={inputRef}
@@ -330,14 +258,12 @@ useEffect(() => {
           placeholder="Message..."
           value={message}
           onChange={e => setMessage(e.target.value)}
-          onKeyDown={e =>
-            e.key === 'Enter' && handleSend()
-          }
+          onKeyDown={e => e.key === 'Enter' && handleSend()}
         />
 
         <Smile
-          onClick={() => setShowEmoji(!showEmoji)}
           className="cursor-pointer"
+          onClick={() => setShowEmoji(!showEmoji)}
         />
 
         {showEmoji && (

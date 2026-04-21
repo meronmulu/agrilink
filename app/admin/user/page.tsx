@@ -70,6 +70,7 @@ export default function AdminUsersPage() {
     setLoading(true)
     try {
       const data = await getUsers()
+      console.log(data)
       setUsers(data)
     } catch (err) {
       console.error(err)
