@@ -95,7 +95,6 @@ export default function AgentFarmersPage() {
         </p>
       </div>
 
-      {/* 🔍 SEARCH BAR */}
       <Card className="p-4">
         <Input
           placeholder="Search farmer by name..."
@@ -168,7 +167,7 @@ export default function AgentFarmersPage() {
                     {/* LOCATION */}
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
-                        {farmer.profile?.kebele?.woreda?.zone?.region?.name && (
+                        {/* {farmer.profile?.kebele?.woreda?.zone?.region?.name && (
                           <Badge variant="secondary">
                             {farmer.profile.kebele.woreda.zone.region.name}
                           </Badge>
@@ -185,7 +184,7 @@ export default function AgentFarmersPage() {
                         )}
                         {farmer.profile?.kebele?.name && (
                           <Badge>{farmer.profile.kebele.name}</Badge>
-                        )}
+                        )} */}
                       </div>
                     </TableCell>
 

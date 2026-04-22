@@ -203,14 +203,14 @@ export default function Page() {
       setUser((prev) =>
         prev
           ? {
-              ...prev,
-              profile: {
-                ...prev.profile!,
-                fullName: form.fullName,
-                kebeleId: form.kebeleId,
-                imageUrl: preview || prev.profile?.imageUrl
-              }
+            ...prev,
+            profile: {
+              ...prev.profile!,
+              fullName: form.fullName,
+              kebeleId: form.kebeleId,
+              imageUrl: preview || prev.profile?.imageUrl
             }
+          }
           : prev
       )
 
@@ -263,7 +263,7 @@ export default function Page() {
                 <CardContent className="p-6 flex flex-col items-center text-center">
                   <div className="relative">
                     <Avatar className="w-32 h-32">
-                      <AvatarImage src={preview || user?.profile?.imageUrl} />
+                      <AvatarImage src={(preview || user?.profile?.imageUrl) || undefined} />                      
                       <AvatarFallback>{getInitials(form.fullName)}</AvatarFallback>
                     </Avatar>
 

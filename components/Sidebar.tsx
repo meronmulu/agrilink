@@ -52,6 +52,7 @@ export default function Sidebar() {
       { name: t('nav_orders') || 'Orders', href: '/agent/order', icon: ListOrdered },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name:  'Market Place', href: '/MarketPlace', icon: Store },
+      { name:  'Data Approval', href: '/agent/data-collection-approval', icon: Store },
 
     ],
 

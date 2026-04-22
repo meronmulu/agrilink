@@ -22,9 +22,13 @@ export interface Kebele {
 }
 export interface Profile {
   id: string
+  userId: string
   fullName: string
-  email?: string
-  phone?: string
-  imageUrl?: string
+  imageUrl?: string | null
+  kebeleId?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  telegramChatId?: string | null
+  receiveWeatherAlerts?: boolean
   kebele?:Kebele
 }
