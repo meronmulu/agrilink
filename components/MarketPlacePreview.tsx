@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent } from './ui/card'
-import { ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { getProducts } from '@/services/productService'
 import { Product } from '@/types/product'
@@ -92,7 +91,7 @@ export default function MarketPlacePreview() {
                     {product.amount > 0 ? (
                       <span className="text-xs font-medium text-gray-600">
                         Avalable :
-                        <strong className="text-gray-900">{product.amount}</strong> 
+                        <strong className="text-gray-900">{product.amount}kg</strong> 
                       </span>
                     ) : (
                       <span className="text-xs font-semibold text-red-500">

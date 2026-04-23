@@ -48,7 +48,6 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [chartData, setChartData] = useState<ChartData[]>([])
-
   const [totalProducts, setTotalProducts] = useState(0)
   const [totalUsers, setTotalUsers] = useState(0)
   const [totalOrders, setTotalOrders] = useState(0)
@@ -188,7 +187,7 @@ export default function AdminDashboardPage() {
               <YAxis />
               <Tooltip />
               <Line type="monotone" dataKey="users" stroke="#4F46E5" strokeWidth={2} />
-              <Line type="monotone" dataKey="sales" stroke="#10B981" strokeWidth={2} />
+              <Line type="monotone" dataKey="product" stroke="#10B981" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

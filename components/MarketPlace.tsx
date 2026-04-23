@@ -282,14 +282,14 @@ export default function MarketPlace() {
 
                   {/* Availability */}
                   <div className='flex gap-2'>
-                    {t('available_colon') || 'Available:'}
+                    {'Available:'}
                     <span className={`font-medium ${product.amount > 10
                       ? 'text-green-600'
                       : product.amount > 0
                         ? 'text-orange-500'
                         : 'text-red-500'
                       }`}>
-                      {product.amount}
+                      {product.amount}kg
                     </span>
                   </div>
 

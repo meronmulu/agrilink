@@ -18,8 +18,7 @@ import {
   Users,
   ShoppingCart,
   ListOrdered,
-  Store,
-  Signature,
+  Store
 } from "lucide-react"
 
 import LanguageDropdown from "./LanguageDropdown"
@@ -38,7 +37,6 @@ import { useMessage } from "@/context/MessageContext"
 import Image from "next/image"
 
 export default function Header() {
-  // ✅ FIX: include loading
   const { user, logout, loading } = useAuth()
 
   const router = useRouter()
@@ -49,7 +47,7 @@ export default function Header() {
 
   if (loading) return null
 
-    const dashboardRoute =
+  const dashboardRoute =
     user?.role === "FARMER"
       ? "/farmer/crops"
       : user?.role === "BUYER"
@@ -70,7 +68,7 @@ export default function Header() {
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
       { name: t('orders') || "Orders", href: "/buyer/order", icon: ShoppingBag },
-      { name: t('cart') || 'Cart', href: '/buyer/cart', icon: ShoppingCart, badge: cartCount },
+      { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('messages') || "Messages", href: "/message", icon: MessageSquare, badge: unreadCount },
       { name: t('market_insights') || "Market Insights", href: "/buyer/insights", icon: BrainCircuit },
     ],
@@ -84,6 +82,7 @@ export default function Header() {
     AGENT: [
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
       { name: t('nav_orders') || 'Orders', href: '/agent/order', icon: ListOrdered },
+      { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Place', href: '/MarketInsight', icon: Store },
     ],
@@ -92,8 +91,8 @@ export default function Header() {
       { name: t('user_management') || "User Management", href: "/admin/user", icon: Users },
       { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
       { name: t('categories') || "Categories", href: "/admin/category", icon: Settings },
-      { name:  'Market Place', href: '/MarketPlace', icon: Store },
-      
+      { name: 'Market Place', href: '/MarketPlace', icon: Store },
+
     ],
   }
 
@@ -175,9 +174,26 @@ export default function Header() {
             {user.role === "BUYER" && (
               <Button className="bg-linear-to-r from-emerald-600 to-teal-600
                   hover:from-emerald-700 hover:to-teal-700 text-white" onClick={handleRoleRequest}>
-                 Request Role
+                Request Role
               </Button>
             )}
+            <div
+              className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100"
+              onClick={() =>
+                router.push(
+                  "/cart"
+                )
+              }
+            >
+              <ShoppingCart className="w-5 h-5 text-gray-700" />
+
+              {/* Badge */}
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </div>
 
             <LanguageDropdown />
 
@@ -192,8 +208,16 @@ export default function Header() {
                     )}
                   </div>
                   <div className="hidden sm:block text-sm leading-4 text-gray-800 dark:text-white">
-                    <p className="font-medium">{user.profile?.fullName || 'User'}</p>
-                    <p className="text-emerald-600 text-xs">{user.role.charAt(0) + user.role.slice(1).toLowerCase()}</p>
+                    <p className="font-medium">
+                      {user?.profile?.fullName
+                        ? user.profile.fullName.charAt(0).toUpperCase() +
+                        user.profile.fullName.slice(1).toLowerCase()
+                        : 'User'}
+                    </p>
+
+                    <p className="text-emerald-600 text-xs capitalize">
+                      {user?.role?.toLowerCase() || 'user'}
+                    </p>
                   </div>
                 </div>
               </DropdownMenuTrigger>

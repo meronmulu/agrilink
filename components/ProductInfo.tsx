@@ -292,8 +292,9 @@ export default function ProductDetailPage() {
 
               {product.amount > 0
                 ? (t('in_stock_ready') || 'In Stock & Ready to Ship')
-                : (t('out_of_stock') || 'Out of Stock')}
-
+                : (t('out_of_stock') || 'Out of Stock')
+              }kg
+                
             </div>
 
 
@@ -407,7 +408,7 @@ export default function ProductDetailPage() {
                 </p>
 
                 <p className="text-sm font-semibold">
-                  {product.amount} {t('units') || 'Units'}
+                  {product.amount} kg
                 </p>
               </div>
 

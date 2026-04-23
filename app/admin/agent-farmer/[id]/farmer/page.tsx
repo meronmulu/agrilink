@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { getAgentFarmers } from '@/services/authService'
-
 import {
   Table,
   TableBody,
@@ -12,15 +11,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { User } from '@/types/auth'
 import { Loader2, Users } from 'lucide-react'
 import Image from 'next/image'
-
 import { Input } from '@/components/ui/input'
-
 import {
   Pagination,
   PaginationContent,
@@ -29,17 +24,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-
 export default function AgentFarmersPage() {
   const { id } = useParams()
 
   const [farmers, setFarmers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
 
-  // 🔍 SEARCH
   const [search, setSearch] = useState('')
 
-  // 📄 PAGINATION
   const [page, setPage] = useState(1)
   const pageSize = 7
 
@@ -47,6 +39,7 @@ export default function AgentFarmersPage() {
     const fetchFarmers = async () => {
       try {
         const data = await getAgentFarmers(id as string)
+        console.log("Farmers under agent:", data)
         setFarmers(data || [])
       } catch (error) {
         console.error(error)

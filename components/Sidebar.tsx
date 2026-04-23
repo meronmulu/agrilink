@@ -1,10 +1,20 @@
-// components/Sidebar.tsx
 'use client'
 
 import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, MessageSquare, BrainCircuit, Settings, Sprout, BookOpen, Users, ShoppingCart, ListOrdered, Store, Signature } from 'lucide-react'
+import {
+  LayoutDashboard,
+  MessageSquare,
+  BrainCircuit,
+  Settings,
+  Sprout,
+  Users,
+  ShoppingCart,
+  ListOrdered,
+  Store
+} from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -20,16 +30,18 @@ type NavItem = {
 
 export default function Sidebar() {
   const pathname = usePathname()
+
   const { cartCount } = useCart()
-  const { unreadCount, markAsRead } = useMessage()
+  const { unreadCount, setUnreadCount } = useMessage() // ✅ updated
   const { user } = useAuth()
   const { t } = useLanguage()
 
+  // 🔔 RESET message badge when entering message page (Cart-style behavior)
   useEffect(() => {
     if (pathname === '/message') {
-      markAsRead()
+      setUnreadCount(0)
     }
-  }, [pathname, markAsRead])
+  }, [pathname, setUnreadCount])
 
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
@@ -50,20 +62,19 @@ export default function Sidebar() {
     AGENT: [
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
       { name: t('nav_orders') || 'Orders', href: '/agent/order', icon: ListOrdered },
+      { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Place', href: '/MarketPlace', icon: Store },
-      { name:  'Data Approval', href: '/agent/data-collection-approval', icon: Store },
-
+      { name: 'Market Place', href: '/MarketPlace', icon: Store },
+      { name: 'Data Approval', href: '/agent/data-collection-approval', icon: Store },
     ],
 
     ADMIN: [
       { name: t('dashboard') || 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
       { name: t('user_management') || 'User Management', href: '/admin/user', icon: Users },
-      { name:  'Agent Management', href: '/admin/agent-farmer', icon: Users },
-      { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
+      { name: 'Agent Management', href: '/admin/agent-farmer', icon: Users },
+      { name: t('products') || 'Products', href: '/admin/products', icon: Sprout },
       { name: t('categories') || 'Categories', href: '/admin/catagory', icon: Settings },
-      { name:  'Market Place', href: '/MarketPlace', icon: Store },
-
+      { name: 'Market Place', href: '/MarketPlace', icon: Store },
     ],
   }
 
@@ -72,11 +83,13 @@ export default function Sidebar() {
   return (
     <aside className="w-64 h-full border-r border-gray-200 bg-white hidden md:flex flex-col pt-6">
       <div className="px-4 space-y-2">
+
         {navItems.map((item) => {
           const isActive =
             item.href === '/agent'
               ? pathname === '/agent'
               : pathname.startsWith(item.href)
+
           const Icon = item.icon
 
           return (
@@ -100,19 +113,23 @@ export default function Sidebar() {
 
               <span className="flex-1">{item.name}</span>
 
-              {/* Show badge if count is > 0 */}
+              {/* Badge */}
               {item.badge !== undefined && item.badge > 0 && (
-                <span className={cn(
-                  "bg-emerald-500 text-white text-xs font-bold min-w-5 h-5 px-1 flex items-center justify-center rounded-full",
-                  // Logic: If this is the message link AND we are currently on the message page, hide it
-                  (item.href === '/message' && pathname === '/message') ? "hidden" : "flex"
-                )}>
+                <span
+                  className={cn(
+                    "bg-emerald-500 text-white text-xs font-bold min-w-5 h-5 px-1 flex items-center justify-center rounded-full",
+                    item.href === '/message' && pathname === '/message'
+                      ? "hidden"
+                      : "flex"
+                  )}
+                >
                   {item.badge}
                 </span>
               )}
             </Link>
           )
         })}
+
       </div>
     </aside>
   )

@@ -192,7 +192,7 @@ export const getAgentFarmers = async (
     const res = await instance.get(`/user/Agent-Farmers/${agentId}`)
     console.log("Agent Farmers:", res.data)
 
-    return res.data.data || res.data
+    return res.data
   } catch (error) {
     console.error("Get agent farmers error:", error)
     return []

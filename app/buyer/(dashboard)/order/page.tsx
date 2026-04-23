@@ -79,7 +79,7 @@ export default function BuyerOrdersPage() {
     }
   }
 
-  // ✅ FILTER LOGIC (NO DATE FILTER)
+  //  FILTER LOGIC (NO DATE FILTER)
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.items.some(item =>
       item.product?.name?.toLowerCase().includes(search.toLowerCase())

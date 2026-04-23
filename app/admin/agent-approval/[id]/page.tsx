@@ -201,7 +201,7 @@ export default function Page() {
 
                         <div className="flex items-center gap-2 text-sm">
                             <MapPin size={16} />
-                            {data.kebeleId || "Unknown location"}
+                            {data.kebeleId|| "Unknown location"}
                         </div>
                     </CardContent>
                 </Card>

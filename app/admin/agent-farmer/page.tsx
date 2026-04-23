@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { getAgents, getAgentFarmers } from '@/services/authService'
 
@@ -71,13 +71,21 @@ export default function AgentsPage() {
   }, [])
 
   // FILTER
-  const filtered = agents.filter(a => {
-    return (
-      (a.profile?.fullName || '').toLowerCase().includes(search.toLowerCase()) ||
-      (a.email || '').toLowerCase().includes(search.toLowerCase()) ||
-      (a.phone || '').includes(search)
-    )
-  })
+  const filtered = useMemo(() => {
+    return agents.filter(a => {
+      const name = (a.profile?.fullName || '').toLowerCase()
+      const email = (a.email || '').toLowerCase()
+      const phone = (a.phone || '')
+
+      const q = search.toLowerCase()
+
+      return (
+        name.includes(q) ||
+        email.includes(q) ||
+        phone.includes(search)
+      )
+    })
+  }, [agents, search])
 
   const totalPages = Math.ceil(filtered.length / pageSize)
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
@@ -92,6 +100,8 @@ export default function AgentsPage() {
 
   return (
     <div className="p-6 space-y-6">
+
+      {/* HEADER */}
       <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
@@ -101,16 +111,18 @@ export default function AgentsPage() {
             View and manage all agents with their assigned farmers
           </p>
         </div>
+
         <Button
           onClick={() => router.push(`/admin/agent-approval`)}
           className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-5"
         >
-          Request Roles
+          All Role requests
         </Button>
       </div>
 
+      {/* SEARCH */}
       <Card>
-        <CardContent className="p-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <CardContent className="p-4">
           <Input
             placeholder="Search agent..."
             value={search}
@@ -149,16 +161,18 @@ export default function AgentsPage() {
                   <TableRow key={a.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Image
-                          src={a.profile?.imageUrl || "/placeholder.png"}
-                          alt=""
-                          width={40}
-                          height={40}
-                          className="rounded-full"
-                        />
-                        {a.profile?.fullName}
-                      </div>
+                        <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
+                          <Image
+                            src={a.profile?.imageUrl || "/placeholder.png"}
+                            alt="user"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        {a.profile?.fullName}                      
+                        </div>
                     </TableCell>
+                 
 
                     <TableCell>{a.email}</TableCell>
                     <TableCell>{a.phone}</TableCell>
@@ -189,7 +203,9 @@ export default function AgentsPage() {
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious onClick={() => setPage(p => Math.max(p - 1, 1))} />
+            <PaginationPrevious
+              onClick={() => setPage(p => Math.max(p - 1, 1))}
+            />
           </PaginationItem>
 
           {Array.from({ length: totalPages }).map((_, i) => (
@@ -204,10 +220,13 @@ export default function AgentsPage() {
           ))}
 
           <PaginationItem>
-            <PaginationNext onClick={() => setPage(p => Math.min(p + 1, totalPages))} />
+            <PaginationNext
+              onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+            />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+
     </div>
   )
 }

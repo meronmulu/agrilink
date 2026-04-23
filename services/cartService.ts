@@ -57,7 +57,7 @@ export const removeCartItem = async (productId: string) => {
 
     const res = await instance.delete(`/cart/${productId}`)
 
-    // console.log("REMOVE ITEM RESPONSE:", res.data)
+    console.log("REMOVE ITEM RESPONSE:", res.data)
 
     return res.data
   } catch (error) {
@@ -69,14 +69,11 @@ export const removeCartItem = async (productId: string) => {
 //  Clear cart
 export const clearCart = async () => {
   try {
-
     const res = await instance.delete("/cart/clear")
-
-    console.log(" CLEAR CART RESPONSE:", res.data)
 
     return res.data
   } catch (error) {
-    console.log(error)
+    console.log("CLEAR CART ERROR:", error)
     throw error
   }
 }

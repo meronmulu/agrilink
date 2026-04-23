@@ -33,7 +33,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(fullUser)
         } catch (error) {
           console.error('Failed to restore user:', error)
-          // If token is expired, clear cookies too
           Cookies.remove('token')
           Cookies.remove('user-role')
           setUser(null)

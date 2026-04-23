@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useCart } from '@/context/CartContext'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -42,12 +43,16 @@ import {
 
 export default function CartPage() {
   const { t } = useLanguage()
+  const { setCartCount } = useCart()
 
   const [cart, setCart] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [checkingOut, setCheckingOut] = useState(false)
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  // ✅ cart item selection (IMPORTANT)
+  const [selectedCartItemId, setSelectedCartItemId] = useState<string | null>(null)
+
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const fetchCart = async () => {
@@ -62,30 +67,52 @@ export default function CartPage() {
   }
 
   useEffect(() => {
-    fetchCart()
+    const init = async () => {
+      await fetchCart()
+      setCartCount(0)
+    }
+    init()
   }, [])
 
   const handleUpdate = async (productId: string, amount: number) => {
     if (amount < 1) return
+
     try {
       await updateCart({ productId, amount })
-      await fetchCart()
+
+      setCart(prev =>
+        prev.map(item =>
+          item.product.id === productId
+            ? { ...item, amount }
+            : item
+        )
+      )
     } catch {
       toast.error(t('update_failed') || 'Update failed')
     }
   }
 
+  // ✅ DELETE FIXED (backend expects productId)
   const handleRemove = async () => {
-    if (!selectedId) return
+    if (!deleteId) return
+
+    const item = cart.find(i => i.id === deleteId)
+    if (!item) return
 
     try {
-      await removeCartItem(selectedId)
-      setCart(prev => prev.filter(i => i.product.id !== selectedId))
-      toast.success(t('product_removed_from_cart') || 'Removed')
+      await removeCartItem(item.product.id)
+
+      setCart(prev => prev.filter(i => i.id !== deleteId))
+
+      if (selectedCartItemId === deleteId) {
+        setSelectedCartItemId(null)
+      }
+
+      toast.success('Removed')
     } catch {
-      toast.error(t('remove_failed') || 'Remove failed')
+      toast.error('Remove failed')
     } finally {
-      setSelectedId(null)
+      setDeleteId(null)
       setIsDialogOpen(false)
     }
   }
@@ -94,37 +121,46 @@ export default function CartPage() {
     try {
       await clearCart()
       setCart([])
-      toast.success(t('cart_cleared') || 'Cart cleared')
+      setSelectedCartItemId(null)
+      toast.success('Cart cleared')
     } catch {
-      toast.error(t('failed_to_clear_cart') || 'Failed')
+      toast.error('Failed')
     }
   }
 
   const handleCheckout = async () => {
     try {
+      if (!selectedCartItemId) {
+        toast.error('Please select one product')
+        return
+      }
+
+      const item = cart.find(i => i.id === selectedCartItemId)
+      if (!item) return
+
       setCheckingOut(true)
 
       const res = await checkoutOrder({
-        items: cart.map(item => ({
-          productId: item.product.id,
-          amount: item.amount
-        }))
+        items: [
+          {
+            productId: item.product.id,
+            amount: item.amount
+          }
+        ]
       })
 
       if (res?.paymentUrl) {
-        window.location.href = res.paymentUrl
+        window.location.href =
+          `${res.paymentUrl}?return_url=${window.location.origin}/payment`
       }
     } catch {
-      toast.error(t('checkout_error') || 'Checkout error')
+      toast.error('Checkout error')
     } finally {
       setCheckingOut(false)
     }
   }
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.product.price * item.amount,
-    0
-  )
+  
 
   if (loading) {
     return (
@@ -135,28 +171,25 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4">
 
         <h1 className="text-2xl font-bold mb-6">
           {t('shopping_cart') || 'Shopping Cart'}
         </h1>
 
-        {/* DELETE DIALOG (GLOBAL) */}
+        {/* DELETE DIALOG */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Remove item</DialogTitle>
               <DialogDescription>
-                Are you sure you want to remove this item from your cart?
+                Are you sure you want to remove this item?
               </DialogDescription>
             </DialogHeader>
 
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
 
@@ -173,7 +206,7 @@ export default function CartPage() {
         {cart.length === 0 ? (
           <Card className="text-center p-10">
             <ShoppingCart className="mx-auto mb-4 text-gray-400" size={50} />
-            <p>{t('your_cart_is_empty') || 'Your cart is empty'}</p>
+            <p>Your cart is empty</p>
           </Card>
         ) : (
           <div className="grid lg:grid-cols-12 gap-6">
@@ -184,7 +217,14 @@ export default function CartPage() {
                 <Card key={item.id}>
                   <CardContent className="p-5 flex gap-5 items-center">
 
-                    <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
+                    <input
+                      type="radio"
+                      name="selected"
+                      checked={selectedCartItemId === item.id}
+                      onChange={() => setSelectedCartItemId(item.id)}
+                    />
+
+                    <div className="relative w-20 h-20 border rounded-lg overflow-hidden">
                       <Image
                         src={item.product.image || "/placeholder.png"}
                         alt={item.product.name}
@@ -195,12 +235,7 @@ export default function CartPage() {
 
                     <div className="flex-1">
                       <h3 className="font-semibold">{item.product.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        ETB {item.product.price}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        ETB {item.product.amount}
-                      </p>
+                      <p>ETB {item.product.price}</p>
 
                       <div className="flex items-center gap-2 mt-2">
                         <Button
@@ -236,7 +271,7 @@ export default function CartPage() {
                         variant="ghost"
                         className="text-red-500"
                         onClick={() => {
-                          setSelectedId(item.product.id)
+                          setDeleteId(item.id)
                           setIsDialogOpen(true)
                         }}
                       >
@@ -257,20 +292,46 @@ export default function CartPage() {
                 </CardHeader>
 
                 <CardContent className="space-y-3">
-                  <div className="flex justify-between">
-                    <span>Subtotal</span>
-                    <span>ETB {subtotal}</span>
-                  </div>
 
-                  <div className="flex justify-between font-bold text-lg">
-                    <span>Total</span>
-                    <span className="text-emerald-600">
-                      ETB {subtotal}
-                    </span>
-                  </div>
+                  {!selectedCartItemId ? (
+                    <p className="text-sm text-gray-500">
+                      Select one product
+                    </p>
+                  ) : (
+                    <>
+                      {/* Selected product details */}
+                      {cart
+                        .filter(item => item.id === selectedCartItemId)
+                        .map(item => (
+                          <div key={item.id} className="space-y-2">
+
+                           
+
+                            <div className="flex justify-between">
+                              <span>Price</span>
+                              <span>
+                                ETB {item.product.price}
+                              </span>
+                            </div>
+
+                            
+
+                            <div className="flex justify-between font-bold text-lg">
+                              <span>Total</span>
+                              <span className="text-emerald-600">
+                                ETB {item.product.price * item.amount}
+                              </span>
+                            </div>
+
+                          </div>
+                        ))
+                      }
+                    </>
+                  )}
 
                   <Button
-                    className="w-full mt-4 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+                    disabled={!selectedCartItemId}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                     onClick={handleCheckout}
                   >
                     {checkingOut ? (
@@ -287,6 +348,7 @@ export default function CartPage() {
                   >
                     Clear Cart
                   </Button>
+
                 </CardContent>
               </Card>
             </div>

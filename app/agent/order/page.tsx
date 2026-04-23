@@ -16,11 +16,16 @@ import {
 import { Loader2, Package } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function BuyerOrdersPage() {
   const { t } = useLanguage()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('ALL')
+
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -50,6 +55,18 @@ export default function BuyerOrdersPage() {
     }
   }
 
+   //  FILTER LOGIC (NO DATE FILTER)
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = order.items.some(item =>
+      item.product?.name?.toLowerCase().includes(search.toLowerCase())
+    )
+
+    const matchesStatus =
+      statusFilter === 'ALL' || order.status === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
+
   if (loading) {
     return (
       <div className="h-[70vh] flex items-center justify-center">
@@ -70,7 +87,34 @@ export default function BuyerOrdersPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{t('my_orders') || 'My Orders'}</h1>
+      {/* FILTER CARD */}
+      <Card className="mb-4">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between flex-wrap">
 
+          {/* SEARCH */}
+          <Input
+            placeholder="Search product..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full md:w-96"
+          />
+
+          {/* STATUS */}
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full md:w-44">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Status</SelectItem>
+              <SelectItem value="PAID">Paid</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
+            </SelectContent>
+          </Select>
+
+         
+
+        </CardContent>
+      </Card>
       <Card className=" ">
         <CardContent className="p-4">
           <div className="overflow-x-auto">        <Table>

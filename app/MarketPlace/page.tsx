@@ -5,7 +5,7 @@ import MarketPlace from '@/components/MarketPlace'
 export default function page() {
   return (
       <div className="min-h-screen ">
-                <Header />
+                {/* <Header /> */}
                    <MarketPlace/> 
                 <Footer/>
         

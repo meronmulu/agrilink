@@ -1,7 +1,6 @@
 import React from "react"
 import Header from "@/components/Header"
 import Sidebar from "@/components/Sidebar"
-import ProtectedRoute from "@/components/ProtectedRoute"
 
 export default function FarmerLayout({
     children,
@@ -9,7 +8,6 @@ export default function FarmerLayout({
     children: React.ReactNode
 }) {
     return (
-            // <ProtectedRoute roles={ ["AGENT"]}>
         
             <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
                 {/* Top Navbar */}
@@ -31,7 +29,6 @@ export default function FarmerLayout({
                     </main>
                 </div>
             </div>
-        //    </ProtectedRoute>
 
     )
 }
