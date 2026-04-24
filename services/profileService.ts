@@ -111,7 +111,6 @@ export const createProfile = async (data: {
     }
 
     const res = await instance.post("/profile", formData)
-
     return res.data
    } catch (error) {
     console.log("Create profile error:", error)

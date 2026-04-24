@@ -147,7 +147,7 @@ export default function ProductDetailPage() {
       setBuyLoading(false)
     }
   }
- if (loading) {
+  if (loading) {
     return (
       <div className="h-[70vh] flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-500" size={32} />
@@ -194,7 +194,7 @@ export default function ProductDetailPage() {
 
               <div className="absolute top-4 left-4 z-10 bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow">
                 <CheckCircle2 size={14} />
-                {t('available_colon') || 'Available:'} {product.amount}
+                {'Available:'} {product.amount}kg
               </div>
 
               <Image
@@ -293,8 +293,8 @@ export default function ProductDetailPage() {
               {product.amount > 0
                 ? (t('in_stock_ready') || 'In Stock & Ready to Ship')
                 : (t('out_of_stock') || 'Out of Stock')
-              }kg
-                
+              }
+
             </div>
 
 
@@ -387,78 +387,73 @@ export default function ProductDetailPage() {
 
             {/* PRODUCT INFO */}
 
-            <div className="grid grid-cols-2 gap-5 bg-gray-50 p-5 rounded-xl border">
+            <div className="bg-gray-50  rounded-2xl  p-5">
 
-              {/* SUB CATEGORY */}
 
-              <div>
-                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
-                  <Package size={12} />
-                  {t('sub_category') || 'Sub Category'}
-                </p>
+              {/* GRID 2 */}
+              <div className="grid grid-cols-2 gap-4">
 
-                <p className="text-sm font-semibold">
-                  {product.subCategory?.name || (t('general') || "General")}
-                </p>
+                {/* SUB CATEGORY */}
+                <div>
+                  <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                    <Package size={12} />
+                    {t('sub_category') || 'Sub Category'}
+                  </p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {product.subCategory?.name || (t('general') || "General")}
+                  </p>
+                </div>
+
+                {/* STOCK */}
+                <div>
+                  <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                    <Package size={12} />
+                    {t('stock') || 'Stock'}
+                  </p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {product.amount} kg
+                  </p>
+                </div>
+
+                {/* DELIVERY */}
+                <div>
+                  <p className="text-xs text-gray-500 uppercase mb-1">
+                    {t('delivery') || 'Delivery'}
+                  </p>
+                  <p className={`text-sm font-semibold ${product.withDelivery ? 'text-green-600' : 'text-red-500'
+                    }`}>
+                    {product.withDelivery ? (t('yes') || 'Yes') : (t('no') || 'No')}
+                  </p>
+                </div>
+
+                {/* POSTED DATE */}
+                <div>
+                  <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
+                    <Calendar size={12} />
+                    {t('posted_date') || 'Posted Date'}
+                  </p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {new Date(product.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* LOCATION (FULL WIDTH) */}
+                <div className="col-span-2">
+                  <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-2">
+                    <MapPin size={12} />
+                    {t('location') || 'Location'}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-y-1 text-sm font-semibold text-gray-800">
+                    <span>Region: {product.farmer?.profile?.kebele?.woreda?.zone?.region?.name || '-'}</span>
+                    <span>Zone: {product.farmer?.profile?.kebele?.woreda?.zone?.name || '-'}</span>
+                    <span>Woreda: {product.farmer?.profile?.kebele?.woreda?.name || '-'}</span>
+                    <span>Kebele: {product.farmer?.profile?.kebele?.name || '-'}</span>
+                    <span className="col-span-2">City: {product.city || '-'}</span>
+                  </div>
+                </div>
+
               </div>
-              <div>
-                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
-                  <Package size={12} />
-                  {t('stock') || 'Stock'}
-                </p>
-
-                <p className="text-sm font-semibold">
-                  {product.amount} kg
-                </p>
-              </div>
-
-
-
-
-
-              {/* LOCATION */}
-
-              <div>
-                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
-                  <MapPin size={12} />
-                  {t('location') || 'Location'}
-                </p>
-
-                <p className="text-sm font-semibold">
-
-                 
-                  {product.farmer?.profile?.kebele?.woreda?.zone?.region?.name} • {product.farmer?.profile?.kebele?.woreda?.zone?.name} • {product.farmer?.profile?.kebele?.woreda?.name} • {product.farmer?.profile?.kebele?.name}
-                </p>
-              </div>
-
-
-              {/* POSTED DATE */}
-
-              <div>
-                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
-                  <Calendar size={12} />
-                  {t('posted_date') || 'Posted Date'}
-                </p>
-
-                <p className="text-sm font-semibold">
-                  {new Date(product.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-
-
-              {/* STOCK */}
-
-              {/* <div>
-                <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-1">
-                  <Package size={12} />
-                  Stock
-                </p>
-
-                <p className="text-sm font-semibold">
-                  {product.amount} Units
-                </p>
-              </div> */}
-
             </div>
 
           </div>

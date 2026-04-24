@@ -299,7 +299,7 @@ export default function AdminProductsPage() {
                     <TableCell>
                       {product.amount > 0 ? (
                         <Badge className="bg-emerald-100 text-emerald-700">
-                          {product.amount}
+                          {product.amount}kg
                         </Badge>
                       ) : (
                         <Badge variant="destructive">Out</Badge>

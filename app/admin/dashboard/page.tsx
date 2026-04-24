@@ -39,7 +39,7 @@ import Image from "next/image"
 interface ChartData {
   month: string
   users: number
-  sales: number
+  products: number
 }
 
 export default function AdminDashboardPage() {
@@ -60,7 +60,7 @@ export default function AdminDashboardPage() {
     const monthlyData: ChartData[] = months.map((m) => ({
       month: m,
       users: 0,
-      sales: 0,
+      products: 0,
     }))
 
     // Users per month
@@ -71,18 +71,12 @@ export default function AdminDashboardPage() {
       monthlyData[monthIndex].users += 1
     })
 
-    // Sales per month
+    // Products added per month
     products.forEach((product) => {
       if (!product.createdAt) return
       const date = new Date(product.createdAt)
       const monthIndex = date.getMonth()
-
-      const revenue =
-        product.amountSold && product.price
-          ? product.amountSold * Number(product.price)
-          : 0
-
-      monthlyData[monthIndex].sales += revenue
+      monthlyData[monthIndex].products += 1
     })
 
     return monthlyData
@@ -187,8 +181,9 @@ export default function AdminDashboardPage() {
               <YAxis />
               <Tooltip />
               <Line type="monotone" dataKey="users" stroke="#4F46E5" strokeWidth={2} />
-              <Line type="monotone" dataKey="product" stroke="#10B981" strokeWidth={2} />
-            </LineChart>
+              <Line type="monotone" dataKey="products" stroke="#10B981" strokeWidth={2} />
+              </LineChart>
+
           </ResponsiveContainer>
         </CardContent>
       </Card>
@@ -220,7 +215,7 @@ export default function AdminDashboardPage() {
                           unoptimized
                           className="object-cover"
                         />
-                        
+
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">
@@ -279,7 +274,7 @@ export default function AdminDashboardPage() {
                           {u.phone}
                         </div>
                       )}
-                      
+
                     </TableCell>
                     <TableCell>
                       <span className="px-2 py-1 bg-gray-100 rounded text-xs">{u.role}</span>

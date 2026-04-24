@@ -70,14 +70,14 @@ export default function Header() {
       { name: t('orders') || "Orders", href: "/buyer/order", icon: ShoppingBag },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('messages') || "Messages", href: "/message", icon: MessageSquare, badge: unreadCount },
-      { name: t('market_insights') || "Market Insights", href: "/buyer/insights", icon: BrainCircuit },
+      { name: "Market Price ", href: "/buyer/insights", icon: BrainCircuit },
     ],
     FARMER: [
       { name: t('my_crops') || 'My Crops', href: '/farmer/crops', icon: Sprout },
       { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('messages') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: t('market_insights') || 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
+      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
     ],
     AGENT: [
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
@@ -85,6 +85,8 @@ export default function Header() {
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Place', href: '/MarketInsight', icon: Store },
+      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+
     ],
     ADMIN: [
       { name: t('dashboard') || "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -92,6 +94,10 @@ export default function Header() {
       { name: t('products') || "Products", href: "/admin/products", icon: Sprout },
       { name: t('categories') || "Categories", href: "/admin/category", icon: Settings },
       { name: 'Market Place', href: '/MarketPlace', icon: Store },
+      { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
+      { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
+      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+
 
     ],
   }

@@ -24,6 +24,7 @@ export function middleware(request: NextRequest) {
     pathname === '/login' || 
     pathname === '/register' ||
     pathname === '/signup' ||
+    pathname === '/other-register' ||
     pathname === '/forgotPassword' ||
     pathname === '/verify-otp' ||
     pathname === '/resetPassword' 

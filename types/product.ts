@@ -9,6 +9,8 @@ export type Product = {
   amountSold?: number
   price: number
   description?: string
+  city: string
+  withDelivery: boolean
   image?: string
   createdAt: string
   subCategory?: SubCategory

@@ -39,7 +39,8 @@ export default function AddCrop() {
   const [subCategories, setSubCategories] = useState<SubCategory[]>([])
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedSubCategory, setSelectedSubCategory] = useState('')
-
+  const [city, setCity] = useState('')
+  const [withDelivery, setWithDelivery] = useState(false)
   // Image + crop state
   const [imageSrc, setImageSrc] = useState<string | null>(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -111,7 +112,6 @@ export default function AddCrop() {
     })
   }
 
-  // ✅ SAVE (with validation like farmer registration)
   const handleSave = async () => {
     setErrors({})
 
@@ -136,6 +136,8 @@ export default function AddCrop() {
         amount: amount === '' ? 0 : Number(amount),
         price: price === '' ? 0 : Number(price),
         description,
+        city,
+        withDelivery,
         image: new File([imageBlob], `${name}.jpg`, {
           type: 'image/jpeg',
         }),
@@ -233,9 +235,9 @@ export default function AddCrop() {
               className="w-full border rounded-lg p-3"
               rows={4}
             />
-             {errors.description && (
-                <p className="text-sm text-red-500">{errors.description}</p>
-              )}
+            {errors.description && (
+              <p className="text-sm text-red-500">{errors.description}</p>
+            )}
           </div>
 
           {/* Pricing */}
@@ -267,6 +269,31 @@ export default function AddCrop() {
                 <p className="text-sm text-red-500">{errors.amount}</p>
               )}
             </div>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+
+            <div>
+              <Label>City</Label>
+              <Input
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Enter city"
+              />
+              {errors.city && (
+                <p className="text-sm text-red-500">{errors.city}</p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 mt-6">
+              <input
+                type="checkbox"
+                checked={withDelivery}
+                onChange={(e) => setWithDelivery(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <Label>With Delivery</Label>
+            </div>
+
           </div>
 
           {/* Image */}

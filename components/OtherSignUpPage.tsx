@@ -38,6 +38,24 @@ export default function OtherSignUpPage() {
 
   const [fullName, setFullName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [latitude, setLatitude] = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!navigator.geolocation) return
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatitude(pos.coords.latitude)
+        setLongitude(pos.coords.longitude)
+      },
+      (err) => {
+        console.log("Location denied or failed:", err)
+        // do nothing → optional
+      }
+    )
+  }, [])
+
 
   // Load regions
   useEffect(() => {
@@ -117,42 +135,47 @@ export default function OtherSignUpPage() {
     try {
       setIsLoading(true)
 
-    //  Loading toast
+      //  Loading toast
 
-      const res = await createProfile({
+      const payload: any = {
         fullName,
         kebeleId
-      })
+      }
+
+      if (latitude !== null) payload.latitude = latitude
+      if (longitude !== null) payload.longitude = longitude
+
+      const res = await createProfile(payload)
 
       console.log("Profile created:", res)
       console.log("Role selected:", role)
 
-    //  Success
-    toast.success("Profile created successfully ")
+      //  Success
+      toast.success("Profile created successfully ")
 
-    // Redirect based on role
-    setTimeout(() => {
-      if (role === "BUYER") {
-        router.push("/buyer")
-      } else if (role === "FARMER") {
-        router.push("/farmer")
-      } else if (role === "AGENT") {
-        router.push("/agent/dashboard")
-      }
-    }, 1000)
+      // Redirect based on role
+      setTimeout(() => {
+        if (role === "BUYER") {
+          router.push("/buyer")
+        } else if (role === "FARMER") {
+          router.push("/farmer")
+        } else if (role === "AGENT") {
+          router.push("/agent/dashboard")
+        }
+      }, 1000)
 
-  } catch (error) {
-    console.log(error)
+    } catch (error) {
+      console.log(error)
 
-    toast.error(
-      // error?.response?.data?.message ||
-      // error?.message ||
-      "Failed to create profile"
-    )
-  } finally {
-    setIsLoading(false)
+      toast.error(
+        // error?.response?.data?.message ||
+        // error?.message ||
+        "Failed to create profile"
+      )
+    } finally {
+      setIsLoading(false)
+    }
   }
-}
 
 
   return (

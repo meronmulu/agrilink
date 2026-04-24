@@ -29,7 +29,6 @@ export default function FarmerDashboardLayout({
                         <div className="max-w-7xl mx-auto">
                             {children}
                         </div>
-                        <AiAssistant />
                     </main>
                 </div>
             </div>

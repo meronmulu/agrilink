@@ -32,11 +32,10 @@ export default function Sidebar() {
   const pathname = usePathname()
 
   const { cartCount } = useCart()
-  const { unreadCount, setUnreadCount } = useMessage() // ✅ updated
+  const { unreadCount, setUnreadCount } = useMessage() 
   const { user } = useAuth()
   const { t } = useLanguage()
 
-  // 🔔 RESET message badge when entering message page (Cart-style behavior)
   useEffect(() => {
     if (pathname === '/message') {
       setUnreadCount(0)
@@ -48,7 +47,7 @@ export default function Sidebar() {
       { name: t('nav_orders') || 'Orders', href: '/buyer/order', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: t('nav_market_insight') || 'Market Insights', href: '/buyer/insights', icon: BrainCircuit },
+      { name:  'Market Price', href: '/buyer/insights', icon: BrainCircuit },
     ],
 
     FARMER: [
@@ -56,7 +55,7 @@ export default function Sidebar() {
       { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: t('nav_market_insight') || 'Market Insights', href: '/farmer/insights', icon: BrainCircuit },
+      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
     ],
 
     AGENT: [
@@ -65,6 +64,7 @@ export default function Sidebar() {
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Place', href: '/MarketPlace', icon: Store },
+      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
       { name: 'Data Approval', href: '/agent/data-collection-approval', icon: Store },
     ],
 
@@ -75,6 +75,9 @@ export default function Sidebar() {
       { name: t('products') || 'Products', href: '/admin/products', icon: Sprout },
       { name: t('categories') || 'Categories', href: '/admin/catagory', icon: Settings },
       { name: 'Market Place', href: '/MarketPlace', icon: Store },
+      { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
+      { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
+      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
     ],
   }
 

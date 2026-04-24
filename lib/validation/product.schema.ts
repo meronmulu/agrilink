@@ -19,6 +19,8 @@ export const productSchema = z.object({
   amount: z.coerce.number().min(1, "Amount is required"),
   price: z.coerce.number().min(1, "Price is required"),
   description: z.string().min(1, "Description is required"),
+  city: z.string().min(1, "City is required"),
+  withDelivery: z.boolean(),
   image: fileSchema,
 });
 

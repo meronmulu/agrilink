@@ -21,6 +21,7 @@ import { getProductById, updateProduct } from '@/services/productService'
 import { Category, SubCategory } from '@/types/category'
 import { toast } from 'sonner'
 import { useLanguage } from '@/context/LanguageContext'
+import { Checkbox } from './ui/checkbox'
 
 export default function EditCrop() {
     const router = useRouter()
@@ -46,7 +47,8 @@ export default function EditCrop() {
     // Image
     const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null)
     const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
-
+    const [city, setCity] = useState('')
+    const [withDelivery, setWithDelivery] = useState(false)
     // Crop
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
@@ -78,7 +80,8 @@ export default function EditCrop() {
                 setPrice(product.price)
                 setDescription(product.description || '')
                 setExistingImageUrl(product.image || null)
-
+                setCity(product.city || '')
+                setWithDelivery(product.withDelivery || false)
                 setSelectedSubCategory(product.subCategoryId)
 
                 // Find category from subcategory
@@ -165,6 +168,8 @@ export default function EditCrop() {
                 amount: Number(amount),
                 price: Number(price),
                 description,
+                city,
+                withDelivery,
                 ...(imageBlob ? { image: imageBlob } : {})
             })
 
@@ -277,6 +282,32 @@ export default function EditCrop() {
                                 onChange={(e) => setAmount(Number(e.target.value))}
                             />
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+
+                        {/* CITY */}
+                        <div>
+                            <Label>{t('city') || 'City'}</Label>
+                            <Input
+                                value={city}
+                                onChange={(e) => setCity(e.target.value)}
+                                placeholder="Enter city"
+                            />
+                        </div>
+
+                        {/* DELIVERY CHECKBOX */}
+                        <div className="flex items-center space-x-3 mt-6">
+                            <Checkbox
+                                id="delivery"
+                                checked={withDelivery}
+                                onCheckedChange={(checked) => setWithDelivery(!!checked)}
+                            />
+                            <Label htmlFor="delivery" className="cursor-pointer">
+                                {t('with_delivery') || 'With Delivery'}
+                            </Label>
+                        </div>
+
                     </div>
 
                     {/* Image */}

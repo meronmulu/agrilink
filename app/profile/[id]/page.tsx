@@ -71,7 +71,24 @@ export default function Page() {
   const [regionId, setRegionId] = useState<string | undefined>()
   const [zoneId, setZoneId] = useState<string | undefined>()
   const [woredaId, setWoredaId] = useState<string | undefined>()
+  const [latitude, setLatitude] = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
 
+
+  useEffect(() => {
+    if (!navigator.geolocation) return
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatitude(pos.coords.latitude)
+        setLongitude(pos.coords.longitude)
+      },
+      (err) => {
+        console.log("Location not allowed:", err)
+        // optional → do nothing
+      }
+    )
+  }, [])
   /* ====================== Fetch User ====================== */
   useEffect(() => {
     if (!id) return
@@ -183,9 +200,19 @@ export default function Page() {
       setUpdating(true)
 
       const formData = new FormData()
+
       formData.append('fullName', form.fullName)
       formData.append('kebeleId', form.kebeleId)
+
       if (form.image) formData.append('image', form.image)
+
+      if (latitude !== null) {
+        formData.append('latitude', latitude.toString())
+      }
+
+      if (longitude !== null) {
+        formData.append('longitude', longitude.toString())
+      }
 
       // Debug: log entries
       for (const [key, value] of formData.entries()) {
@@ -252,171 +279,169 @@ export default function Page() {
   }
 
   return (
-    <ProtectedRoute roles={['ADMIN', 'AGENT', 'BUYER', 'FARMER']}>
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="max-w-7xl mx-auto p-6 pt-24">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* PROFILE CARD */}
-            <div className="lg:col-span-4">
-              <Card>
-                <CardContent className="p-6 flex flex-col items-center text-center">
-                  <div className="relative">
-                    <Avatar className="w-32 h-32">
-                      <AvatarImage src={(preview || user?.profile?.imageUrl) || undefined} />                      
-                      <AvatarFallback>{getInitials(form.fullName)}</AvatarFallback>
-                    </Avatar>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="max-w-7xl mx-auto p-6 pt-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* PROFILE CARD */}
+          <div className="lg:col-span-4">
+            <Card>
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="relative">
+                  <Avatar className="w-32 h-32">
+                    <AvatarImage src={(preview || user?.profile?.imageUrl) || undefined} />
+                    <AvatarFallback>{getInitials(form.fullName)}</AvatarFallback>
+                  </Avatar>
 
-                    <label className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer">
-                      <Camera className="w-4 h-4" />
-                      <input type="file" className="hidden" onChange={handleImageChange} />
-                    </label>
+                  <label className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer">
+                    <Camera className="w-4 h-4" />
+                    <input type="file" className="hidden" onChange={handleImageChange} />
+                  </label>
+                </div>
+
+                <h2 className="font-bold text-xl mt-4">{form.fullName}</h2>
+                <Badge className="mt-2 bg-emerald-500">{user?.role}</Badge>
+
+                <div className="w-full mt-6 space-y-3 text-left">
+                  <div className="flex gap-3 items-center">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    <span>{user?.email}</span>
                   </div>
-
-                  <h2 className="font-bold text-xl mt-4">{form.fullName}</h2>
-                  <Badge className="mt-2 bg-emerald-500">{user?.role}</Badge>
-
-                  <div className="w-full mt-6 space-y-3 text-left">
-                    <div className="flex gap-3 items-center">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      <span>{user?.email}</span>
-                    </div>
-                    <div className="flex gap-3 items-center">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                      <span>{user?.phone}</span>
-                    </div>
-                    <div className="flex gap-3 items-center">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span>
-                        {user?.profile?.kebele?.woreda?.zone?.region?.name} •{' '}
-                        {user?.profile?.kebele?.woreda?.zone?.name} •{' '}
-                        {user?.profile?.kebele?.woreda?.name} • {user?.profile?.kebele?.name}
-                      </span>
-                    </div>
+                  <div className="flex gap-3 items-center">
+                    <Phone className="w-4 h-4 text-muted-foreground" />
+                    <span>{user?.phone}</span>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* FORM */}
-            <div className="lg:col-span-8">
-              <Card className="p-7">
-                <CardHeader>
-                  <CardTitle>{t('edit_profile') || 'Edit Profile'}</CardTitle>
-                  <CardDescription>{t('update_personal_info') || 'Update your personal information'}</CardDescription>
-                </CardHeader>
-
-                <CardContent className="space-y-6">
-                  {/* Full Name */}
-                  <div className="space-y-2">
-                    <Label>{t('full_name') || 'Full Name'}</Label>
-                    <Input
-                      value={form.fullName}
-                      onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                    />
+                  <div className="flex gap-3 items-center">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    <span>
+                      {user?.profile?.kebele?.woreda?.zone?.region?.name} •{' '}
+                      {user?.profile?.kebele?.woreda?.zone?.name} •{' '}
+                      {user?.profile?.kebele?.woreda?.name} • {user?.profile?.kebele?.name}
+                    </span>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-                  {/* Region */}
-                  <div className="space-y-2">
-                    <Label>{t('region') || 'Region'}</Label>
-                    <Select value={regionId} onValueChange={handleRegionChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t('select_region') || "Select region"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {regions.map((region) => (
-                          <SelectItem key={region.id} value={region.id}>
-                            {region.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+          {/* FORM */}
+          <div className="lg:col-span-8">
+            <Card className="p-7">
+              <CardHeader>
+                <CardTitle>{t('edit_profile') || 'Edit Profile'}</CardTitle>
+                <CardDescription>{t('update_personal_info') || 'Update your personal information'}</CardDescription>
+              </CardHeader>
 
-                  {/* Zone */}
-                  <div className="space-y-2">
-                    <Label>{t('zone') || 'Zone'}</Label>
-                    <Select value={zoneId} onValueChange={handleZoneChange} disabled={!regionId}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t('select_zone') || "Select zone"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {zones.map((zone) => (
-                          <SelectItem key={zone.id} value={zone.id}>
-                            {zone.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <CardContent className="space-y-6">
+                {/* Full Name */}
+                <div className="space-y-2">
+                  <Label>{t('full_name') || 'Full Name'}</Label>
+                  <Input
+                    value={form.fullName}
+                    onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                  />
+                </div>
 
-                  {/* Woreda */}
-                  <div className="space-y-2">
-                    <Label>{t('woreda') || 'Woreda'}</Label>
-                    <Select
-                      value={woredaId}
-                      onValueChange={handleWoredaChange}
-                      disabled={!zoneId}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t('select_woreda') || "Select woreda"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {woredas.map((woreda) => (
-                          <SelectItem key={woreda.id} value={woreda.id}>
-                            {woreda.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                {/* Region */}
+                <div className="space-y-2">
+                  <Label>{t('region') || 'Region'}</Label>
+                  <Select value={regionId} onValueChange={handleRegionChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t('select_region') || "Select region"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {regions.map((region) => (
+                        <SelectItem key={region.id} value={region.id}>
+                          {region.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {/* Kebele */}
-                  <div className="space-y-2">
-                    <Label>{t('kebele') || 'Kebele'}</Label>
-                    <Select
-                      value={form.kebeleId}
-                      onValueChange={(value) => setForm({ ...form, kebeleId: value })}
-                      disabled={!woredaId}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t('select_kebele') || "Select kebele"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {kebeles.map((kebele) => (
-                          <SelectItem key={kebele.id} value={kebele.id}>
-                            {kebele.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                {/* Zone */}
+                <div className="space-y-2">
+                  <Label>{t('zone') || 'Zone'}</Label>
+                  <Select value={zoneId} onValueChange={handleZoneChange} disabled={!regionId}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t('select_zone') || "Select zone"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {zones.map((zone) => (
+                        <SelectItem key={zone.id} value={zone.id}>
+                          {zone.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  <div className="flex justify-end">
-                    <Button
-                      onClick={handleUpdate}
-                      disabled={updating}
-                      className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-                    >
-                      {updating ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t('updating') || 'Updating...'}
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Update Profile
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                {/* Woreda */}
+                <div className="space-y-2">
+                  <Label>{t('woreda') || 'Woreda'}</Label>
+                  <Select
+                    value={woredaId}
+                    onValueChange={handleWoredaChange}
+                    disabled={!zoneId}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t('select_woreda') || "Select woreda"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {woredas.map((woreda) => (
+                        <SelectItem key={woreda.id} value={woreda.id}>
+                          {woreda.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Kebele */}
+                <div className="space-y-2">
+                  <Label>{t('kebele') || 'Kebele'}</Label>
+                  <Select
+                    value={form.kebeleId}
+                    onValueChange={(value) => setForm({ ...form, kebeleId: value })}
+                    disabled={!woredaId}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t('select_kebele') || "Select kebele"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {kebeles.map((kebele) => (
+                        <SelectItem key={kebele.id} value={kebele.id}>
+                          {kebele.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleUpdate}
+                    disabled={updating}
+                    className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                  >
+                    {updating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {t('updating') || 'Updating...'}
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Update Profile
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </div>
   )
 }

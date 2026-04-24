@@ -155,120 +155,120 @@ export default function CategoriesPage() {
 
       setSubcategories((prev) => [...prev, created])
 
-     toast.success("Subcategory created successfully")
+      toast.success("Subcategory created successfully")
 
-    setNewSubName('')
-    setParentCategoryId('')
-    setSubDialogOpen(false)
-  } catch (err) {
-    console.error(err)
-    toast.error("Failed to create subcategory ")
+      setNewSubName('')
+      setParentCategoryId('')
+      setSubDialogOpen(false)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to create subcategory ")
     } finally {
       setSubmitting(false)
     }
   }
 
   const handleDelete = async () => {
-  if (!itemToDelete) return;
+    if (!itemToDelete) return;
 
-  setSubmitting(true);
+    setSubmitting(true);
 
-  try {
-    if (itemToDelete.type === 'category') {
-      const hasSubcategories = subcategories.some(
-        (s) => s.categoryId === itemToDelete.id
-      );
-
-      if (hasSubcategories) {
-        toast.warning(
-          "Cannot delete category with subcategories. Delete them first."
+    try {
+      if (itemToDelete.type === 'category') {
+        const hasSubcategories = subcategories.some(
+          (s) => s.categoryId === itemToDelete.id
         );
-        return;
+
+        if (hasSubcategories) {
+          toast.warning(
+            "Cannot delete category with subcategories. Delete them first."
+          );
+          return;
+        }
+
+        await deleteCategory(itemToDelete.id);
+        setCategories((prev) =>
+          prev.filter((c) => c.id !== itemToDelete.id)
+        );
+
+        toast.success("Category deleted successfully ");
+
+      } else {
+        await deleteSubCategory(itemToDelete.id);
+        setSubcategories((prev) =>
+          prev.filter((s) => s.id !== itemToDelete.id)
+        );
+
+        toast.success("Subcategory deleted successfully");
       }
 
-      await deleteCategory(itemToDelete.id);
-      setCategories((prev) =>
-        prev.filter((c) => c.id !== itemToDelete.id)
-      );
-
-      toast.success("Category deleted successfully ");
-
-    } else {
-      await deleteSubCategory(itemToDelete.id);
-      setSubcategories((prev) =>
-        prev.filter((s) => s.id !== itemToDelete.id)
-      );
-
-      toast.success("Subcategory deleted successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete ");
+    } finally {
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+      setSubmitting(false);
     }
-
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to delete ");
-  } finally {
-    setDeleteDialogOpen(false);
-    setItemToDelete(null);
-    setSubmitting(false);
-  }
-};
+  };
 
   const handleEditCategory = async (e: React.FormEvent) => {
-  e.preventDefault()
-  if (!editingCategoryId || !editValue.trim()) return
+    e.preventDefault()
+    if (!editingCategoryId || !editValue.trim()) return
 
-  setSubmitting(true)
+    setSubmitting(true)
 
-  try {
-    const updated = await updateCategory(editingCategoryId, { name: editValue })
+    try {
+      const updated = await updateCategory(editingCategoryId, { name: editValue })
 
-    setCategories(prev =>
-      prev.map(cat =>
-        cat.id === editingCategoryId ? { ...cat, name: updated.name } : cat
+      setCategories(prev =>
+        prev.map(cat =>
+          cat.id === editingCategoryId ? { ...cat, name: updated.name } : cat
+        )
       )
-    )
 
-    toast.success("Category updated successfully ")
+      toast.success("Category updated successfully ")
 
-    setEditCategoryDialogOpen(false)
-    setEditValue('')
-    setEditingCategoryId(null)
+      setEditCategoryDialogOpen(false)
+      setEditValue('')
+      setEditingCategoryId(null)
 
-  } catch (err) {
-    console.error(err)
-    toast.error("Failed to update category")
-  } finally {
-    setSubmitting(false)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update category")
+    } finally {
+      setSubmitting(false)
+    }
   }
-}
 
- const handleEditSubCategory = async (e: React.FormEvent) => {
-  e.preventDefault()
-  if (!editingSubId || !editValue.trim()) return
+  const handleEditSubCategory = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingSubId || !editValue.trim()) return
 
-  setSubmitting(true)
+    setSubmitting(true)
 
-  try {
-    const updated = await updateSubCategory(editingSubId, { name: editValue })
+    try {
+      const updated = await updateSubCategory(editingSubId, { name: editValue })
 
-    setSubcategories(prev =>
-      prev.map(sub =>
-        sub.id === editingSubId ? { ...sub, name: updated.name } : sub
+      setSubcategories(prev =>
+        prev.map(sub =>
+          sub.id === editingSubId ? { ...sub, name: updated.name } : sub
+        )
       )
-    )
 
-    toast.success("Subcategory updated successfully ")
+      toast.success("Subcategory updated successfully ")
 
-    setEditSubDialogOpen(false)
-    setEditValue('')
-    setEditingSubId(null)
+      setEditSubDialogOpen(false)
+      setEditValue('')
+      setEditingSubId(null)
 
-  } catch (err) {
-    console.error(err)
-    toast.error("Failed to update subcategory ")
-  } finally {
-    setSubmitting(false)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update subcategory ")
+    } finally {
+      setSubmitting(false)
+    }
   }
-}
 
   const grouped = useMemo(() => {
     return categories
@@ -291,7 +291,7 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Header Section */}
-      <div className=" bg-white border-b">
+      <div className="">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -349,26 +349,31 @@ export default function CategoriesPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Tabs defaultValue="view" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search categories..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 md:w-4xl"
-                />
+          <Card>
+            <CardContent className="p-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Search categories..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-9 md:w-4xl"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
+                  >
+                    {viewMode === 'list' ? <Grid3x3 className="h-4 w-4" /> : <List className="h-4 w-4" />}
+                  </Button>
+                </div>
               </div>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
-              >
-                {viewMode === 'list' ? <Grid3x3 className="h-4 w-4" /> : <List className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* VIEW ALL TAB */}
           <TabsContent value="view" className="space-y-4">
