@@ -148,9 +148,9 @@ const user = await login(payload)
       }
 
       router.push(roleRoutes[res.user.role] || '/')
-    } catch (error: any) {
+    } catch (error) {
       console.error('Google login failed', error)
-      toast.error(error?.message || 'Google login failed. Try again.')
+      toast.error('Google login failed. Try again.')
     } finally {
       setIsLoading(false)
     }

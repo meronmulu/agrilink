@@ -23,7 +23,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-
 import { MarketPrice } from "@/types/marketprice"
 import {
   getMarketPrices,
@@ -36,7 +35,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function MarketPricePage() {
   const [data, setData] = useState<MarketPrice[]>([])
   const [loading, setLoading] = useState(true)
-
   const [search, setSearch] = useState("")
   const [woredaFilter, setWoredaFilter] = useState("all")
   const [page, setPage] = useState(1)
@@ -47,7 +45,6 @@ export default function MarketPricePage() {
     fetchData()
   }, [])
 
-  /* ================= FETCH ================= */
   const fetchData = async () => {
     try {
       const res = await getMarketPrices()
@@ -60,7 +57,6 @@ export default function MarketPricePage() {
     }
   }
 
-  /* ================= APPROVE ================= */
   const handleApprove = async (id: string) => {
     try {
       await approveMarketPrice(id)
