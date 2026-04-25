@@ -1,5 +1,5 @@
 import instance from "@/lib/axios/axios"
-import { MarketPrice } from "@/types/marketprice"
+import { MarketPrice } from "@/types/market-place"
 
 
 export const getMarketPrices = async (): Promise<MarketPrice[]> => {

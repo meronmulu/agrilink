@@ -23,7 +23,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { MarketPrice } from "@/types/marketprice"
+import { MarketPrice } from "@/types/market-place"
 import {
   getMarketPrices,
   approveMarketPrice,
