@@ -21,6 +21,7 @@ import { getCategories, getSubCategories } from '@/services/categoryService'
 import { Category, SubCategory } from '@/types/category'
 import { productSchema, ProductInput } from '@/lib/validation/product.schema'
 import { useLanguage } from '@/context/LanguageContext'
+import { Checkbox } from './ui/checkbox'
 
 export default function AddCrop() {
   const router = useRouter()
@@ -243,7 +244,7 @@ export default function AddCrop() {
           {/* Pricing */}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <Label>Price (ETB) *</Label>
+              <Label className='mb-2'>Price (ETB) *</Label>
               <Input
                 type="number"
                 value={price}
@@ -257,7 +258,7 @@ export default function AddCrop() {
             </div>
 
             <div>
-              <Label>Available Amount *</Label>
+              <Label className='mb-2'>Available Amount *</Label>
               <Input
                 type="number"
                 value={amount}
@@ -273,7 +274,7 @@ export default function AddCrop() {
           <div className="grid md:grid-cols-2 gap-6">
 
             <div>
-              <Label>City</Label>
+              <Label className='mb-2'>City</Label>
               <Input
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
@@ -285,13 +286,18 @@ export default function AddCrop() {
             </div>
 
             <div className="flex items-center gap-3 mt-6">
-              <input
-                type="checkbox"
+              <Checkbox
+                id="delivery"
                 checked={withDelivery}
-                onChange={(e) => setWithDelivery(e.target.checked)}
-                className="w-4 h-4"
+                onCheckedChange={(checked) => setWithDelivery(checked === true)}
               />
-              <Label>With Delivery</Label>
+
+              <Label
+                htmlFor="delivery"
+                className="text-sm font-medium text-gray-700 cursor-pointer"
+              >
+                With Delivery
+              </Label>
             </div>
 
           </div>

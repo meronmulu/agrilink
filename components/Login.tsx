@@ -53,7 +53,7 @@ const user = await login(payload)
 
       if (!user) return
 
-      // 🚨 BLOCK NON ACTIVE USERS
+      //  BLOCK NON ACTIVE USERS
       if (user.status !== 'ACTIVE') {
         toast.warning('Please verify your account first')
 

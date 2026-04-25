@@ -11,6 +11,8 @@ export const addProducts = async (data: CreateProductPayload) => {
     formData.append("subCategoryId", data.subCategoryId)
     formData.append("amount", String(data.amount))
     formData.append("price", String(data.price))
+    formData.append("city", data.city)
+formData.append("withDelivery", String(data.withDelivery))
 
     if (data.description) {
       formData.append("description", data.description)
@@ -69,7 +71,7 @@ export const updateProduct = async (
     amount: number
     price: number
     description?: string
-    city?: string
+    city: string
     withDelivery?: boolean
     image?: Blob | null
   }
@@ -81,7 +83,8 @@ export const updateProduct = async (
     formData.append("subCategoryId", data.subCategoryId)
     formData.append("amount", String(data.amount))
     formData.append("price", String(data.price))
-
+    formData.append("city", data.city)
+    formData.append("withDelivery", String(data.withDelivery))
     if (data.description) {
       formData.append("description", data.description)
     }

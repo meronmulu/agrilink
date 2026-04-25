@@ -23,6 +23,8 @@ export type CreateProductPayload = {
   amount: number
   price: number
   description?: string
+  city: string
+  withDelivery: boolean
   image: Blob
 }
 
