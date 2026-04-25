@@ -2,6 +2,7 @@ import instance from "@/lib/axios/axios"
 import { ForgotPasswordRequest, LoginResponse, RegisterRequest, ResetPasswordRequest, User, VerifyOtpRequest } from "@/types/auth"
 import { signInWithPopup } from "firebase/auth"
 import { auth, googleProvider } from "@/lib/firebase"
+import { toast } from "sonner"
 
 
 export const register = async (userData: RegisterRequest): Promise<User> => {
@@ -14,50 +15,52 @@ export const register = async (userData: RegisterRequest): Promise<User> => {
     throw error
   }
 }
-export const login = async (credentials: { email?: string; phone?: string; password: string }): Promise<LoginResponse> => {
+export const login = async (credentials: {
+  email?: string
+  phone?: string
+  password: string
+}): Promise<LoginResponse> => {
   try {
-    console.log("Sending login request:", credentials);
+    console.log('Sending login request:', credentials)
 
-    const res = await instance.post("/auth/signin", credentials);
+    const cleanCredentials = credentials.email
+      ? {
+          email: credentials.email,
+          password: credentials.password
+        }
+      : {
+          phone: credentials.phone,
+          password: credentials.password
+        }
+
+    const res = await instance.post('/auth/signin', cleanCredentials)
 
     if (res.data?.token && res.data?.user) {
-      const decoded = JSON.parse(atob(res.data.token.split('.')[1]));
-      console.log("Decoded JWT:", decoded);
-
       const user = {
         id: res.data.user.id,
         role: res.data.user.role,
         email: res.data.user.email,
         phone: res.data.user.phone,
-        status: res.data.user.status || res.data.status // backend might put it in either place
-      };
+        status: res.data.user.status || res.data.status
+      }
 
       return {
         token: res.data.token,
         user
-      };
+      }
     }
 
-    throw new Error("Invalid credentials");
+    throw new Error('Invalid credentials')
   } catch (error) {
-    // Uncomment and use proper error handling if needed
-    // if (error.response) {
-    //   const err = new Error(error.response.data?.message || "Login failed");
-    //   (err as any).status = error.response.status;
-    //   throw err;
-    // } else if (error.code === "ECONNABORTED") {
-    //   const err = new Error("Server timeout. Please try again.");
-    //   (err as any).status = 504;
-    //   throw err;
-    // } else {
-    //   const err = new Error("Network error. Please try again.");
-    //   (err as any).status = 0;
-    //   throw err;
-    // }
-    console.log(error);
-    throw error;
+    console.log('LOGIN ERROR RESPONSE:', error)
+    toast.error(
+        'Login failed. Please check your credentials and try again.'
+    )
+    
+
+      throw error
   }
-};
+}
 export const verifyOtp = async (data: VerifyOtpRequest) => {
   try {
     const res = await instance.post("/auth/verify-otp", data)

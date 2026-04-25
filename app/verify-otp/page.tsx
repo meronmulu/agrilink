@@ -8,6 +8,8 @@ import { verifyOtp, resendOtp } from "@/services/authService"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/AuthContext"
 import { useLanguage } from "@/context/LanguageContext"
+import Cookies from 'js-cookie'
+
 
 export default function VerifyOTP() {
   const router = useRouter()
@@ -57,16 +59,19 @@ export default function VerifyOTP() {
 
       //  Save token + user
       if (res?.token && res?.user) {
-        localStorage.setItem("token", res.token)
-        localStorage.setItem("user", JSON.stringify(res.user))
+  Cookies.set("token", res.token, { path: '/' })
+  Cookies.set("user-role", res.user.role, { path: '/' })
 
-        setUser({
-          id: res.user.id,
-          role: res.user.role,
-          email: res.user.email ?? "",
-          phone: res.user.phone ?? ""
-        })
-      }
+  localStorage.setItem("token", res.token)
+  localStorage.setItem("user", JSON.stringify(res.user))
+
+  setUser({
+    id: res.user.id,
+    role: res.user.role,
+    email: res.user.email ?? "",
+    phone: res.user.phone ?? ""
+  })
+}
 
       // Redirect based on purpose
       switch (purpose) {
@@ -79,7 +84,7 @@ export default function VerifyOTP() {
           break
 
         case "LOGIN":
-          router.push("/dashboard")
+          router.push(`/other-register?identifier=${identifier}&role=${role}`)
           break
       }
 

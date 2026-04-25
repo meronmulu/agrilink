@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { Toaster } from "@/components/ui/sonner";
 import AiAssistant from "@/components/AiAssistance";
+import { usePathname } from "next/navigation";
 
 export default function LayoutContent({
   children,
@@ -11,6 +12,20 @@ export default function LayoutContent({
   children: React.ReactNode;
 }) {
   const { user } = useAuth();
+  const pathname = usePathname();
+
+  const hiddenRoutes = [
+    '/',
+    '/login',
+    '/register',
+    '/signup',
+    '/other-register',
+    '/forgotPassword',
+    '/verify-otp',
+    '/resetPassword'
+  ];
+
+  const hideAi = hiddenRoutes.includes(pathname);
 
   return (
     <>
@@ -20,7 +35,7 @@ export default function LayoutContent({
 
       <Toaster position="top-center" richColors />
 
-      {user && <AiAssistant />}
+=      {user && !hideAi && <AiAssistant />}
     </>
   );
 }

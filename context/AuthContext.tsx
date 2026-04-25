@@ -43,30 +43,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     restoreUser()
   }, [])
 
-  const login = async (credentials: { email?: string; phone?: string; password: string }) => {
-    if (!credentials.password) {
-      throw new Error('Password is required')
-    }
-
-    const res = await AuthService.login(credentials)
-
-    if (res?.token && res?.user) {
-      // 2. Set Cookies for Middleware (Expires in 7 days)
-      Cookies.set('token', res.token, { expires: 7 })
-      Cookies.set('user-role', res.user.role, { expires: 7 })
-
-      // Keep localStorage for client-side persistence
-      localStorage.setItem('token', res.token)
-      localStorage.setItem('user', JSON.stringify(res.user))
-
-      const fullUser = await AuthService.getUserById(res.user.id)
-      setUser(fullUser)
-      localStorage.setItem('user', JSON.stringify(fullUser))
-
-      return fullUser
-    }
-    return null
+ const login = async (credentials: { email?: string; phone?: string; password: string }) => {
+  if (!credentials.password) {
+    throw new Error('Password is required')
   }
+
+  const res = await AuthService.login(credentials)
+
+  if (res?.token && res?.user) {
+    // 🚨 RETURN NON ACTIVE USER IMMEDIATELY
+    if (res.user.status !== 'ACTIVE') {
+      return res.user
+    }
+
+    // ✅ ONLY ACTIVE USER SAVE SESSION
+    Cookies.set('token', res.token, { expires: 7, path: '/' })
+    Cookies.set('user-role', res.user.role, { expires: 7, path: '/' })
+    Cookies.set('user-status', res.user.status, { expires: 7, path: '/' })
+
+    localStorage.setItem('token', res.token)
+    localStorage.setItem('user', JSON.stringify(res.user))
+
+    const fullUser = await AuthService.getUserById(res.user.id)
+
+    setUser(fullUser)
+    localStorage.setItem('user', JSON.stringify(fullUser))
+
+    return fullUser
+  }
+
+  return null
+}
 
   const logout = () => {
   // 1. Clear LocalStorage

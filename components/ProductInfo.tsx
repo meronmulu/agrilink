@@ -449,7 +449,20 @@ export default function ProductDetailPage() {
                     <span>Zone: {product.farmer?.profile?.kebele?.woreda?.zone?.name || '-'}</span>
                     <span>Woreda: {product.farmer?.profile?.kebele?.woreda?.name || '-'}</span>
                     <span>Kebele: {product.farmer?.profile?.kebele?.name || '-'}</span>
-                    <span className="col-span-2">City: {product.city || '-'}</span>
+                    <div className="col-span-2 mt-4">
+                      <iframe
+                        width="100%"
+                        height="280"
+                        className="rounded-xl border"
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://www.google.com/maps?q=${encodeURIComponent(
+                          product.city ||
+                          product.farmer?.profile?.kebele?.name ||
+                          'Ethiopia'
+                        )}&output=embed`}
+                      />
+                    </div>
                   </div>
                 </div>
 

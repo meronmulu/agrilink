@@ -15,6 +15,8 @@ import {
 import { Input } from "./ui/input"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import Cookies from 'js-cookie'
+
 
 export default function OtherSignUpPage() {
   const router = useRouter()
@@ -146,6 +148,11 @@ export default function OtherSignUpPage() {
       if (longitude !== null) payload.longitude = longitude
 
       const res = await createProfile(payload)
+
+      if (res.token) {
+        Cookies.set("token", res.token)
+        localStorage.setItem("token", res.token)
+      }
 
       console.log("Profile created:", res)
       console.log("Role selected:", role)

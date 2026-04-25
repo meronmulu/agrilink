@@ -1,19 +1,8 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { approveRoleRequest, getRoleRequests } from "@/services/roleRequestService"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import {
-  Loader2,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-} from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
 
 import {
   Table,
@@ -23,111 +12,95 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { RoleRequest } from "@/types/roleRequest"
 
+import { Button } from "@/components/ui/button"
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
-export default function RoleRequestTable() {
-  const [requests, setRequests] = useState<RoleRequest[]>([])
+import { MarketPrice } from "@/types/marketprice"
+import {
+  getMarketPrices,
+  approveMarketPrice,
+} from "@/services/marketPrice"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+export default function MarketPricePage() {
+  const [data, setData] = useState<MarketPrice[]>([])
   const [loading, setLoading] = useState(true)
-  const [processingId, setProcessingId] = useState<string | null>(null)
 
-  const router = useRouter()
+  const [search, setSearch] = useState("")
+  const [woredaFilter, setWoredaFilter] = useState("all")
+  const [page, setPage] = useState(1)
+
+  const pageSize = 5
 
   useEffect(() => {
-    fetchRequests()
+    fetchData()
   }, [])
 
   /* ================= FETCH ================= */
-  const fetchRequests = async () => {
+  const fetchData = async () => {
     try {
-      const data = await getRoleRequests()
-      setRequests(data)
-    } catch (error) {
-      console.error(error)
+      const res = await getMarketPrices()
+      setData(res)
+    } catch (err) {
+      toast.error("Failed to load market prices")
+      console.log(err)
     } finally {
       setLoading(false)
     }
   }
 
-  /* ================= SAFE STATUS UPDATE ================= */
-  const updateStatus = (id: string, status: "APPROVED" | "REJECTED") => {
-    setRequests(prev =>
-      prev.map(req =>
-        req.id === id
-          ? { ...req, status }
-          : req
-      )
-    )
-  }
-
   /* ================= APPROVE ================= */
   const handleApprove = async (id: string) => {
-    setProcessingId(id)
-
     try {
-      await approveRoleRequest(id, true)
+      await approveMarketPrice(id)
 
-      toast.success("Approved successfully")
+      toast.success("Price approved")
 
-      updateStatus(id, "APPROVED") 
-
-    } catch (error) {
-      toast.error("Failed to approve")
-      console.log(error)
-    } finally {
-      setProcessingId(null)
+      setData(prev =>
+        prev.map(item =>
+          item.id === id
+            ? { ...item, status: "APPROVED" }
+            : item
+        )
+      )
+    } catch (err) {
+      toast.error("Approval failed")
+      console.log(err)
     }
   }
 
-  /* ================= REJECT ================= */
-  const handleReject = async (id: string) => {
-    setProcessingId(id)
+  /* ================= FILTER ================= */
+  const filteredData = data.filter((item) => {
+    const matchesSearch =
+      item.product?.name
+        ?.toLowerCase()
+        .includes(search.toLowerCase()) ||
+      item.productId.toLowerCase().includes(search.toLowerCase())
 
-    try {
-      await approveRoleRequest(id, false)
+    const matchesWoreda =
+      woredaFilter === "all" ||
+      item.woreda?.name === woredaFilter
 
-      toast.success("Rejected successfully")
+    return matchesSearch && matchesWoreda
+  })
 
-      updateStatus(id, "REJECTED") 
+  const totalPages = Math.ceil(filteredData.length / pageSize)
 
-    } catch (error) {
-      toast.error("Failed to reject")
-      console.log(error)
-    } finally {
-      setProcessingId(null)
-    }
-  }
-
-  /* ================= STATUS UI ================= */
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return {
-          color: "bg-amber-50 text-amber-700 border-amber-200",
-          icon: Clock,
-          label: "Pending",
-        }
-      case "APPROVED":
-        return {
-          color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-          icon: CheckCircle,
-          label: "Approved",
-        }
-      case "REJECTED":
-        return {
-          color: "bg-rose-50 text-rose-700 border-rose-200",
-          icon: XCircle,
-          label: "Rejected",
-        }
-      default:
-        return {
-          color: "bg-gray-50 text-gray-700 border-gray-200",
-          icon: AlertCircle,
-          label: status,
-        }
-    }
-  }
+  const paginatedData = filteredData.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  )
 
   /* ================= LOADING ================= */
   if (loading) {
@@ -142,139 +115,157 @@ export default function RoleRequestTable() {
     <div className="p-6 max-w-7xl mx-auto">
 
       {/* HEADER */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Price Management </h1>
-         
-      </div>
+      <h1 className="text-2xl font-bold mb-6">
+        Market Price Management
+      </h1>
+
+      <Card className="mb-6">
+        <CardContent className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+          <Input
+            placeholder="Search by name..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            className="w-96"
+          />
+
+          <Select
+            value={woredaFilter}
+            onValueChange={(value) => {
+              setWoredaFilter(value)
+              setPage(1)
+            }}
+          >
+
+            <SelectTrigger className="w-full md:w-1/3">
+              <SelectValue placeholder="All Locations" />
+            </SelectTrigger>
+
+            <SelectContent>
+
+              <SelectItem value="all">
+                All Locations
+              </SelectItem>
+
+              {[...new Set(data.map(i => i.woreda?.name))]
+                .filter(Boolean)
+                .map((w, i) => (
+                  <SelectItem key={i} value={w as string}>
+                    {w}
+                  </SelectItem>
+                ))}
+
+            </SelectContent>
+
+          </Select>
+
+        </CardContent>
+      </Card>
 
       {/* TABLE */}
       <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+
         <Table>
 
-          {/* HEADER */}
           <TableHeader>
             <TableRow>
               <TableHead>Product</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
 
-          {/* BODY */}
           <TableBody>
-            {requests.map((req) => {
-              const statusConfig = getStatusConfig(req.status)
-              const StatusIcon = statusConfig.icon
+            {paginatedData.map((item) => (
+              <TableRow key={item.id} className="hover:bg-gray-50">
 
-              return (
-                <TableRow
-                  key={req.id}
-                  onClick={() => router.push(`/admin/agent-approval/${req.id}`)}
-                  className="cursor-pointer hover:bg-gray-50"
-                >
+                {/* PRODUCT */}
+                <TableCell>
+                  <span className="font-medium">
+                    {item.product?.name || item.productId}
+                  </span>
+                </TableCell>
 
-                  {/* USER */}
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                        <Image
-                          src={req.user.profile?.imageUrl || "/placeholder.png"}
-                          alt="user"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <span className="font-medium">
-                        {req.user.profile?.fullName || "User"}
-                      </span>
-                    </div>
-                  </TableCell>
+                {/* PRICE */}
+                <TableCell className="font-semibold text-emerald-600">
+                  ${item.price}
+                </TableCell>
 
-                  {/* ROLE */}
-                  <TableCell>
-                    <Badge variant="secondary">
-                      {req.requestedRole}
-                    </Badge>
-                  </TableCell>
+                {/* LOCATION */}
+                <TableCell className="text-gray-600">
+                  {item.woreda?.name || "-"}
+                </TableCell>
 
-                  {/* CONTACT */}
-                  <TableCell className="text-sm text-gray-600">
-                    <div>{req.user.email}</div>
-                    <div className="text-gray-400">{req.user.phone}</div>
-                  </TableCell>
+                {/* ACTION */}
+                <TableCell className="text-right">
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={() => handleApprove(item.id)}
+                    disabled={item.status === "APPROVED"}
+                  >
+                    Approve
+                  </Button>
+                </TableCell>
 
-                  {/* DATE */}
-                  <TableCell className="text-sm text-gray-500">
-                    {req.createdAt
-                      ? new Date(req.createdAt).toLocaleDateString()
-                      : "-"}
-                  </TableCell>
-
-                  {/* STATUS */}
-                  <TableCell>
-                    <Badge className={`${statusConfig.color} border flex items-center gap-1`}>
-                      <StatusIcon size={14} />
-                      {statusConfig.label}
-                    </Badge>
-                  </TableCell>
-
-                  {/* ACTIONS */}
-                  <TableCell className="text-right">
-                    {req.status === "PENDING" ? (
-                      <div className="flex justify-end gap-2">
-
-                        {/* APPROVE */}
-                        <Button
-                          size="sm"
-                          className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleApprove(req.id)
-                          }}
-                          disabled={processingId === req.id}
-                        >
-                          {processingId === req.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            "Approve"
-                          )}
-                        </Button>
-
-                        {/* REJECT */}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 border-rose-200 text-rose-600 hover:bg-rose-50"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleReject(req.id)
-                          }}
-                          disabled={processingId === req.id}
-                        >
-                          {processingId === req.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            "Reject"
-                          )}
-                        </Button>
-
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400 italic">
-                        {req.status}
-                      </span>
-                    )}
-                  </TableCell>
-
-                </TableRow>
-              )
-            })}
+              </TableRow>
+            ))}
           </TableBody>
 
         </Table>
       </div>
+
+      {/* PAGINATION (SHADCN STYLE) */}
+      <div className="mt-6 flex justify-center">
+
+        <Pagination>
+          <PaginationContent>
+
+            {/* PREV */}
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => setPage(p => Math.max(p - 1, 1))}
+                className={page === 1 ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+
+            {/* PAGES */}
+            {Array.from({ length: totalPages || 1 }).map((_, i) => {
+              const pageNumber = i + 1
+
+              return (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    isActive={page === pageNumber}
+                    onClick={() => setPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            })}
+
+            {/* NEXT */}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() =>
+                  setPage(p => Math.min(p + 1, totalPages || 1))
+                }
+                className={
+                  page === totalPages ? "pointer-events-none opacity-50" : ""
+                }
+              />
+            </PaginationItem>
+
+          </PaginationContent>
+        </Pagination>
+
+      </div>
+
     </div>
   )
 }
