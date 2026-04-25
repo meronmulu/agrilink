@@ -47,7 +47,7 @@ export default function EditCrop() {
     // Image
     const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null)
     const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
-    const [city, setCity] = useState('')
+     const [city, setCity] = useState<string>('') 
     const [withDelivery, setWithDelivery] = useState(false)
     // Crop
     const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -80,7 +80,7 @@ export default function EditCrop() {
                 setPrice(product.price)
                 setDescription(product.description || '')
                 setExistingImageUrl(product.image || null)
-                setCity(product.city || '')
+                setCity(product.city ?? '')
                 setWithDelivery(product.withDelivery || false)
                 setSelectedSubCategory(product.subCategoryId)
 

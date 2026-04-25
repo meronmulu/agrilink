@@ -69,6 +69,8 @@ export const updateProduct = async (
     amount: number
     price: number
     description?: string
+    city?: string
+    withDelivery?: boolean
     image?: Blob | null
   }
 ) => {

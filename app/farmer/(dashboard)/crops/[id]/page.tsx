@@ -5,8 +5,7 @@ import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { Loader2, Calendar, Package, MapPin, CheckCircle2 } from 'lucide-react'
 
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+
 
 import { getProductById } from '@/services/productService'
 import { Product } from '@/types/product'

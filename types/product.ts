@@ -32,5 +32,7 @@ export type UpdateProductPayload = {
   amount?: number
   price?: number
   description?: string
+  city?: string
+  withDelivery?: boolean
   image?: Blob
 }

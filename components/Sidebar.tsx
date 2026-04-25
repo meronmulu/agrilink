@@ -32,22 +32,22 @@ export default function Sidebar() {
   const pathname = usePathname()
 
   const { cartCount } = useCart()
-  const { unreadCount, setUnreadCount } = useMessage() 
+  const { unreadCount, markAsRead } = useMessage()
   const { user } = useAuth()
   const { t } = useLanguage()
 
   useEffect(() => {
-    if (pathname === '/message') {
-      setUnreadCount(0)
+    if (pathname.startsWith('/message')) {
+      markAsRead()
     }
-  }, [pathname, setUnreadCount])
+  }, [pathname, markAsRead])
 
   const roleNav: Record<string, NavItem[]> = {
     BUYER: [
       { name: t('nav_orders') || 'Orders', href: '/buyer/order', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Price', href: '/buyer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/buyer/insights', icon: BrainCircuit },
     ],
 
     FARMER: [
@@ -55,7 +55,7 @@ export default function Sidebar() {
       { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
     ],
 
     AGENT: [
@@ -64,7 +64,7 @@ export default function Sidebar() {
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Place', href: '/MarketPlace', icon: Store },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
       { name: 'Data Approval', href: '/agent/data-collection-approval', icon: Store },
     ],
 
@@ -77,7 +77,7 @@ export default function Sidebar() {
       { name: 'Market Place', href: '/MarketPlace', icon: Store },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
     ],
   }
 
@@ -86,7 +86,6 @@ export default function Sidebar() {
   return (
     <aside className="w-64 h-full border-r border-gray-200 bg-white hidden md:flex flex-col pt-6">
       <div className="px-4 space-y-2">
-
         {navItems.map((item) => {
           const isActive =
             item.href === '/agent'
@@ -116,12 +115,11 @@ export default function Sidebar() {
 
               <span className="flex-1">{item.name}</span>
 
-              {/* Badge */}
               {item.badge !== undefined && item.badge > 0 && (
                 <span
                   className={cn(
                     "bg-emerald-500 text-white text-xs font-bold min-w-5 h-5 px-1 flex items-center justify-center rounded-full",
-                    item.href === '/message' && pathname === '/message'
+                    item.href === '/message' && pathname.startsWith('/message')
                       ? "hidden"
                       : "flex"
                   )}
@@ -132,7 +130,6 @@ export default function Sidebar() {
             </Link>
           )
         })}
-
       </div>
     </aside>
   )
