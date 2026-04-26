@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginInput } from '@/lib/validation/auth.schema'
 import Cookies from 'js-cookie'
 import { Button } from './ui/button'
+import { listenForegroundNotification, requestNotificationPermission } from '@/services/notificationService'
 
 export default function LoginPage() {
   const { t } = useLanguage()
@@ -64,7 +65,7 @@ const user = await login(payload)
       }
 
       toast.success('Login successful')
-
+  
       const roleRoutes: Record<string, string> = {
         ADMIN: '/admin/dashboard',
         AGENT: '/agent/farmer',
@@ -137,7 +138,8 @@ const user = await login(payload)
 
       localStorage.setItem('token', res.token)
       localStorage.setItem('user', JSON.stringify(res.user))
-
+        
+     
       toast.success('Google login successful')
 
       const roleRoutes: Record<string, string> = {

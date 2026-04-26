@@ -1,5 +1,5 @@
 import instance from "@/lib/axios/axios";
-import { CreateProductPayload, Product } from "@/types/product";
+import { CreateAllProductsPayload, CreateProductPayload, Product } from "@/types/product";
 
 
 
@@ -116,3 +116,40 @@ export const deleteProducts = async (id: string) => {
   }
 }
 
+export const addAllProducts = async (data: CreateAllProductsPayload) => {
+  try {
+    console.log("Sending product:", data)
+
+    const res = await instance.post("/all-product", data)
+
+    console.log("Response:", res.data)
+
+    return res.data
+  } catch (errors) {
+    console.error("Add product error:")
+
+    throw new Error(
+       "Failed to create product"
+    )
+  }
+}
+
+
+
+// GET all products
+export const getAllProducts = async () => {
+  const res = await instance.get("/all-product")
+  return res.data
+}
+
+// DELETE product
+export const deleteAllProduct = async (id: string) => {
+  const res = await instance.delete(`/all-product/${id}`)
+  return res.data
+}
+
+// UPDATE product (basic example)
+// export const updateAllProduct = async (id: string, data: any) => {
+//   const res = await instance.put(`/all-product/${id}`, data)
+//   return res.data
+// }

@@ -38,3 +38,8 @@ export type UpdateProductPayload = {
   withDelivery?: boolean
   image?: Blob
 }
+
+
+export type CreateAllProductsPayload = {
+  name: string
+}

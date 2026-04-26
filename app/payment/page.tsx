@@ -26,15 +26,15 @@ export default function Page() {
           {/* Message */}
           <p className="text-gray-500 text-sm">
             Your payment has been processed successfully.  
-            Thank you for your purchase 🎉
+            Thank you for your purchase
           </p>
 
           {/* Button */}
           <Button
-            className="mt-4 w-full"
-            onClick={() => router.push("/")}
+            className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white mt-4 w-full'
+            onClick={() => router.push("/cart")}
           >
-            Go to Home
+            Go to Cart
           </Button>
 
         </CardContent>

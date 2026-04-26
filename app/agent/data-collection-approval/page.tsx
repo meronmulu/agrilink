@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table"
 
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 import {
   Pagination,
@@ -23,14 +24,23 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { MarketPrice } from "@/types/market-place"
 import {
   getMarketPrices,
   approveMarketPrice,
+  rejectMarketPrice,
 } from "@/services/marketPrice"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function MarketPricePage() {
   const [data, setData] = useState<MarketPrice[]>([])
@@ -57,6 +67,7 @@ export default function MarketPricePage() {
     }
   }
 
+  /* ================= APPROVE ================= */
   const handleApprove = async (id: string) => {
     try {
       await approveMarketPrice(id)
@@ -72,6 +83,26 @@ export default function MarketPricePage() {
       )
     } catch (err) {
       toast.error("Approval failed")
+      console.log(err)
+    }
+  }
+
+  /* ================= REJECT ================= */
+  const handleReject = async (id: string) => {
+    try {
+      await rejectMarketPrice(id)
+
+      toast.success("Price rejected")
+
+      setData(prev =>
+        prev.map(item =>
+          item.id === id
+            ? { ...item, status: "REJECTED" }
+            : item
+        )
+      )
+    } catch (err) {
+      toast.error("Rejection failed")
       console.log(err)
     }
   }
@@ -115,6 +146,7 @@ export default function MarketPricePage() {
         Market Price Management
       </h1>
 
+      {/* FILTER CARD */}
       <Card className="mb-6">
         <CardContent className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
@@ -135,16 +167,12 @@ export default function MarketPricePage() {
               setPage(1)
             }}
           >
-
             <SelectTrigger className="w-full md:w-1/3">
               <SelectValue placeholder="All Locations" />
             </SelectTrigger>
 
             <SelectContent>
-
-              <SelectItem value="all">
-                All Locations
-              </SelectItem>
+              <SelectItem value="all">All Locations</SelectItem>
 
               {[...new Set(data.map(i => i.woreda?.name))]
                 .filter(Boolean)
@@ -153,7 +181,6 @@ export default function MarketPricePage() {
                     {w}
                   </SelectItem>
                 ))}
-
             </SelectContent>
 
           </Select>
@@ -171,6 +198,7 @@ export default function MarketPricePage() {
               <TableHead>Product</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Location</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -180,15 +208,13 @@ export default function MarketPricePage() {
               <TableRow key={item.id} className="hover:bg-gray-50">
 
                 {/* PRODUCT */}
-                <TableCell>
-                  <span className="font-medium">
-                    {item.product?.name || item.productId}
-                  </span>
+                <TableCell className="font-medium">
+                  {item.product?.name || item.productId}
                 </TableCell>
 
                 {/* PRICE */}
                 <TableCell className="font-semibold text-emerald-600">
-                  ${item.price}
+                  {item.price} ETB
                 </TableCell>
 
                 {/* LOCATION */}
@@ -196,16 +222,42 @@ export default function MarketPricePage() {
                   {item.woreda?.name || "-"}
                 </TableCell>
 
+                {/* STATUS */}
+                <TableCell>
+                  <Badge
+                    className={
+                      item.status === "APPROVED"
+                        ? "bg-emerald-600"
+                        : item.status === "REJECTED"
+                        ? "bg-red-600"
+                        : "bg-yellow-500"
+                    }
+                  >
+                    {item.status || "PENDING"}
+                  </Badge>
+                </TableCell>
+
                 {/* ACTION */}
-                <TableCell className="text-right">
+                <TableCell className="text-right space-x-2">
+
                   <Button
                     size="sm"
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                     onClick={() => handleApprove(item.id)}
-                    disabled={item.status === "APPROVED"}
+                    disabled={item.status !== "PENDING"}
                   >
                     Approve
                   </Button>
+
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleReject(item.id)}
+                    disabled={item.status !== "PENDING"}
+                  >
+                    Reject
+                  </Button>
+
                 </TableCell>
 
               </TableRow>
@@ -215,13 +267,12 @@ export default function MarketPricePage() {
         </Table>
       </div>
 
-      {/* PAGINATION (SHADCN STYLE) */}
+      {/* PAGINATION */}
       <div className="mt-6 flex justify-center">
 
         <Pagination>
           <PaginationContent>
 
-            {/* PREV */}
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => setPage(p => Math.max(p - 1, 1))}
@@ -229,7 +280,6 @@ export default function MarketPricePage() {
               />
             </PaginationItem>
 
-            {/* PAGES */}
             {Array.from({ length: totalPages || 1 }).map((_, i) => {
               const pageNumber = i + 1
 
@@ -245,7 +295,6 @@ export default function MarketPricePage() {
               )
             })}
 
-            {/* NEXT */}
             <PaginationItem>
               <PaginationNext
                 onClick={() =>

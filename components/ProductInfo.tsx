@@ -26,6 +26,7 @@ import { toast } from 'sonner'
 import { addToCart } from '@/services/cartService'
 import { checkoutOrder } from '@/services/orderService'
 import { useLanguage } from '@/context/LanguageContext'
+import { useCart } from '@/context/CartContext'
 
 export default function ProductDetailPage() {
   const { t } = useLanguage()
@@ -33,7 +34,8 @@ export default function ProductDetailPage() {
   const router = useRouter()
   const params = useParams()
   const id = params?.id as string
-
+  const { incrementCart } = useCart()
+  
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -99,7 +101,7 @@ export default function ProductDetailPage() {
         productId: product.id,
         amount: 1
       })
-
+       incrementCart()
       toast.success('Added to cart')
     } catch (error) {
       console.error(error)

@@ -117,16 +117,7 @@ export default function CartPage() {
     }
   }
 
-  const handleClear = async () => {
-    try {
-      await clearCart()
-      setCart([])
-      setSelectedCartItemId(null)
-      toast.success('Cart cleared')
-    } catch {
-      toast.error('Failed')
-    }
-  }
+ 
 
   const handleCheckout = async () => {
     try {
@@ -286,7 +277,7 @@ export default function CartPage() {
 
             {/* SUMMARY */}
             <div className="lg:col-span-4">
-              <Card className='py-2'>
+              <Card className='py-4'>
                 <CardHeader>
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
@@ -341,13 +332,7 @@ export default function CartPage() {
                     )}
                   </Button>
 
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleClear}
-                  >
-                    Clear Cart
-                  </Button>
+                 
 
                 </CardContent>
               </Card>

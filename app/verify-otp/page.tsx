@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuth } from "@/context/AuthContext"
 import { useLanguage } from "@/context/LanguageContext"
 import Cookies from 'js-cookie'
+import { listenForegroundNotification, requestNotificationPermission } from "@/services/notificationService"
 
 
 export default function VerifyOTP() {
@@ -71,6 +72,11 @@ export default function VerifyOTP() {
     email: res.user.email ?? "",
     phone: res.user.phone ?? ""
   })
+
+  await new Promise(resolve => setTimeout(resolve, 100))
+
+await requestNotificationPermission()
+listenForegroundNotification()
 }
 
       // Redirect based on purpose

@@ -26,10 +26,15 @@ export const getRoleRequests = async () => {
   }
 }
 
-export const approveRoleRequest = async (id: string, approve: boolean) => {
+export const approveRoleRequest = async (
+  id: string,
+  approve: boolean,
+  requestedRole?: string
+) => {
   try {
     const res = await instance.patch(`/role-request/${id}`, {
-      approve
+      approve,
+      requestedRole, 
     })
 
     return res.data

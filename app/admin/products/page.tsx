@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { getProducts } from '@/services/productService'
+import { deleteProducts, getProducts } from '@/services/productService'
 import { Product } from '@/types/product'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -21,7 +21,7 @@ import {
 
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
-import { Loader2, Search, ChevronDown } from 'lucide-react'
+import { Loader2, Search, ChevronDown, MoreHorizontal, Trash2 } from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -50,6 +50,7 @@ import {
 
 import { getCategories, getSubCategories } from '@/services/categoryService'
 import { Category, SubCategory } from '@/types/category'
+import { toast } from 'sonner'
 
 export default function AdminProductsPage() {
   const { t } = useLanguage()
@@ -57,13 +58,13 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
-  // 🔍 SEARCH + FILTER
+  //  SEARCH + FILTER
   const [search, setSearch] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<SubCategory[]>([])
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null)
-
-  // 📄 PAGINATION
+ 
+  // PAGINATION
   const [page, setPage] = useState(1)
   const pageSize = 7
 
@@ -87,6 +88,16 @@ export default function AdminProductsPage() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteProducts(id)
+      toast.success("Product deleted successfully")
+      await loadData()
+    } catch {
+      toast.error("Failed to delete product")
     }
   }
 
@@ -261,6 +272,8 @@ export default function AdminProductsPage() {
                   <TableHead>Stock</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Farmer</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+
                 </TableRow>
               </TableHeader>
 
@@ -320,30 +333,52 @@ export default function AdminProductsPage() {
                           className="object-cover"
                         />
                       </div>
-                         {/* Info */}
-                        <div className="flex flex-col leading-tight">
+                      {/* Info */}
+                      <div className="flex flex-col leading-tight">
 
-                          {/* Name */}
-                          <span className="font-semibold text-gray-900 capitalize">
-                            {product.farmer?.profile?.fullName || "Unknown Farmer"}
+                        {/* Name */}
+                        <span className="font-semibold text-gray-900 capitalize">
+                          {product.farmer?.profile?.fullName || "Unknown Farmer"}
+                        </span>
+
+                        {/* Email */}
+                        <span className="text-xs text-gray-500">
+                          {product.farmer?.email}
+                        </span>
+
+                        {/* Phone */}
+                        {product.farmer?.phone && (
+                          <span className="text-xs text-gray-400">
+                            {product.farmer.phone}
                           </span>
+                        )}
 
-                          {/* Email */}
-                          <span className="text-xs text-gray-500">
-                            {product.farmer?.email}
-                          </span>
-
-                          {/* Phone */}
-                          {product.farmer?.phone && (
-                            <span className="text-xs text-gray-400">
-                              {product.farmer.phone}
-                            </span>
-                          )}
-
-                        </div>
-                      
+                      </div>
 
 
+
+
+
+                    </TableCell>
+
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal size={18} />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(product.id)}
+                            className="text-red-600"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
 
                   </TableRow>

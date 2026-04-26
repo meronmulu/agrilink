@@ -47,7 +47,7 @@ export default function Sidebar() {
       { name: t('nav_orders') || 'Orders', href: '/buyer/order', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: 'Market Price', href: '/buyer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/payment', icon: BrainCircuit },
     ],
 
     FARMER: [
@@ -55,7 +55,7 @@ export default function Sidebar() {
       { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/market-price', icon: BrainCircuit },
     ],
 
     AGENT: [
@@ -64,7 +64,7 @@ export default function Sidebar() {
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Place', href: '/MarketPlace', icon: Store },
-      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/market-price', icon: BrainCircuit },
       { name: 'Data Approval', href: '/agent/data-collection-approval', icon: Store },
     ],
 
@@ -77,7 +77,7 @@ export default function Sidebar() {
       { name: 'Market Place', href: '/MarketPlace', icon: Store },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/market-price', icon: BrainCircuit },
     ],
   }
 

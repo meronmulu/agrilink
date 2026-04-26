@@ -16,11 +16,48 @@ export const getMarketPrices = async (): Promise<MarketPrice[]> => {
 
 export const approveMarketPrice = async (id: string) => {
   try {
-    const res = await instance.patch(`/market-price/approve/${id}`)
-
-    return res.data
+    const res = await instance.patch(`/market-price/approve/${id}`, {
+    approve: true,
+  })
+  return res.data
   } catch (error) {
-    console.log("Approve market price failed:", error)
+    console.log(error)
     throw error
   }
+  
+}
+
+export const rejectMarketPrice = async (id: string) => {
+  try {
+    const res = await instance.patch(`/market-price/approve/${id}`, {
+      approve: false,
+    })
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+    
+}
+
+
+
+
+
+
+
+
+
+
+export const getApprovedMarketPrices = async (): Promise<MarketPrice[]> => {
+  try {
+     const res = await instance.get('/market-price/approved')
+     console.log(res.data)
+     return res.data
+
+  } catch (error) {
+     console.log(error)
+     throw error
+  }
+ 
 }

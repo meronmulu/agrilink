@@ -1,6 +1,6 @@
 'use client'
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "./ui/button"
@@ -18,7 +18,8 @@ import {
   Users,
   ShoppingCart,
   ListOrdered,
-  Store
+  Store,
+  Bell
 } from "lucide-react"
 
 import LanguageDropdown from "./LanguageDropdown"
@@ -30,11 +31,13 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 
+
 import { useAuth } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/context/CartContext"
 import { useMessage } from "@/context/MessageContext"
 import Image from "next/image"
+import { getNotifications } from "@/services/notificationService"
 
 export default function Header() {
   const { user, logout, loading } = useAuth()
@@ -44,9 +47,33 @@ export default function Header() {
   const pathname = usePathname()
   const { cartCount } = useCart()
   const { unreadCount } = useMessage()
+  const [notifications, setNotifications] = useState([])
+
+
+  
+
+
+
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const data = await getNotifications()
+        console.log(data)
+        setNotifications(data)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
+    if (user) {
+      loadNotifications()
+    }
+  }, [user])
+
+
 
   if (loading) return null
-
   const dashboardRoute =
     user?.role === "FARMER"
       ? "/farmer/crops"
@@ -77,7 +104,7 @@ export default function Header() {
       { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('messages') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
     ],
     AGENT: [
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
@@ -85,7 +112,7 @@ export default function Header() {
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Place', href: '/MarketInsight', icon: Store },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
 
     ],
     ADMIN: [
@@ -96,7 +123,7 @@ export default function Header() {
       { name: 'Market Place', href: '/MarketPlace', icon: Store },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
 
 
     ],
@@ -199,7 +226,39 @@ export default function Header() {
                   {cartCount}
                 </span>
               )}
+
+
+
             </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100">
+                  <Bell />
+
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                      {unreadCount}
+                    </span>
+                  )}
+                </div>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
+
+                {notifications.length === 0 ? (
+                  <p className="p-3 text-sm text-gray-500">No notifications</p>
+                ) : (
+                  notifications.map((n) => (
+                    <div key={n.id} className="p-3 border-b hover:bg-gray-50">
+                      <p className="font-medium">{n.title}</p>
+                      <p className="text-sm text-gray-500">{n.message}</p>
+                    </div>
+                  ))
+                )}
+
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <LanguageDropdown />
 

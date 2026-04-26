@@ -13,14 +13,14 @@ type Ctx = {
 
 export const LanguageContext = createContext<Ctx | undefined>(undefined);
 
-// ✅ Memory cache
+//  Memory cache
 const localeCache: Record<string, Record<string, string> | null> = {
   en: null,
   am: null,
   om: null,
 };
 
-// ✅ Load with cache + localStorage fallback
+//  Load with cache + localStorage fallback
 async function loadLocaleFile(lang: Lang) {
   // 1. Memory cache
   if (localeCache[lang]) return localeCache[lang]!;

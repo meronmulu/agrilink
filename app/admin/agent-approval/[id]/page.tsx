@@ -96,10 +96,14 @@ export default function Page() {
         setApproving(true)
 
         try {
-            await approveRoleRequest(data.id, true)
+            await approveRoleRequest(data.id, true, data.requestedRole)
+
             toast.success("Approved successfully")
 
-            setData(prev => prev ? { ...prev, status: "APPROVED" } : prev)
+            setData(prev =>
+                prev ? { ...prev, status: "APPROVED" } : prev
+            )
+
             router.push("/admin/agent-approval")
         } catch {
             toast.error("Failed to approve")
@@ -107,7 +111,6 @@ export default function Page() {
             setApproving(false)
         }
     }
-
     const handleReject = async () => {
         if (!data) return
         setRejecting(true)
@@ -201,7 +204,7 @@ export default function Page() {
 
                         <div className="flex items-center gap-2 text-sm">
                             <MapPin size={16} />
-                            {data.kebeleId|| "Unknown location"}
+                            {data.kebeleId || "Unknown location"}
                         </div>
                     </CardContent>
                 </Card>
@@ -307,10 +310,10 @@ export default function Page() {
 
                     </div>
 
-                 
+
                 </CardContent>
             </Card>
-        
+
 
 
             {/* ================= IMAGE MODAL ================= */}
