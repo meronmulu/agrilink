@@ -63,7 +63,7 @@ export default function AgentFarmerRegistration() {
       const user = await registerFarmer(payload)
 
       if (user) {
-        toast.success("Farmer created successfully")
+        toast.success(t('toast_farmer_created'))
 
         const identifier = validData.email || validData.phone
 
@@ -74,7 +74,7 @@ export default function AgentFarmerRegistration() {
 
     } catch (error) {
       console.log(error)
-      toast.error("Registration failed")
+      toast.error(t('toast_registration_failed'))
     } finally {
       setIsLoading(false)
     }
@@ -89,13 +89,13 @@ export default function AgentFarmerRegistration() {
           {t('role') || 'Role'}
         </label>
         <div className="h-11 flex items-center px-3 rounded-xl border bg-gray-50">
-          Farmer
+          {t('farmer')}
         </div>
       </div>
 
       {/* EMAIL */}
       <div className="space-y-1">
-        <label className="text-sm font-medium">Email (Optional)</label>
+        <label className="text-sm font-medium">{t('signup_email_label')} ({t('optional')})</label>
         <Input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -109,11 +109,11 @@ export default function AgentFarmerRegistration() {
 
       {/* PHONE */}
       <div className="space-y-1">
-        <label className="text-sm font-medium">Phone</label>
+        <label className="text-sm font-medium">{t('signup_phone_label')}</label>
         <Input
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="Enter phone number"
+          placeholder={t('enter_phone_number')}
           className={`h-11 rounded-xl ${errors.phone ? "border-red-500" : ""}`}
         />
         {errors.phone && (
@@ -123,7 +123,7 @@ export default function AgentFarmerRegistration() {
 
       {/* PASSWORD */}
       <div className="space-y-1">
-        <label className="text-sm font-medium">Password</label>
+        <label className="text-sm font-medium">{t('signup_password_label')}</label>
         <Input
           type="password"
           value={password}
@@ -138,7 +138,7 @@ export default function AgentFarmerRegistration() {
 
       {/* CONFIRM PASSWORD */}
       <div className="space-y-1">
-        <label className="text-sm font-medium">Confirm Password</label>
+        <label className="text-sm font-medium">{t('signup_confirm_password_label')}</label>
         <Input
           type="password"
           value={confirmPassword}
@@ -159,7 +159,7 @@ export default function AgentFarmerRegistration() {
         disabled={isLoading}
         className="w-full h-11 rounded-xl bg-emerald-600 text-white"
       >
-        {isLoading ? "Loading..." : "Create Farmer Account"}
+        {isLoading ? t('loading') || "Loading..." : t('create_farmer_account')}
       </button>
 
     </form>

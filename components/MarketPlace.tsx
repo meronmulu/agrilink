@@ -75,11 +75,11 @@ export default function MarketPlace() {
      
       incrementCart()
       console.log(res)
-      toast.success("Added to cart")
+      toast.success(t('toast_added_to_cart'))
 
     } catch (error) {
       console.error(error)
-      toast.error("Failed to add to cart")
+      toast.error(t('toast_failed_add_cart'))
     }
   }
 
@@ -282,7 +282,7 @@ export default function MarketPlace() {
 
                   {/* Availability */}
                   <div className='flex gap-2'>
-                    {'Available:'}
+                    {t('available_colon')}
                     <span className={`font-medium ${product.amount > 10
                       ? 'text-green-600'
                       : product.amount > 0

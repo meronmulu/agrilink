@@ -12,23 +12,23 @@ import {
 import { sendMessageToAI } from '@/services/aiAssistance'
 import { useLanguage } from '@/context/LanguageContext'
 
-const suggestedQuestions = {
+const getSuggestedQuestions = (t: (key: string) => string) => ({
   agronomist: [
-    'When is the best time to plant maize in Oromia?',
-    'What fertilizer is best for clay soil?',
-    'How do I control wheat rust disease?'
+    t('ai_q_plant_maize'),
+    t('ai_q_fertilizer_clay'),
+    t('ai_q_wheat_rust')
   ],
   market: [
-    'Current tomato price in Addis Ababa?',
-    'Where can I sell onions in bulk?',
-    'Which crop has highest market demand now?'
+    t('ai_q_tomato_price'),
+    t('ai_q_sell_onions'),
+    t('ai_q_highest_demand')
   ],
   weather: [
-    'Will it rain next week in Amhara?',
-    'Is there frost risk this month?',
-    'Best irrigation timing this week?'
+    t('ai_q_rain_amhara'),
+    t('ai_q_frost_risk'),
+    t('ai_q_irrigation')
   ]
-}
+})
 
 export default function AiAssistant() {
   const { t } = useLanguage()
@@ -130,9 +130,9 @@ export default function AiAssistant() {
                 <div>
                   <div className="h-full flex flex-col items-center justify-center text-center px-6">
                     <Bot className="w-14 h-14 text-emerald-500 mb-4" />
-                    <h2 className="text-xl font-bold text-gray-700 mb-2">Smart Farm Assistant 🌱</h2>
+                    <h2 className="text-xl font-bold text-gray-700 mb-2">{t('smart_farm_assistant')}</h2>
                     <p className="text-sm text-gray-500 max-w-md mb-6">
-                      Choose an expert or ask your own farming question.
+                      {t('choose_expert_question')}
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl mb-6">
@@ -143,8 +143,8 @@ export default function AiAssistant() {
                         <div className="flex items-center justify-center mb-2 text-green-600">
                           <Sprout className="w-6 h-6" />
                         </div>
-                        <h3 className="text-sm font-semibold">Agronomist</h3>
-                        <p className="text-xs text-gray-500">Crop & soil advice</p>
+                        <h3 className="text-sm font-semibold">{t('agronomist')}</h3>
+                        <p className="text-xs text-gray-500">{t('crop_soil_advice')}</p>
                       </div>
 
                       <div
@@ -154,8 +154,8 @@ export default function AiAssistant() {
                         <div className="flex items-center justify-center mb-2 text-yellow-600">
                           <TrendingUp className="w-6 h-6" />
                         </div>
-                        <h3 className="text-sm font-semibold">Market</h3>
-                        <p className="text-xs text-gray-500">Prices & selling</p>
+                        <h3 className="text-sm font-semibold">{t('market_label')}</h3>
+                        <p className="text-xs text-gray-500">{t('prices_selling')}</p>
                       </div>
 
                       <div
@@ -165,8 +165,8 @@ export default function AiAssistant() {
                         <div className="flex items-center justify-center mb-2 text-blue-600">
                           <CloudSun className="w-6 h-6" />
                         </div>
-                        <h3 className="text-sm font-semibold">Weather</h3>
-                        <p className="text-xs text-gray-500">Forecast & risks</p>
+                        <h3 className="text-sm font-semibold">{t('weather')}</h3>
+                        <p className="text-xs text-gray-500">{t('forecast_risks')}</p>
                       </div>
                     </div>
                   </div>
@@ -175,10 +175,10 @@ export default function AiAssistant() {
                 {selectedAgent && (
                   <div className="w-full max-w-2xl mt-2 animate-in fade-in slide-in-from-top-2 duration-300 px-6">
                     <p className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">
-                      Suggested Questions
+                      {t('suggested_questions')}
                     </p>
                     <div className="space-y-2">
-                      {suggestedQuestions[selectedAgent].map((q, i) => (
+                      {getSuggestedQuestions(t)[selectedAgent].map((q, i) => (
                         <button
                           key={i}
                           onClick={() => setInput(q)}

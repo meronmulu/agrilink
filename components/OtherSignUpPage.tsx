@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { getRegions, getZones, getWoredas, getKebeles, createProfile } from "@/services/profileService"
 import { Region, Zone, Woreda, Kebele } from "@/types/profile"
+import { useLanguage } from "@/context/LanguageContext"
 
 import {
   Select,
@@ -20,6 +21,7 @@ import Cookies from 'js-cookie'
 
 export default function OtherSignUpPage() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [role, setRole] = useState("BUYER")
 
   useEffect(() => {
@@ -130,7 +132,7 @@ export default function OtherSignUpPage() {
 
     //  Validation
     if (!fullName || !kebeleId) {
-      toast.error("Please fill all fields")
+      toast.error(t('toast_fill_all_fields'))
       return
     }
 
@@ -158,7 +160,7 @@ export default function OtherSignUpPage() {
       console.log("Role selected:", role)
 
       //  Success
-      toast.success("Profile created successfully ")
+      toast.success(t('toast_profile_created'))
 
       // Redirect based on role
       setTimeout(() => {
@@ -175,9 +177,7 @@ export default function OtherSignUpPage() {
       console.log(error)
 
       toast.error(
-        // error?.response?.data?.message ||
-        // error?.message ||
-        "Failed to create profile"
+        t('toast_failed_create_profile')
       )
     } finally {
       setIsLoading(false)
@@ -193,13 +193,13 @@ export default function OtherSignUpPage() {
         {/* Full Name */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">
-            Full Name
+            {t('full_name')}
           </label>
 
           <Input
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="Full Name"
+            placeholder={t('full_name')}
             required
             className="h-9 rounded-xl border-gray-200 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
@@ -207,11 +207,11 @@ export default function OtherSignUpPage() {
 
         {/* Region */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Region</label>
+          <label className="text-sm font-medium text-gray-700">{t('region')}</label>
 
           <Select value={regionId} onValueChange={setRegionId}>
             <SelectTrigger className="h-11 w-full  rounded-xl">
-              <SelectValue placeholder="Select Region" />
+              <SelectValue placeholder={t('select_region')} />
             </SelectTrigger>
 
             <SelectContent className="w-full">
@@ -227,11 +227,11 @@ export default function OtherSignUpPage() {
 
         {/* Zone */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Zone</label>
+          <label className="text-sm font-medium text-gray-700">{t('zone')}</label>
 
           <Select value={zoneId} onValueChange={setZoneId} disabled={!regionId || zones.length === 0}>
             <SelectTrigger className="h-11 w-full rounded-xl">
-              <SelectValue placeholder={!!regionId && zones.length === 0 ? "No zones available" : "Select Zone"} />
+              <SelectValue placeholder={!!regionId && zones.length === 0 ? t('no_zones_available') : t('select_zone')} />
             </SelectTrigger>
 
             <SelectContent className="w-full">
@@ -247,11 +247,11 @@ export default function OtherSignUpPage() {
 
         {/* Woreda */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Woreda</label>
+          <label className="text-sm font-medium text-gray-700">{t('woreda')}</label>
 
           <Select value={woredaId} onValueChange={setWoredaId} disabled={!zoneId || woredas.length === 0}>
             <SelectTrigger className="h-11 w-full rounded-xl">
-              <SelectValue placeholder={!!zoneId && woredas.length === 0 ? "No woredas available" : "Select Woreda"} />
+              <SelectValue placeholder={!!zoneId && woredas.length === 0 ? t('no_woredas_available') : t('select_woreda')} />
             </SelectTrigger>
 
             <SelectContent className="w-full">
@@ -267,11 +267,11 @@ export default function OtherSignUpPage() {
 
         {/* Kebele */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Kebele</label>
+          <label className="text-sm font-medium text-gray-700">{t('kebele')}</label>
 
           <Select value={kebeleId} onValueChange={setKebeleId} disabled={!woredaId || kebeles.length === 0}>
             <SelectTrigger className="h-11 w-full rounded-xl">
-              <SelectValue placeholder={!!woredaId && kebeles.length === 0 ? "No kebeles available" : "Select Kebele"} />
+              <SelectValue placeholder={!!woredaId && kebeles.length === 0 ? t('no_kebeles_available') : t('select_kebele')} />
             </SelectTrigger>
 
             <SelectContent className="w-full">
@@ -293,7 +293,7 @@ export default function OtherSignUpPage() {
         >
           {isLoading
             ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            : "Create Profile"}
+            : t('create_profile')}
         </button>
 
       </form>

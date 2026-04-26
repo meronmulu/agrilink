@@ -108,10 +108,10 @@ export default function FarmerManagementPage() {
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">
-            Farmer Management
+            {t('farmer_management')}
           </h1>
           <p className="text-gray-500">
-            Manage all registered farmers and statuses
+            {t('manage_farmers_statuses')}
           </p>
         </div>
 
@@ -120,7 +120,7 @@ export default function FarmerManagementPage() {
           className="bg-emerald-500 hover:bg-emerald-600 h-10"
         >
           <Plus className="mr-2 h-6 w-4" />
-          Register Farmer
+          {t('register_farmer')}
         </Button>
       </div>
 
@@ -130,7 +130,7 @@ export default function FarmerManagementPage() {
         <Card className="shadow-sm rounded-xl ">
           <CardContent className="p-5 flex justify-between items-center">
             <div>
-              <p className="text-gray-500 text-sm">Total Farmers</p>
+              <p className="text-gray-500 text-sm">{t('total_farmers_label')}</p>
               <h2 className="text-3xl font-bold">{totalFarmers}</h2>
             </div>
             <div className="p-3 rounded-full bg-emerald-100">
@@ -142,7 +142,7 @@ export default function FarmerManagementPage() {
         <Card className="shadow-sm rounded-xl ">
           <CardContent className="p-5 flex justify-between items-center">
             <div>
-              <p className="text-gray-500 text-sm">Active Farmers</p>
+              <p className="text-gray-500 text-sm">{t('active_farmers_label')}</p>
               <h2 className="text-3xl font-bold">{activeFarmers}</h2>
             </div>
             <div className="p-3 rounded-full bg-green-100">
@@ -154,7 +154,7 @@ export default function FarmerManagementPage() {
         <Card className="shadow-sm rounded-xl ">
           <CardContent className="p-5 flex justify-between items-center">
             <div>
-              <p className="text-gray-500 text-sm">Pending Farmers</p>
+              <p className="text-gray-500 text-sm">{t('pending_farmers_label')}</p>
               <h2 className="text-3xl font-bold">{pendingFarmers}</h2>
             </div>
             <div className="p-3 rounded-full bg-yellow-100">
@@ -191,17 +191,17 @@ export default function FarmerManagementPage() {
             }}
           >
             <SelectTrigger className="w-full md:w-48">
-              <SelectValue placeholder="Filter status" />
+              <SelectValue placeholder={t('filter_status')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">
-                All Status
+                {t('all_status')}
               </SelectItem>
               <SelectItem value="ACTIVE">
-                Active
+                {t('active')}
               </SelectItem>
               <SelectItem value="PENDING">
-                Pending
+                {t('pending')}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -215,11 +215,11 @@ export default function FarmerManagementPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Farmer</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('farmer')}</TableHead>
+                <TableHead>{t('email')}</TableHead>
+                <TableHead>{t('phone')}</TableHead>
+                <TableHead>{t('location')}</TableHead>
+                <TableHead>{t('status')}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -227,7 +227,7 @@ export default function FarmerManagementPage() {
               {paginatedUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-10 text-gray-500">
-                    No farmers found
+                    {t('no_farmers_found')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -245,7 +245,7 @@ export default function FarmerManagementPage() {
                           />
                         </div>
                         <span className="font-medium">
-                          {user.profile?.fullName || "No Name"}
+                          {user.profile?.fullName || t('no_name')}
                         </span>
                       </div>
                     </TableCell>

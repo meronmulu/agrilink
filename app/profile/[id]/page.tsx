@@ -118,7 +118,7 @@ export default function Page() {
         if (woreda?.id) setKebeles(await getKebeles(woreda.id))
       } catch (error) {
         console.error('Failed to fetch user:', error)
-        toast.error('Failed to load user')
+        toast.error(t('toast_failed_load_user') || 'Failed to load user')
       } finally {
         setLoading(false)
       }
@@ -192,7 +192,7 @@ export default function Page() {
 
   const handleUpdate = async () => {
     if (!form.kebeleId) {
-      toast.error('Please select kebele')
+      toast.error(t('toast_select_kebele') || 'Please select kebele')
       return
     }
 
@@ -250,10 +250,10 @@ export default function Page() {
       }
 
       setPreview(null)
-      toast.success('Profile updated successfully')
+      toast.success(t('toast_profile_updated') || 'Profile updated successfully')
     } catch (error) {
       console.error('Update profile error:', error)
-      toast.error('Failed to update profile')
+      toast.error(t('toast_failed_update_profile') || 'Failed to update profile')
     } finally {
       setUpdating(false)
     }
@@ -432,7 +432,7 @@ export default function Page() {
                     ) : (
                       <>
                         <Save className="mr-2 h-4 w-4" />
-                        Update Profile
+                        {t('update_profile_button') || 'Update Profile'}
                       </>
                     )}
                   </Button>

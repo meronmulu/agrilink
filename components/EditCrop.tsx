@@ -94,7 +94,7 @@ export default function EditCrop() {
 
             } catch (err) {
                 console.error(err)
-                toast.error('Failed to load product')
+                toast.error(t('toast_failed_load_product'))
             } finally {
                 setIsFetching(false)
             }
@@ -149,7 +149,7 @@ export default function EditCrop() {
 
     const handleUpdate = async () => {
         if (!name || !selectedSubCategory || !amount || !price) {
-            toast.error('Please fill all required fields')
+            toast.error(t('toast_fill_required_fields'))
             return
         }
 
@@ -173,7 +173,7 @@ export default function EditCrop() {
                 ...(imageBlob ? { image: imageBlob } : {})
             })
 
-            toast.success('Product updated successfully')
+            toast.success(t('toast_product_updated'))
 
             setTimeout(() => {
                 router.push('/farmer/crops')
@@ -181,7 +181,7 @@ export default function EditCrop() {
 
         } catch (err) {
             console.error(err)
-            toast.error('Update failed')
+            toast.error(t('toast_update_failed'))
         } finally {
             setIsSaving(false)
         }
@@ -292,7 +292,7 @@ export default function EditCrop() {
                             <Input
                                 value={city}
                                 onChange={(e) => setCity(e.target.value)}
-                                placeholder="Enter city"
+                                placeholder={t('enter_city')}
                             />
                         </div>
 

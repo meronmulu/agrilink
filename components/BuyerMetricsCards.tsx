@@ -41,7 +41,7 @@ export default function BuyerMetricsCards() {
     if (!metrics) {
         return (
             <div className="text-center py-8">
-                <p className="text-gray-500">Failed to load metrics</p>
+                <p className="text-gray-500">{t('toast_failed_load_metrics')}</p>
             </div>
         )
     }
