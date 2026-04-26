@@ -62,7 +62,7 @@ export default function AddCrop() {
         setCategories(cats)
         setSubCategories(subs)
       } catch {
-        toast.error('Failed to load categories')
+        toast.error(t('toast_failed_load_categories'))
       }
     }
     fetchData()
@@ -117,7 +117,7 @@ export default function AddCrop() {
     setErrors({})
 
     if (!imageSrc) {
-      toast.error('Please upload an image')
+      toast.error(t('toast_upload_image'))
       return
     }
 
@@ -127,7 +127,7 @@ export default function AddCrop() {
       const imageBlob = await getCroppedImageBlob()
 
       if (!imageBlob) {
-        toast.error('Please crop the image properly')
+        toast.error(t('toast_crop_image_properly'))
         return
       }
 
@@ -162,12 +162,12 @@ export default function AddCrop() {
 
       await addProducts(result.data)
 
-      toast.success('Crop added successfully')
+      toast.success(t('toast_crop_added'))
       router.push('/farmer/crops')
 
     } catch (err) {
       console.error(err)
-      toast.error('Failed to add crop')
+      toast.error(t('toast_failed_add_crop'))
     } finally {
       setLoading(false)
     }
@@ -177,9 +177,9 @@ export default function AddCrop() {
     <div className="min-h-screen bg-[#F8FAFC] font-sans">
       <header className="bg-white border-b px-6 py-4 rounded-2xl">
         <div>
-          <h1 className="text-2xl font-bold">Add Crop</h1>
+          <h1 className="text-2xl font-bold">{t('add_crop_page_title')}</h1>
           <p className="text-sm text-slate-500">
-            Create a new crop with details and image.
+            {t('add_crop_page_desc')}
           </p>
         </div>
       </header>
@@ -202,7 +202,7 @@ export default function AddCrop() {
               }}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder={t('select_category')} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -211,13 +211,13 @@ export default function AddCrop() {
               </SelectContent>
             </Select>
 
-            <Label>Subcategory *</Label>
+            <Label>{t('subcategory_required')}</Label>
             <Select
               value={selectedSubCategory}
               onValueChange={setSelectedSubCategory}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select subcategory" />
+                <SelectValue placeholder={t('select_subcategory')} />
               </SelectTrigger>
               <SelectContent>
                 {filteredSubs.map((sub) => (
@@ -244,7 +244,7 @@ export default function AddCrop() {
           {/* Pricing */}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <Label className='mb-2'>Price (ETB) *</Label>
+              <Label className='mb-2'>{t('price_etb_required')}</Label>
               <Input
                 type="number"
                 value={price}
@@ -258,7 +258,7 @@ export default function AddCrop() {
             </div>
 
             <div>
-              <Label className='mb-2'>Available Amount *</Label>
+              <Label className='mb-2'>{t('available_amount_required')}</Label>
               <Input
                 type="number"
                 value={amount}
@@ -274,11 +274,11 @@ export default function AddCrop() {
           <div className="grid md:grid-cols-2 gap-6">
 
             <div>
-              <Label className='mb-2'>City</Label>
+              <Label className='mb-2'>{t('city')}</Label>
               <Input
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="Enter city"
+                placeholder={t('enter_city')}
               />
               {errors.city && (
                 <p className="text-sm text-red-500">{errors.city}</p>
@@ -296,7 +296,7 @@ export default function AddCrop() {
                 htmlFor="delivery"
                 className="text-sm font-medium text-gray-700 cursor-pointer"
               >
-                With Delivery
+                {t('with_delivery')}
               </Label>
             </div>
 
@@ -305,7 +305,7 @@ export default function AddCrop() {
           {/* Image */}
           <div className="space-y-6">
             <h2 className="text-lg font-bold border-b pb-2">
-              Product Image
+              {t('product_image')}
             </h2>
 
             <div className="relative">
@@ -317,7 +317,7 @@ export default function AddCrop() {
               />
               <div className="w-full h-14 border-2 border-dashed rounded-xl flex items-center justify-center gap-2 text-gray-600">
                 <ImagePlus size={20} />
-                <span>{imageSrc ? "Change image" : "Upload image"}</span>
+                <span>{imageSrc ? t('change_image') : t('upload_image')}</span>
               </div>
             </div>
 
@@ -344,7 +344,7 @@ export default function AddCrop() {
             ) : (
               <div className="flex flex-col items-center justify-center py-10 border border-dashed rounded-2xl text-gray-400">
                 <ImageIcon size={40} />
-                <p>No image selected</p>
+                <p>{t('no_image_selected')}</p>
               </div>
             )}
           </div>
@@ -352,7 +352,7 @@ export default function AddCrop() {
           {/* Buttons */}
           <div className="flex justify-end gap-3 pt-6 border-t">
             <Button variant="outline" onClick={() => router.push('/farmer/crops')}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button onClick={handleSave} disabled={loading} className='bg-emerald-500'>
               {loading ? (
@@ -360,7 +360,7 @@ export default function AddCrop() {
               ) : (
                 <Save className="w-4 h-4 mr-2" />
               )}
-              Add Crop
+              {t('add_crop_page_title')}
             </Button>
           </div>
 

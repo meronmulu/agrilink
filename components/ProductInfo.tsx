@@ -101,11 +101,11 @@ export default function ProductDetailPage() {
         productId: product.id,
         amount: 1
       })
-       incrementCart()
+
       toast.success('Added to cart')
     } catch (error) {
       console.error(error)
-      toast.error('Failed to add to cart')
+      toast.error(t('toast_failed_add_cart'))
     } finally {
       setCartLoading(false)
     }
@@ -126,16 +126,16 @@ export default function ProductDetailPage() {
         ]
       })
 
-      toast.success('Order created. Redirecting to payment...')
+      toast.success(t('toast_order_created_redirect'))
 
       if (res?.paymentUrl) {
         window.location.href = res.paymentUrl
       } else {
-        toast.error('Checkout failed')
+        toast.error(t('toast_checkout_failed'))
       }
     } catch (error) {
       console.log(error)
-      toast.error('Checkout error')
+      toast.error(t('toast_checkout_error'))
     } finally {
       setBuyLoading(false)
     }
@@ -195,7 +195,7 @@ export default function ProductDetailPage() {
             <div className="relative aspect-4/3 w-full rounded-2xl overflow-hidden border bg-gray-50">
               <div className="absolute top-4 left-4 z-10 bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow">
                 <CheckCircle2 size={14} />
-                Available: {product.amount}kg
+                {t('available_colon')} {product.amount}kg
               </div>
 
               <Image
@@ -357,7 +357,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">{t('delivery') || 'With Delivery'}</p>
+                  <p className="text-xs text-gray-500 uppercase mb-1">{t('delivery')}</p>
                   <p className={`text-sm font-semibold ${product.withDelivery ? 'text-green-600' : 'text-red-500'}`}>
                     {product.withDelivery ? t('yes') || 'Yes' : t('no') || 'No'}
                   </p>
@@ -376,15 +376,15 @@ export default function ProductDetailPage() {
                 <div className="col-span-2 mt-2">
                   <p className="flex items-center gap-1 text-xs text-gray-500 uppercase mb-3">
                     <MapPin size={12} />
-                    Location
+                    {t('location')}
                   </p>
 
                   <div className="grid grid-cols-2 gap-y-2 text-sm font-semibold text-gray-800 mb-4">
-                    <span>Region: {product.farmer?.profile?.kebele?.woreda?.zone?.region?.name || '-'}</span>
-                    <span>Zone: {product.farmer?.profile?.kebele?.woreda?.zone?.name || '-'}</span>
-                    <span>Woreda: {product.farmer?.profile?.kebele?.woreda?.name || '-'}</span>
-                    <span>Kebele: {product.farmer?.profile?.kebele?.name || '-'}</span>
-                    <span className="col-span-2">City: {product.city || '-'}</span>
+                    <span>{t('region')}: {product.farmer?.profile?.kebele?.woreda?.zone?.region?.name || '-'}</span>
+                    <span>{t('zone')}: {product.farmer?.profile?.kebele?.woreda?.zone?.name || '-'}</span>
+                    <span>{t('woreda')}: {product.farmer?.profile?.kebele?.woreda?.name || '-'}</span>
+                    <span>{t('kebele')}: {product.farmer?.profile?.kebele?.name || '-'}</span>
+                    <span className="col-span-2">{t('city')}: {product.city || '-'}</span>
                   </div>
 
                   <div className="rounded-2xl overflow-hidden border shadow-sm">

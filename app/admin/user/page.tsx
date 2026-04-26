@@ -84,11 +84,11 @@ export default function AdminUsersPage() {
 
     try {
       await deleteUser(deleteId)
-      toast.success("User deleted successfully")
+      toast.success(t('toast_user_deleted') || "User deleted successfully")
       await loadUsers()
       setOpen(false)
     } catch {
-      toast.error("Failed to delete user")
+      toast.error(t('toast_failed_delete_user') || "Failed to delete user")
     }
   }
 
@@ -141,7 +141,7 @@ export default function AdminUsersPage() {
           {t('user_management') || 'User Management'}
         </h1>
         <p className="text-sm text-gray-500">
-          Manage users, roles, and status
+          {t('manage_users_desc') || 'Manage users, roles, and status'}
         </p>
       </div>
 
@@ -152,7 +152,7 @@ export default function AdminUsersPage() {
           {/* SEARCH */}
           <div className="relative">
             <Input
-              placeholder="Search users..."
+              placeholder={t('search_users') || "Search users..."}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
@@ -168,26 +168,26 @@ export default function AdminUsersPage() {
             {/* ROLE */}
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="Role" />
+                <SelectValue placeholder={t('role') || "Role"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Roles</SelectItem>
-                <SelectItem value="ADMIN">Admin</SelectItem>
-                <SelectItem value="AGENT">Agent</SelectItem>
-                <SelectItem value="BUYER">Buyer</SelectItem>
-                <SelectItem value="FARMER">Farmer</SelectItem>
+                <SelectItem value="ALL">{t('all_roles') || 'All Roles'}</SelectItem>
+                <SelectItem value="ADMIN">{t('admin') || 'Admin'}</SelectItem>
+                <SelectItem value="AGENT">{t('role_agent') || 'Agent'}</SelectItem>
+                <SelectItem value="BUYER">{t('buyer') || 'Buyer'}</SelectItem>
+                <SelectItem value="FARMER">{t('role_farmer_opt') || 'Farmer'}</SelectItem>
               </SelectContent>
             </Select>
 
             {/* STATUS */}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t('status') || "Status"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Status</SelectItem>
-                <SelectItem value="ACTIVE">Active</SelectItem>
-                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="ALL">{t('all_status') || 'All Status'}</SelectItem>
+                <SelectItem value="ACTIVE">{t('active') || 'Active'}</SelectItem>
+                <SelectItem value="PENDING">{t('pending') || 'Pending'}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -202,12 +202,12 @@ export default function AdminUsersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('user') || 'User'}</TableHead>
+                <TableHead>{t('email') || 'Email'}</TableHead>
+                <TableHead>{t('phone') || 'Phone'}</TableHead>
+                <TableHead>{t('role') || 'Role'}</TableHead>
+                <TableHead>{t('status') || 'Status'}</TableHead>
+                <TableHead className="text-right">{t('actions') || 'Actions'}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -215,7 +215,7 @@ export default function AdminUsersPage() {
               {paginatedUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-10">
-                    No users found
+                    {t('no_users_found') || 'No users found'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -232,7 +232,7 @@ export default function AdminUsersPage() {
                             className="object-cover"
                           />
                         </div>
-                        {user.profile?.fullName || "No Name"}
+                        {user.profile?.fullName || (t('no_name') || "No Name")}
                       </div>
                     </TableCell>
 
@@ -270,7 +270,7 @@ export default function AdminUsersPage() {
                             className="text-red-600"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
+                            {t('delete') || 'Delete'}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -320,17 +320,17 @@ export default function AdminUsersPage() {
       {/* DELETE DIALOG */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogTitle>Delete User</DialogTitle>
+          <DialogTitle>{t('delete_user') || 'Delete User'}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this user?
+            {t('delete_user_desc') || 'Are you sure you want to delete this user?'}
           </DialogDescription>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              {t('cancel') || 'Cancel'}
             </Button>
             <Button variant="destructive" onClick={handleDelete}>
-              Delete
+              {t('delete') || 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>

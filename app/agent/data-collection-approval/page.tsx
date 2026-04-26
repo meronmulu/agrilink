@@ -41,8 +41,12 @@ import {
   approveMarketPrice,
   rejectMarketPrice,
 } from "@/services/marketPrice"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function MarketPricePage() {
+  const { t } = useLanguage()
   const [data, setData] = useState<MarketPrice[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -60,7 +64,7 @@ export default function MarketPricePage() {
       const res = await getMarketPrices()
       setData(res)
     } catch (err) {
-      toast.error("Failed to load market prices")
+      toast.error(t('toast_failed_load_market_prices') || "Failed to load market prices")
       console.log(err)
     } finally {
       setLoading(false)
@@ -72,7 +76,7 @@ export default function MarketPricePage() {
     try {
       await approveMarketPrice(id)
 
-      toast.success("Price approved")
+      toast.success(t('toast_price_approved') || "Price approved")
 
       setData(prev =>
         prev.map(item =>
@@ -82,7 +86,7 @@ export default function MarketPricePage() {
         )
       )
     } catch (err) {
-      toast.error("Approval failed")
+      toast.error(t('toast_approval_failed') || "Approval failed")
       console.log(err)
     }
   }
@@ -143,7 +147,7 @@ export default function MarketPricePage() {
 
       {/* HEADER */}
       <h1 className="text-2xl font-bold mb-6">
-        Market Price Management
+        {t('market_price_mgt') || 'Market Price Management'}
       </h1>
 
       {/* FILTER CARD */}
@@ -151,7 +155,7 @@ export default function MarketPricePage() {
         <CardContent className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
           <Input
-            placeholder="Search by name..."
+            placeholder={t('search_by_name') || "Search by name..."}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -168,11 +172,14 @@ export default function MarketPricePage() {
             }}
           >
             <SelectTrigger className="w-full md:w-1/3">
-              <SelectValue placeholder="All Locations" />
+              <SelectValue placeholder={t('all_locations') || "All Locations"} />
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="all">All Locations</SelectItem>
+
+              <SelectItem value="all">
+                All Locations
+              </SelectItem>
 
               {[...new Set(data.map(i => i.woreda?.name))]
                 .filter(Boolean)
@@ -198,7 +205,6 @@ export default function MarketPricePage() {
               <TableHead>Product</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Location</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -246,7 +252,7 @@ export default function MarketPricePage() {
                     onClick={() => handleApprove(item.id)}
                     disabled={item.status !== "PENDING"}
                   >
-                    Approve
+                    {t('approve') || 'Approve'}
                   </Button>
 
                   <Button

@@ -12,6 +12,8 @@ import {
   getSubCategories,
 } from '@/services/categoryService'
 
+import { useLanguage } from '@/context/LanguageContext'
+
 import { Category, SubCategory } from '@/types/category'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -57,6 +59,7 @@ import { toast } from 'sonner'
 
 
 export default function CategoriesPage() {
+  const { t } = useLanguage()
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<SubCategory[]>([])
 
@@ -128,13 +131,13 @@ export default function CategoriesPage() {
       const created = await addCategory({ name: newCategoryName })
 
       setCategories((prev) => [...prev, created])
-      toast.success("Category created successfully ")
+      toast.success(t('toast_category_created') || "Category created successfully")
 
       setNewCategoryName('')
       setDetailDialogOpen(false)
     } catch (err) {
       console.error(err)
-      toast.error("Failed to create category")
+      toast.error(t('toast_failed_create_category') || "Failed to create category")
     } finally {
       setSubmitting(false)
     }
@@ -155,14 +158,14 @@ export default function CategoriesPage() {
 
       setSubcategories((prev) => [...prev, created])
 
-      toast.success("Subcategory created successfully")
+      toast.success(t('toast_subcategory_created') || "Subcategory created successfully")
 
       setNewSubName('')
       setParentCategoryId('')
       setSubDialogOpen(false)
     } catch (err) {
       console.error(err)
-      toast.error("Failed to create subcategory ")
+      toast.error(t('toast_failed_create_subcategory') || "Failed to create subcategory")
     } finally {
       setSubmitting(false)
     }
@@ -180,9 +183,7 @@ export default function CategoriesPage() {
         );
 
         if (hasSubcategories) {
-          toast.warning(
-            "Cannot delete category with subcategories. Delete them first."
-          );
+          toast.warning(t('toast_delete_subs_first') || "Cannot delete category with subcategories. Delete them first.")
           return;
         }
 
@@ -191,7 +192,7 @@ export default function CategoriesPage() {
           prev.filter((c) => c.id !== itemToDelete.id)
         );
 
-        toast.success("Category deleted successfully ");
+        toast.success(t('toast_category_deleted') || "Category deleted successfully");
 
       } else {
         await deleteSubCategory(itemToDelete.id);
@@ -199,12 +200,12 @@ export default function CategoriesPage() {
           prev.filter((s) => s.id !== itemToDelete.id)
         );
 
-        toast.success("Subcategory deleted successfully");
+        toast.success(t('toast_subcategory_deleted') || "Subcategory deleted successfully");
       }
 
     } catch (err) {
       console.error(err);
-      toast.error("Failed to delete ");
+      toast.error(t('toast_failed_delete') || "Failed to delete");
     } finally {
       setDeleteDialogOpen(false);
       setItemToDelete(null);
@@ -227,7 +228,7 @@ export default function CategoriesPage() {
         )
       )
 
-      toast.success("Category updated successfully ")
+      toast.success(t('toast_category_updated') || "Category updated successfully")
 
       setEditCategoryDialogOpen(false)
       setEditValue('')
@@ -235,7 +236,7 @@ export default function CategoriesPage() {
 
     } catch (err) {
       console.error(err)
-      toast.error("Failed to update category")
+      toast.error(t('toast_failed_update_category') || "Failed to update category")
     } finally {
       setSubmitting(false)
     }
@@ -256,7 +257,7 @@ export default function CategoriesPage() {
         )
       )
 
-      toast.success("Subcategory updated successfully ")
+      toast.success(t('toast_subcategory_updated') || "Subcategory updated successfully")
 
       setEditSubDialogOpen(false)
       setEditValue('')
@@ -264,7 +265,7 @@ export default function CategoriesPage() {
 
     } catch (err) {
       console.error(err)
-      toast.error("Failed to update subcategory ")
+      toast.error(t('toast_failed_update_subcategory') || "Failed to update subcategory")
     } finally {
       setSubmitting(false)
     }
@@ -295,9 +296,9 @@ export default function CategoriesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('categories') || 'Categories'}</h1>
               <p className="text-sm text-gray-500 mt-1">
-                Organize your products with categories and subcategories
+                {t('categories_desc') || 'Organize your products with categories and subcategories'}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -305,24 +306,24 @@ export default function CategoriesPage() {
                 <DialogTrigger asChild>
                   <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
                     <PlusCircle className="h-4 w-4 mr-2" />
-                    Add Category
+                    {t('add_category') || 'Add Category'}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-106.25">
                   <DialogHeader>
-                    <DialogTitle>Create New Category</DialogTitle>
+                    <DialogTitle>{t('create_new_category') || 'Create New Category'}</DialogTitle>
                     <DialogDescription>
-                      Add a new category to organize your products
+                      {t('create_category_desc') || 'Add a new category to organize your products'}
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleCreateCategory} className="space-y-4">
                     <div>
-                      <Label htmlFor="name">Category Name *</Label>
+                      <Label htmlFor="name">{t('category_name') || 'Category Name'} *</Label>
                       <Input
                         id="name"
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
-                        placeholder="e.g., Fresh Produce"
+                        placeholder={t('category_name_placeholder') || "e.g., Fresh Produce"}
                         className="mt-4"
                       />
                     </div>
@@ -331,10 +332,10 @@ export default function CategoriesPage() {
                         {submitting ? (
                           <>
                             <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                            Creating...
+                            {t('creating') || 'Creating...'}
                           </>
                         ) : (
-                          'Create Category'
+                          t('create_category') || 'Create Category'
                         )}
                       </Button>
                     </DialogFooter>
@@ -357,7 +358,7 @@ export default function CategoriesPage() {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="Search categories..."
+                      placeholder={t('search_categories') || "Search categories..."}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-9 md:w-4xl"
@@ -381,7 +382,7 @@ export default function CategoriesPage() {
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Folder className="h-12 w-12 text-gray-300 mb-4" />
-                  <p className="text-lg font-medium text-gray-900">No categories found</p>
+                  <p className="text-lg font-medium text-gray-900">{t('no_categories_found') || 'No categories found'}</p>
 
                 </CardContent>
               </Card>
@@ -411,7 +412,7 @@ export default function CategoriesPage() {
                               <div className="flex items-center gap-2">
                                 <h3 className="font-semibold text-gray-900">{cat.name}</h3>
                               </div>
-                              <p className="text-xs text-gray-500">• {cat.subs.length} subcategories</p>
+                              <p className="text-xs text-gray-500">• {cat.subs.length} {t('subcategories') || 'subcategories'}</p>
                             </div>
                           </div>
                         </div>
@@ -431,7 +432,7 @@ export default function CategoriesPage() {
                                 setEditCategoryDialogOpen(true)
                               }}
                             >
-                              <Pencil className="h-4 w-4 mr-2" /> Edit
+                              <Pencil className="h-4 w-4 mr-2" /> {t('edit') || 'Edit'}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-600"
@@ -440,7 +441,7 @@ export default function CategoriesPage() {
                                 setDeleteDialogOpen(true)
                               }}
                             >
-                              <Trash className="h-4 w-4 mr-2" /> Delete
+                              <Trash className="h-4 w-4 mr-2" /> {t('delete') || 'Delete'}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -462,7 +463,7 @@ export default function CategoriesPage() {
                             }}
                           >
                             <PlusCircle className="h-4 w-4 mr-2" />
-                            Add Subcategory
+                            {t('add_subcategory') || 'Add Subcategory'}
                           </Button>
 
                         </div>
@@ -507,7 +508,7 @@ export default function CategoriesPage() {
                         ) : (
                           <Alert>
                             <AlertDescription className="text-sm text-center text-gray-500">
-                              No subcategories yet. Click Add Subcategory  to create one.
+                              {t('no_subcategories_desc') || 'No subcategories yet. Click Add Subcategory to create one.'}
                             </AlertDescription>
                           </Alert>
                         )}
@@ -527,15 +528,15 @@ export default function CategoriesPage() {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>{t('confirm_deletion') || 'Confirm Deletion'}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this {itemToDelete?.type}? This action cannot be undone.
-              {itemToDelete?.type === 'category' && ' All subcategories under this category will also be deleted.'}
+              {t('confirm_deletion_desc1') || 'Are you sure you want to delete this'} {itemToDelete?.type}? {t('confirm_deletion_desc2') || 'This action cannot be undone.'}
+              {itemToDelete?.type === 'category' && (t('confirm_deletion_desc_cat') || ' All subcategories under this category will also be deleted.')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>{t('cancel') || 'Cancel'}</Button>
+            <Button variant="destructive" onClick={handleDelete}>{t('delete') || 'Delete'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -544,16 +545,16 @@ export default function CategoriesPage() {
       <Dialog open={subDialogOpen} onOpenChange={setSubDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Subcategory</DialogTitle>
-            <DialogDescription>Add a subcategory under this category</DialogDescription>
+            <DialogTitle>{t('create_subcategory') || 'Create Subcategory'}</DialogTitle>
+            <DialogDescription>{t('create_subcategory_desc') || 'Add a subcategory under this category'}</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateSubCategory} className="space-y-4">
             <div>
-              <Label>Subcategory Name</Label>
+              <Label>{t('subcategory_name') || 'Subcategory Name'}</Label>
               <Input
                 value={newSubName}
                 onChange={(e) => setNewSubName(e.target.value)}
-                placeholder="Enter subcategory"
+                placeholder={t('subcategory_placeholder') || "Enter subcategory"}
                 className='mt-3'
               />
             </div>
@@ -562,9 +563,9 @@ export default function CategoriesPage() {
                 {submitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                    Creating...
+                    {t('creating') || 'Creating...'}
                   </>
-                ) : "Create"}
+                ) : (t('create') || "Create")}
               </Button>
             </DialogFooter>
           </form>
@@ -575,11 +576,11 @@ export default function CategoriesPage() {
       <Dialog open={editCategoryDialogOpen} onOpenChange={setEditCategoryDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Category</DialogTitle>
+            <DialogTitle>{t('edit_category') || 'Edit Category'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditCategory} className="space-y-4">
             <div>
-              <Label>Category Name</Label>
+              <Label>{t('category_name') || 'Category Name'}</Label>
               <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} className='mt-3' />
             </div>
             <DialogFooter>
@@ -587,9 +588,9 @@ export default function CategoriesPage() {
                 {submitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                    Updating...
+                    {t('updating') || 'Updating...'}
                   </>
-                ) : "Update"}
+                ) : (t('update') || "Update")}
               </Button>
             </DialogFooter>
           </form>
@@ -600,11 +601,11 @@ export default function CategoriesPage() {
       <Dialog open={editSubDialogOpen} onOpenChange={setEditSubDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Subcategory</DialogTitle>
+            <DialogTitle>{t('edit_subcategory') || 'Edit Subcategory'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditSubCategory} className="space-y-4">
             <div>
-              <Label>Subcategory Name</Label>
+              <Label>{t('subcategory_name') || 'Subcategory Name'}</Label>
               <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} className='mt-3' />
             </div>
             <DialogFooter>
@@ -612,9 +613,9 @@ export default function CategoriesPage() {
                 {submitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                    Updating...
+                    {t('updating') || 'Updating...'}
                   </>
-                ) : "Update"}
+                ) : (t('update') || "Update")}
               </Button>
             </DialogFooter>
           </form>

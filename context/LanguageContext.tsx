@@ -22,31 +22,32 @@ const localeCache: Record<string, Record<string, string> | null> = {
 
 //  Load with cache + localStorage fallback
 async function loadLocaleFile(lang: Lang) {
-  // 1. Memory cache
-  if (localeCache[lang]) return localeCache[lang]!;
-
-  // 2. localStorage cache
-  const stored = typeof window !== 'undefined' && localStorage.getItem(`locale-${lang}`);
-  if (stored) {
-    const parsed = JSON.parse(stored);
-    localeCache[lang] = parsed;
-    return parsed;
-  }
-
-  // 3. Fetch from public
+  // Try to fetch fresh data from public folder first (with cache busting for dev)
   try {
-    const res = await fetch(`/locales/${lang}.json`);
+    const res = await fetch(`/locales/${lang}.json?t=${new Date().getTime()}`);
     const data = await res.json();
 
+    // Update caches
     localeCache[lang] = data;
-
     if (typeof window !== 'undefined') {
       localStorage.setItem(`locale-${lang}`, JSON.stringify(data));
     }
 
     return data;
   } catch (e) {
-    console.error('Failed to load locale:', e);
+    console.error('Failed to load fresh locale, falling back to cache:', e);
+    
+    // 1. Memory cache
+    if (localeCache[lang]) return localeCache[lang]!;
+
+    // 2. localStorage cache
+    const stored = typeof window !== 'undefined' && localStorage.getItem(`locale-${lang}`);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      localeCache[lang] = parsed;
+      return parsed;
+    }
+
     return {};
   }
 }

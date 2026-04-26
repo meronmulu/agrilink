@@ -21,9 +21,11 @@ import { toast } from "sonner"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { Briefcase, GraduationCap, UploadCloud } from "lucide-react"
+import { useLanguage } from "@/context/LanguageContext"
 
 export default function AskAgentPage() {
   const router = useRouter()
+  const { t } = useLanguage()
 
   const [form, setForm] = useState({
     kebeleId: "",
@@ -125,7 +127,7 @@ export default function AskAgentPage() {
         const data = await getAllKebeles()
         setKebeles(data)
       } catch (err) {
-        toast.error("Failed to load kebeles")
+        toast.error(t('toast_failed_load_kebeles') || "Failed to load kebeles")
       } finally {
         setLoadingKebeles(false)
       }
@@ -145,7 +147,7 @@ export default function AskAgentPage() {
     e.preventDefault()
 
     if (!form.kebeleId) {
-      toast.error("Please select a kebele")
+      toast.error(t('toast_select_kebele'))
       return
     }
 
@@ -167,12 +169,12 @@ export default function AskAgentPage() {
       }
 
       await createRoleRequest(data)
-      toast.success("Application submitted successfully")
+      toast.success(t('toast_application_submitted'))
       router.push("/buyer")
     } catch (err) {
       console.log(err)
 
-      toast.error("Failed to submit")
+      toast.error(t('toast_failed_submit'))
     } finally {
       setLoading(false)
     }
@@ -189,10 +191,10 @@ export default function AskAgentPage() {
 
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-slate-900">
-              Become an Agent and Data Collecter
+              {t('become_agent_title') || "Become an Agent and Data Collector"}
             </h1>
             <p className="text-slate-500 mt-3 text-sm">
-              Empower your community and join our growing agricultural network.
+              {t('become_agent_desc') || "Empower your community and join our growing agricultural network."}
             </p>
           </div>
 
@@ -203,7 +205,7 @@ export default function AskAgentPage() {
               {/* REGION */}
               <Select value={regionId} onValueChange={setRegionId}>
                   <SelectTrigger className="h-12 border-slate-200 w-full">
-                  <SelectValue placeholder="Select Region" />
+                  <SelectValue placeholder={t('select_region') || "Select Region"} />
                   </SelectTrigger>
                 <SelectContent>
                   {regions.map(r => (
@@ -215,7 +217,7 @@ export default function AskAgentPage() {
               {/* ZONE */}
               <Select value={zoneId} onValueChange={setZoneId} disabled={!regionId}>
                   <SelectTrigger className="h-12 border-slate-200 w-full">
-                  <SelectValue placeholder="Select Zone" />
+                  <SelectValue placeholder={t('select_zone') || "Select Zone"} />
                   </SelectTrigger>
                 <SelectContent>
                   {zones.map(z => (
@@ -227,7 +229,7 @@ export default function AskAgentPage() {
               {/* WOREDA */}
               <Select value={woredaId} onValueChange={setWoredaId} disabled={!zoneId}>
                   <SelectTrigger className="h-12 border-slate-200 w-full">
-                  <SelectValue placeholder="Select Woreda" />
+                  <SelectValue placeholder={t('select_woreda') || "Select Woreda"} />
                   </SelectTrigger>
                 <SelectContent>
                   {woredas.map(w => (
@@ -245,7 +247,7 @@ export default function AskAgentPage() {
                 disabled={!woredaId}
               >
                 <SelectTrigger className="h-12 border-slate-200 w-full">
-                  <SelectValue placeholder="Select Kebele" />
+                  <SelectValue placeholder={t('select_kebele') || "Select Kebele"} />
                 </SelectTrigger>
                 <SelectContent>
                   {kebeles.map(k => (
@@ -258,7 +260,7 @@ export default function AskAgentPage() {
               {/* REQUESTED ROLE */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
-                  <Briefcase size={16} /> Requested Role
+                  <Briefcase size={16} /> {t('requested_role') || "Requested Role"}
                 </Label>
 
                 <Select
@@ -267,12 +269,12 @@ export default function AskAgentPage() {
                   }
                 >
                   <SelectTrigger className="h-12 border-slate-200 w-full">
-                    <SelectValue placeholder="Select role" />
+                    <SelectValue placeholder={t('select_role') || "Select role"} />
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="DATA_CONTRIBUTOR">Data Contributor</SelectItem>
-                    <SelectItem value="AGENT">Agent</SelectItem>
+                    <SelectItem value="DATA_CONTRIBUTOR">{t('role_data_contributor') || "Data Contributor"}</SelectItem>
+                    <SelectItem value="AGENT">{t('role_agent') || "Agent"}</SelectItem>
 
                   </SelectContent>
                 </Select>
@@ -281,7 +283,7 @@ export default function AskAgentPage() {
               {/* CURRENT ROLE */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
-                  <Briefcase size={16} /> Current Role
+                  <Briefcase size={16} /> {t('current_role') || "Current Role"}
                 </Label>
 
                 <Select
@@ -290,15 +292,15 @@ export default function AskAgentPage() {
                   }
                 >
                   <SelectTrigger className="h-12 border-slate-200 w-full">
-                    <SelectValue placeholder="Select role" />
+                    <SelectValue placeholder={t('select_role') || "Select role"} />
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="DA_OFFICER">DA Officer</SelectItem>
-                    <SelectItem value="FARMER">Farmer</SelectItem>
-                    <SelectItem value="STUDENT">Student</SelectItem>
-                    <SelectItem value="TRADER">Trader</SelectItem>
-                    <SelectItem value="OTHER">Other</SelectItem>
+                    <SelectItem value="DA_OFFICER">{t('role_da_officer') || "DA Officer"}</SelectItem>
+                    <SelectItem value="FARMER">{t('role_farmer_opt') || "Farmer"}</SelectItem>
+                    <SelectItem value="STUDENT">{t('role_student') || "Student"}</SelectItem>
+                    <SelectItem value="TRADER">{t('role_trader') || "Trader"}</SelectItem>
+                    <SelectItem value="OTHER">{t('role_other') || "Other"}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -306,7 +308,7 @@ export default function AskAgentPage() {
               {/* EDUCATION */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
-                  <GraduationCap size={16} /> Education Level
+                  <GraduationCap size={16} /> {t('education_level') || "Education Level"}
                 </Label>
 
                 <Select
@@ -315,16 +317,16 @@ export default function AskAgentPage() {
                   }
                 >
                   <SelectTrigger className="h-12 border-slate-200 w-full">
-                    <SelectValue placeholder="Select level" />
+                    <SelectValue placeholder={t('select_level') || "Select level"} />
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="NONE">None</SelectItem>
-                    <SelectItem value="PRIMARY">Primary</SelectItem>
-                    <SelectItem value="SECONDARY">Secondary</SelectItem>
-                    <SelectItem value="DIPLOMA">Diploma</SelectItem>
-                    <SelectItem value="DEGREE">Degree</SelectItem>
-                    <SelectItem value="MASTERS">Masters</SelectItem>
+                    <SelectItem value="NONE">{t('edu_none') || "None"}</SelectItem>
+                    <SelectItem value="PRIMARY">{t('edu_primary') || "Primary"}</SelectItem>
+                    <SelectItem value="SECONDARY">{t('edu_secondary') || "Secondary"}</SelectItem>
+                    <SelectItem value="DIPLOMA">{t('edu_diploma') || "Diploma"}</SelectItem>
+                    <SelectItem value="DEGREE">{t('edu_degree') || "Degree"}</SelectItem>
+                    <SelectItem value="MASTERS">{t('edu_masters') || "Masters"}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -332,13 +334,13 @@ export default function AskAgentPage() {
               {/* CHECKBOXES */}
               <div className="bg-slate-50 rounded-xl p-5 space-y-3">
                 <p className="text-sm font-semibold text-slate-700">
-                  Skills & Experience
+                  {t('skills_and_experience') || "Skills & Experience"}
                 </p>
 
                 {[
-                  ["experienceInAgriculture", "Experience in Agriculture"],
-                  ["digitalSkills", "Digital Skills"],
-                  ["governmentAssigned", "Government Assigned"],
+                  ["experienceInAgriculture", t('exp_agriculture') || "Experience in Agriculture"],
+                  ["digitalSkills", t('digital_skills') || "Digital Skills"],
+                  ["governmentAssigned", t('gov_assigned') || "Government Assigned"],
                 ].map(([key, label]) => (
                   <label
                     key={key}
@@ -356,12 +358,12 @@ export default function AskAgentPage() {
 
               {/* FILE UPLOAD */}
               <div className="space-y-2">
-                <Label className="text-slate-700">Documents</Label>
+                <Label className="text-slate-700">{t('documents') || "Documents"}</Label>
 
                 <label className="group border-2 border-dashed border-slate-200 hover:border-emerald-400 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition bg-white">
                   <UploadCloud className="text-slate-400 group-hover:text-emerald-500 mb-2" />
                   <p className="text-sm text-slate-500">
-                    Click or drag files to upload
+                    {t('upload_instructions') || "Click or drag files to upload"}
                   </p>
 
                   <input
@@ -388,7 +390,7 @@ export default function AskAgentPage() {
                 disabled={loading || loadingKebeles}
                 className="w-full h-12 bg-emerald-600 text-white"
               >
-                {loading ? "Submitting..." : "Submit Application"}
+                {loading ? (t('submitting') || "Submitting...") : (t('submit_application') || "Submit Application")}
               </Button>
 
             </form>

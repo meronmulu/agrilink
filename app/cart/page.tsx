@@ -108,21 +108,30 @@ export default function CartPage() {
         setSelectedCartItemId(null)
       }
 
-      toast.success('Removed')
+      toast.success(t('toast_removed') || 'Removed')
     } catch {
-      toast.error('Remove failed')
+      toast.error(t('toast_remove_failed') || 'Remove failed')
     } finally {
       setDeleteId(null)
       setIsDialogOpen(false)
     }
   }
 
- 
+  const handleClear = async () => {
+    try {
+      await clearCart()
+      setCart([])
+      setSelectedCartItemId(null)
+      toast.success('Cart cleared')
+    } catch {
+      toast.error('Failed')
+    }
+  }
 
   const handleCheckout = async () => {
     try {
       if (!selectedCartItemId) {
-        toast.error('Please select one product')
+        toast.error(t('toast_select_one_product') || 'Please select one product')
         return
       }
 
@@ -145,7 +154,7 @@ export default function CartPage() {
           `${res.paymentUrl}?return_url=${window.location.origin}/payment`
       }
     } catch {
-      toast.error('Checkout error')
+      toast.error(t('toast_checkout_error') || 'Checkout error')
     } finally {
       setCheckingOut(false)
     }
@@ -173,22 +182,22 @@ export default function CartPage() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Remove item</DialogTitle>
+              <DialogTitle>{t('remove_item') || 'Remove item'}</DialogTitle>
               <DialogDescription>
-                Are you sure you want to remove this item?
+                {t('remove_item_desc') || 'Are you sure you want to remove this item?'}
               </DialogDescription>
             </DialogHeader>
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
+                {t('cancel') || 'Cancel'}
               </Button>
 
               <Button
                 className="bg-red-600 hover:bg-red-700 text-white"
                 onClick={handleRemove}
               >
-                Remove
+                {t('remove_item') || 'Remove'}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -197,7 +206,7 @@ export default function CartPage() {
         {cart.length === 0 ? (
           <Card className="text-center p-10">
             <ShoppingCart className="mx-auto mb-4 text-gray-400" size={50} />
-            <p>Your cart is empty</p>
+            <p>{t('cart_empty') || 'Your cart is empty'}</p>
           </Card>
         ) : (
           <div className="grid lg:grid-cols-12 gap-6">
@@ -279,14 +288,14 @@ export default function CartPage() {
             <div className="lg:col-span-4">
               <Card className='py-4'>
                 <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
+                  <CardTitle>{t('order_summary') || 'Order Summary'}</CardTitle>
                 </CardHeader>
 
                 <CardContent className="space-y-3">
 
                   {!selectedCartItemId ? (
                     <p className="text-sm text-gray-500">
-                      Select one product
+                      {t('toast_select_one_product') || 'Select one product'}
                     </p>
                   ) : (
                     <>
@@ -299,7 +308,7 @@ export default function CartPage() {
                            
 
                             <div className="flex justify-between">
-                              <span>Price</span>
+                              <span>{t('price') || 'Price'}</span>
                               <span>
                                 ETB {item.product.price}
                               </span>
@@ -308,7 +317,7 @@ export default function CartPage() {
                             
 
                             <div className="flex justify-between font-bold text-lg">
-                              <span>Total</span>
+                              <span>{t('total') || 'Total'}</span>
                               <span className="text-emerald-600">
                                 ETB {item.product.price * item.amount}
                               </span>
@@ -328,11 +337,17 @@ export default function CartPage() {
                     {checkingOut ? (
                       <Loader2 className="animate-spin mx-auto" />
                     ) : (
-                      'Checkout'
+                      t('checkout') || 'Checkout'
                     )}
                   </Button>
 
-                 
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleClear}
+                  >
+                    Clear Cart
+                  </Button>
 
                 </CardContent>
               </Card>

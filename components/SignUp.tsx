@@ -37,7 +37,7 @@ export default function SignUpPage() {
 
   try {
     if (!data.email && !data.phone) {
-      toast.error('Email or phone is required')
+      toast.error(t('toast_email_or_phone_required'))
       return
     }
 
@@ -59,13 +59,13 @@ export default function SignUpPage() {
     const user = await registerUser(payload)
 
     if (user) {
-      toast.success('Account created successfully')
+      toast.success(t('toast_account_created'))
 
       //  unified identifier (no formatting needed anymore)
       const identifier = data.email || data.phone
 
       if (!identifier) {
-        toast.error('Identifier missing')
+        toast.error(t('toast_identifier_missing'))
         return
       }
 
@@ -78,7 +78,7 @@ export default function SignUpPage() {
 
   } catch (error) {
     console.log('Registration error:', error)
-    toast.error('Registration failed.')
+    toast.error(t('toast_registration_failed'))
   } finally {
     setIsLoading(false)
   }
@@ -88,17 +88,17 @@ export default function SignUpPage() {
 
       {/* Role */}
       <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">Role</label>
+        <label className="text-sm font-medium text-gray-700">{t('signup_role_label')}</label>
         <Select
           onValueChange={(value) => setValue('role', value as 'BUYER' | 'FARMER')}
           defaultValue="BUYER"
         >
           <SelectTrigger className="h-14 bg-white rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 w-full">
-            <SelectValue placeholder="Select user role" />
+            <SelectValue placeholder={t('select_user_role')} />
           </SelectTrigger>
           <SelectContent className="bg-white">
-            <SelectItem value="BUYER">Buyer</SelectItem>
-            <SelectItem value="FARMER">Farmer</SelectItem>
+            <SelectItem value="BUYER">{t('signup_role_buyer')}</SelectItem>
+            <SelectItem value="FARMER">{t('signup_role_farmer')}</SelectItem>
           </SelectContent>
         </Select>
         {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
@@ -106,11 +106,11 @@ export default function SignUpPage() {
 
       {/* Email */}
       <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">Email</label>
+        <label className="text-sm font-medium text-gray-700">{t('signup_email_label')}</label>
         <Input
           className='h-9'
           type="email"
-          placeholder="you@example.com"
+          placeholder={t('signup_email_placeholder')}
           {...register('email')}
         />
         {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
@@ -118,12 +118,12 @@ export default function SignUpPage() {
 
       {/* Phone */}
       <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">Phone</label>
+        <label className="text-sm font-medium text-gray-700">{t('signup_phone_label')}</label>
         <Input
           className='h-9'
 
           type="text"
-          placeholder="Enter phone number"
+          placeholder={t('enter_phone_number')}
           {...register('phone')}
         />
         {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
@@ -131,7 +131,7 @@ export default function SignUpPage() {
 
       {/* Password */}
       <div className="space-y-1 relative">
-        <label className="text-sm font-medium text-gray-700">Password</label>
+        <label className="text-sm font-medium text-gray-700">{t('signup_password_label')}</label>
         <Input
           className='h-9'
 
@@ -151,7 +151,7 @@ export default function SignUpPage() {
 
       {/* Confirm Password */}
       <div className="space-y-1 relative">
-        <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+        <label className="text-sm font-medium text-gray-700">{t('signup_confirm_password_label')}</label>
         <Input
           type={showConfirmPassword ? 'text' : 'password'}
           placeholder="••••••••"
@@ -175,14 +175,14 @@ export default function SignUpPage() {
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          'Sign Up'
+          t('sign_up')
         )}
       </button>
 
       <p className="text-gray-500 text-center text-sm mt-2">
-        Already have an account?{' '}
+        {t('signup_already_account')}{' '}
         <Link href="/login" className="text-emerald-600 hover:text-emerald-700 font-medium">
-          Sign In
+          {t('signup_signin_link')}
         </Link>
       </p>
     </form>

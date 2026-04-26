@@ -25,6 +25,7 @@ import {
 
 import { Conversation, Message } from '@/types/chat'
 import { User } from '@/types/auth'
+import { useLanguage } from '@/context/LanguageContext'
 
 const EmojiPicker = dynamic(
   () => import('emoji-picker-react').then(m => m.default),
@@ -37,6 +38,7 @@ export default function Chat() {
   const { id } = useParams()
   const router = useRouter()
   const { refreshUnread } = useMessage()
+  const { t } = useLanguage()
 
   const conversationId = id as string
 
@@ -255,7 +257,7 @@ export default function Chat() {
         <input
           ref={inputRef}
           className="flex-1 bg-gray-100 px-4 py-2 rounded-full"
-          placeholder="Message..."
+          placeholder={t('message_placeholder')}
           value={message}
           onChange={e => setMessage(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSend()}

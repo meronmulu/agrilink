@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useLanguage } from "@/context/LanguageContext"
 
 import {
   Table,
@@ -45,6 +46,7 @@ import {
 } from "@/components/ui/pagination"
 
 export default function RoleRequestTable() {
+  const { t } = useLanguage()
   const [requests, setRequests] = useState<RoleRequest[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -113,10 +115,10 @@ export default function RoleRequestTable() {
 
     try {
       await approveRoleRequest(id, true)
-      toast.success("Approved successfully")
+      toast.success(t('toast_approved_success') || "Approved successfully")
       updateStatus(id, "APPROVED")
     } catch {
-      toast.error("Failed to approve")
+      toast.error(t('toast_failed_approve') || "Failed to approve")
     } finally {
       setProcessing({ id: null, action: null })
     }
@@ -128,10 +130,10 @@ export default function RoleRequestTable() {
 
     try {
       await approveRoleRequest(id, false)
-      toast.success("Rejected successfully")
+      toast.success(t('toast_rejected_success') || "Rejected successfully")
       updateStatus(id, "REJECTED")
     } catch {
-      toast.error("Failed to reject")
+      toast.error(t('toast_failed_reject') || "Failed to reject")
     } finally {
       setProcessing({ id: null, action: null })
     }
@@ -141,11 +143,11 @@ export default function RoleRequestTable() {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case "PENDING":
-        return { color: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock, label: "Pending" }
+        return { color: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock, label: t('pending') || "Pending" }
       case "APPROVED":
-        return { color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle, label: "Approved" }
+        return { color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle, label: t('approved') || "Approved" }
       case "REJECTED":
-        return { color: "bg-rose-50 text-rose-700 border-rose-200", icon: XCircle, label: "Rejected" }
+        return { color: "bg-rose-50 text-rose-700 border-rose-200", icon: XCircle, label: t('rejected') || "Rejected" }
       default:
         return { color: "bg-gray-50 text-gray-700 border-gray-200", icon: AlertCircle, label: status }
     }
@@ -164,8 +166,8 @@ export default function RoleRequestTable() {
 
       {/* HEADER */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Role Requests</h1>
-        <p className="text-gray-500">Manage all role change requests</p>
+        <h1 className="text-2xl font-bold">{t('role_requests') || 'Role Requests'}</h1>
+        <p className="text-gray-500">{t('manage_role_requests') || 'Manage all role change requests'}</p>
       </div>
 
       {/* FILTER */}
@@ -173,7 +175,7 @@ export default function RoleRequestTable() {
         <CardContent className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
           <Input
-            placeholder="Search by name..."
+            placeholder={t('search_by_name') || "Search by name..."}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -190,14 +192,14 @@ export default function RoleRequestTable() {
             }}
           >
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Filter status" />
+              <SelectValue placeholder={t('filter_status') || "Filter status"} />
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="ALL">All</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
-              <SelectItem value="APPROVED">Approved</SelectItem>
-              <SelectItem value="REJECTED">Rejected</SelectItem>
+              <SelectItem value="ALL">{t('all') || 'All'}</SelectItem>
+              <SelectItem value="PENDING">{t('pending') || 'Pending'}</SelectItem>
+              <SelectItem value="APPROVED">{t('approved') || 'Approved'}</SelectItem>
+              <SelectItem value="REJECTED">{t('rejected') || 'Rejected'}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -210,12 +212,12 @@ export default function RoleRequestTable() {
 
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('user') || 'User'}</TableHead>
+              <TableHead>{t('role') || 'Role'}</TableHead>
+              <TableHead>{t('contact') || 'Contact'}</TableHead>
+              <TableHead>{t('date') || 'Date'}</TableHead>
+              <TableHead>{t('status') || 'Status'}</TableHead>
+              <TableHead className="text-right">{t('actions') || 'Actions'}</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -223,7 +225,7 @@ export default function RoleRequestTable() {
             {paginatedRequests.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-10 text-gray-400">
-                  No requests found
+                  {t('no_requests_found') || 'No requests found'}
                 </TableCell>
               </TableRow>
             ) : (
@@ -249,7 +251,7 @@ export default function RoleRequestTable() {
                           />
                         </div>
                         <span className="font-medium">
-                          {req.user.profile?.fullName || "User"}
+                          {req.user.profile?.fullName || (t('user') || "User")}
                         </span>
                       </div>
                     </TableCell>
@@ -296,7 +298,7 @@ export default function RoleRequestTable() {
                             processing.action === "APPROVE" ? (
                               <Loader2 className="animate-spin w-4 h-4" />
                             ) : (
-                              "Approve"
+                              t('approve') || "Approve"
                             )}
                           </Button>
 
@@ -318,7 +320,7 @@ export default function RoleRequestTable() {
                             processing.action === "REJECT" ? (
                               <Loader2 className="animate-spin w-4 h-4" />
                             ) : (
-                              "Reject"
+                              t('reject') || "Reject"
                             )}
                           </Button>
 

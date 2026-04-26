@@ -56,7 +56,7 @@ const user = await login(payload)
 
       //  BLOCK NON ACTIVE USERS
       if (user.status !== 'ACTIVE') {
-        toast.warning('Please verify your account first')
+        toast.warning(t('toast_verify_account'))
 
         router.replace(
           `/verify-otp?identifier=${encodeURIComponent(data.identifier)}&purpose=LOGIN`
@@ -65,7 +65,7 @@ const user = await login(payload)
       }
 
       toast.success('Login successful')
-  
+
       const roleRoutes: Record<string, string> = {
         ADMIN: '/admin/dashboard',
         AGENT: '/agent/farmer',
@@ -85,7 +85,7 @@ const user = await login(payload)
         msg.includes('pending')
 
       if (isUnverified) {
-        toast.warning(error.message || 'Account not verified')
+        toast.warning(error.message || t('toast_account_not_verified'))
 
         router.replace(
           `/verify-otp?identifier=${encodeURIComponent(data.identifier)}&purpose=LOGIN`
@@ -93,7 +93,7 @@ const user = await login(payload)
         return
       }
 
-      toast.error(error?.message || 'Login failed')
+      toast.error(error?.message || t('toast_login_failed'))
     } finally {
       setIsLoading(false)
     }
@@ -114,7 +114,7 @@ const user = await login(payload)
 
       // 🚨 BLOCK NON ACTIVE USERS
       if (res.user.status !== 'ACTIVE') {
-        toast.warning('Please verify your account first')
+        toast.warning(t('toast_verify_account'))
 
         router.replace(
           `/verify-otp?identifier=${encodeURIComponent(
@@ -138,8 +138,7 @@ const user = await login(payload)
 
       localStorage.setItem('token', res.token)
       localStorage.setItem('user', JSON.stringify(res.user))
-        
-     
+
       toast.success('Google login successful')
 
       const roleRoutes: Record<string, string> = {
@@ -152,7 +151,7 @@ const user = await login(payload)
       router.push(roleRoutes[res.user.role] || '/')
     } catch (error) {
       console.error('Google login failed', error)
-      toast.error('Google login failed. Try again.')
+      toast.error(t('toast_google_login_failed'))
     } finally {
       setIsLoading(false)
     }
@@ -193,12 +192,12 @@ const user = await login(payload)
               {/* IDENTIFIER */}
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Email or Phone
+                  {t('email_or_phone_label')}
                 </label>
                 <div className="relative">
                   <Input
                     type="text"
-                    placeholder="Enter email or phone"
+                    placeholder={t('enter_email_or_phone_placeholder')}
                     {...register('identifier')}
                     disabled={isLoading}
                     className="h-10 pl-10 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white
@@ -214,17 +213,17 @@ const user = await login(payload)
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Password
+                    {t('login_password_label')}
                   </label>
                   <Link href="/forgotPassword" className="text-emerald-600 hover:text-emerald-700 text-sm">
-                    Forgot password?
+                    {t('login_forgot_password')}
                   </Link>
                 </div>
 
                 <div className="relative">
                   <Input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter password"
+                    placeholder={t('enter_password_placeholder')}
                     {...register('password')}
                     disabled={isLoading}
                     className="h-10 pl-10 pr-10 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white
@@ -274,7 +273,7 @@ const user = await login(payload)
                   width={18}
                   height={18}
                 />
-                Continue with Google
+                {t('continue_with_google')}
               </button>
 
               {/* SIGNUP LINK */}
