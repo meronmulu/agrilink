@@ -179,11 +179,61 @@ const pageSize = 5
         name: form.name.trim(),
       })
 
-      setOpen(false)
-      setForm({ name: "" })
+      toast.success('Product created successfully')
+      setForm({ name: '' })
+      setAddOpen(false)
+      await loadAllproducts()
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to create product')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
-      await loadData()
-      toast.success("Product created successfully")
+  const handleEditClick = (product: AllProductItem) => {
+    setSelectedProduct(product)
+    setEditName(product.name)
+    setEditOpen(true)
+  }
+
+  const handleDeleteClick = (product: AllProductItem) => {
+    setSelectedProduct(product)
+    setDeleteOpen(true)
+  }
+
+  const handleUpdateProduct = async () => {
+    if (!selectedProduct) return
+
+    try {
+      setSubmitting(true)
+
+      await updateAllProduct(selectedProduct.id, {
+        name: editName,
+      })
+
+      toast.success('Product updated')
+      setEditOpen(false)
+      await loadAllproducts()
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to update product')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleDeleteProduct = async () => {
+    if (!selectedProduct) return
+
+    try {
+      setSubmitting(true)
+
+      await deleteAllProduct(selectedProduct.id)
+
+      toast.success('Product deleted')
+      setDeleteOpen(false)
+      await loadAllproducts()
     } catch (err) {
       console.error(err)
       toast.error('Failed to delete product')
@@ -218,63 +268,36 @@ const paginatedProducts = allProducts.slice(
 
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
-            <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
-              Add Product</Button>
+            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 text-white">
+              Add Product
+            </Button>
           </DialogTrigger>
 
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{t('add_product') || 'Add Product'}</DialogTitle>
+              <DialogTitle>Add Product</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-3">
               <Input
-                placeholder={t('product_name_placeholder') || "Product name"}
+                placeholder="Product name"
                 value={form.name}
                 onChange={(e) => setForm({ name: e.target.value })}
               />
 
-              <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '
-
-                onClick={handleCreateProduct}
-                disabled={submitting}
-              >
-                {submitting ? "Creating..." : "Create"}
+            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 text-white"
+              onClick={handleCreateProduct} disabled={submitting}>
+                {submitting ? 'Creating...' : 'Create'}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* STATS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_products')}</CardTitle></CardHeader>
-          <CardContent className="text-3xl font-bold text-blue-600">
-            {totalProducts}
-          </CardContent>
-        </Card>
-
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_users')}</CardTitle></CardHeader>
-          <CardContent className="text-3xl font-bold text-green-600">
-            {totalUsers}
-          </CardContent>
-        </Card>
-
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_orders')}</CardTitle></CardHeader>
-          <CardContent className="text-3xl font-bold text-purple-600">
-            {totalOrders}
-          </CardContent>
-        </Card>
-
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_revenue')}</CardTitle></CardHeader>
-          <CardContent className="text-3xl font-bold text-orange-600">
-            ${totalRevenue.toLocaleString()}
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card className='py-4'><CardHeader><CardTitle>{t('total_products')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalProducts}</CardContent></Card>
+        <Card className='py-4'><CardHeader><CardTitle>{t('total_users')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalUsers}</CardContent></Card>
+        <Card className='py-4'><CardHeader><CardTitle>{t('total_orders')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalOrders}</CardContent></Card>
       </div>
 
       <Card className="py-2">
@@ -305,28 +328,15 @@ const paginatedProducts = allProducts.slice(
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentProducts.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell className='flex items-center gap-3'>
-                      <div className="relative w-12 h-12 rounded-md overflow-hidden border">
-                        <Image
-                          src={p.image || "/placeholder.png"}
-                          alt={p.name}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
-                      </div>
-                      {p.name}
-                    </TableCell>
-                    <TableCell>
-                      {typeof p.subCategory === 'string'
-                        ? p.subCategory
-                        : p.subCategory?.name || "N/A"}
-                    </TableCell>
-                    <TableCell>${p.price}</TableCell>
-                    <TableCell>{p.amountSold || 0}</TableCell>
-                  </TableRow>
+                {paginatedProducts.map((p) => (<TableRow key={p.id}>
+                  <TableCell>{p.name}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleEditClick(p)}><Pencil className="w-4 h-4 text-emerald-600" /></button>
+                      <button onClick={() => handleDeleteClick(p)}><Trash2 className="w-4 h-4 text-red-400" /></button>
+                    </div>
+                  </TableCell>
+                </TableRow>
                 ))}
               </TableBody>
             </Table>

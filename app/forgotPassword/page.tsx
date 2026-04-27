@@ -24,7 +24,7 @@ export default function ForgotPassword() {
       console.log("Forgot Password Result:", res)
     //   alert(res.message)
       router.push(`/verify-otp?identifier=${encodeURIComponent(emailOrPhone)}&purpose=RESET`)
-      console.log(error)
+    } catch (error) {
       toast.error(t("toast_otp_resend_failed"))
     } finally {
       setLoading(false)
