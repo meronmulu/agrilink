@@ -16,10 +16,10 @@ export default function RegisterFarmerPage() {
                 {/* Header */}
                 <div className="mb-8 text-center">
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        {t('registration_farmer') || 'Registration Farmer'}
+                        {t('register_farmer')}
                     </h1>
                     <p className="text-gray-500 mt-2 text-sm">
-                        Please fill in the details below to create a new farmer account.
+                        {t('register_farmer_desc') || 'Please fill in the details below to create a new farmer account.'}
                     </p>
                 </div>
 

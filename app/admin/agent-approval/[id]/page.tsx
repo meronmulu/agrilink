@@ -37,7 +37,7 @@ const getStatusConfig = (status: string) => {
             return {
                 color: "bg-amber-50 text-amber-700 border-amber-200",
                 icon: Clock,
-                label: "Pending Review",
+                label: t('pending_review') || "Pending Review",
             }
         case "APPROVED":
             return {
@@ -99,7 +99,7 @@ export default function Page() {
 
         try {
             await approveRoleRequest(data.id, true)
-            toast.success("Approved successfully")
+            toast.success(t('toast_approved_success'))
 
             setData(prev =>
                 prev ? { ...prev, status: "APPROVED" } : prev
@@ -137,7 +137,7 @@ export default function Page() {
         )
     }
 
-    if (!data) return <div className="text-center py-10">{t('no_data') || 'No data'}</div>
+    if (!data) return <div className="text-center py-10">{t('no_data')}</div>
 
     const profile = data.user.profile
     const statusConfig = getStatusConfig(data.status)
@@ -203,9 +203,8 @@ export default function Page() {
                         <h3 className="font-semibold">{t('location') || 'Location'}</h3>
                         <Separator />
 
-                        <div className="flex items-center gap-2 text-sm">
                             <MapPin size={16} />
-                            {data.kebeleId|| "Unknown location"}
+                            {data.kebeleId|| t('unknown_location')}
                         </div>
                     </CardContent>
                 </Card>

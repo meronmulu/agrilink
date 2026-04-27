@@ -144,7 +144,7 @@ export default function AdminDashboardPage() {
       setForm({ name: "" })
 
       await loadData()
-      toast.success("Product created successfully")
+      toast.success(t('toast_product_created_success') || "Product created successfully")
     } catch (err) {
       console.error("Create product failed:", err)
     } finally {
@@ -179,17 +179,18 @@ export default function AdminDashboardPage() {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
-              Add Product</Button>
+              {t('add_product') || 'Add Product'}
+            </Button>
           </DialogTrigger>
 
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add Product</DialogTitle>
+              <DialogTitle>{t('add_product') || 'Add Product'}</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-3">
               <Input
-                placeholder="Product name"
+                placeholder={t('product_name_placeholder') || "Product name"}
                 value={form.name}
                 onChange={(e) =>
                   setForm({ name: e.target.value })
@@ -201,7 +202,7 @@ export default function AdminDashboardPage() {
                 onClick={handleCreateProduct}
                 disabled={submitting}
               >
-                {submitting ? "Creating..." : "Create"}
+                {submitting ? (t('creating_loading') || "Creating...") : (t('create') || "Create")}
               </Button>
             </div>
           </DialogContent>
@@ -234,7 +235,7 @@ export default function AdminDashboardPage() {
         <Card className="py-4">
           <CardHeader><CardTitle>{t('total_revenue')}</CardTitle></CardHeader>
           <CardContent className="text-3xl font-bold text-orange-600">
-            ${totalRevenue.toLocaleString()}
+            {totalRevenue.toLocaleString()} ETB
           </CardContent>
         </Card>
       </div>
@@ -293,7 +294,7 @@ export default function AdminDashboardPage() {
                         ? p.subCategory
                         : p.subCategory?.name || "N/A"}
                     </TableCell>
-                    <TableCell>${p.price}</TableCell>
+                    <TableCell>{p.price} ETB</TableCell>
                     <TableCell>{p.amountSold || 0}</TableCell>
                   </TableRow>
                 ))}

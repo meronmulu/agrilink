@@ -25,8 +25,10 @@ import {
 import { User } from '@/types/auth'
 import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function AgentsPage() {
+  const { t } = useLanguage()
   const [agents, setAgents] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [farmersCount, setFarmersCount] = useState<Record<string, number>>({})
@@ -105,10 +107,10 @@ export default function AgentsPage() {
       <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            Agents Management
+            {t('agents_management') || 'Agents Management'}
           </h1>
           <p className="text-sm text-muted-foreground">
-            View and manage all agents with their assigned farmers
+            {t('manage_agents_desc') || 'View and manage all agents with their assigned farmers'}
           </p>
         </div>
 
@@ -116,7 +118,7 @@ export default function AgentsPage() {
           onClick={() => router.push(`/admin/agent-approval`)}
           className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-5"
         >
-          All Role requests
+          {t('all_role_requests') || 'All Role requests'}
         </Button>
       </div>
 
@@ -124,7 +126,7 @@ export default function AgentsPage() {
       <Card>
         <CardContent className="p-4">
           <Input
-            placeholder="Search agent..."
+            placeholder={t('search_agent_placeholder') || "Search agent..."}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -141,11 +143,11 @@ export default function AgentsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Agent</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Farmers</TableHead>
-                <TableHead>Action</TableHead>
+                <TableHead>{t('agent') || 'Agent'}</TableHead>
+                <TableHead>{t('email') || 'Email'}</TableHead>
+                <TableHead>{t('phone') || 'Phone'}</TableHead>
+                <TableHead>{t('farmers') || 'Farmers'}</TableHead>
+                <TableHead>{t('actions') || 'Action'}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -153,7 +155,7 @@ export default function AgentsPage() {
               {paginated.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-10">
-                    No agents found
+                    {t('no_agents_found') || 'No agents found'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -188,7 +190,7 @@ export default function AgentsPage() {
                           router.push(`/admin/agent-farmer/${a.id}/farmer`)
                         }
                       >
-                        View Farmers
+                        {t('view_farmers') || 'View Farmers'}
                       </Button>
                     </TableCell>
                   </TableRow>

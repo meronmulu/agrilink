@@ -150,10 +150,10 @@ export default function AdminProductsPage() {
       {/* HEADER */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          {t('products') || 'Products'}
+          {t('products')}
         </h1>
         <p className="text-sm text-gray-500">
-          {t('manage_all_marketplace_products') || 'Manage all marketplace products'}
+          {t('manage_all_marketplace_products')}
         </p>
       </div>
 
@@ -162,21 +162,21 @@ export default function AdminProductsPage() {
 
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm text-gray-500">Total Products</p>
+            <p className="text-sm text-gray-500">{t('total_products_metric') || t('total_products') || 'Total Products'}</p>
             <p className="text-3xl font-bold">{totalProducts}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm text-gray-500">In Stock</p>
+            <p className="text-sm text-gray-500">{t('total_in_stock') || 'In Stock'}</p>
             <p className="text-3xl font-bold">{totalInStore}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm text-gray-500">Total Farmers</p>
+            <p className="text-sm text-gray-500">{t('total_farmers_metric') || t('total_farmers') || 'Total Farmers'}</p>
             <p className="text-3xl font-bold">{totalFarmers}</p>
           </CardContent>
         </Card>
@@ -208,7 +208,7 @@ export default function AdminProductsPage() {
                 <ChevronDown size={16} />
                 {selectedSubCategory
                   ? subcategories.find(s => s.id === selectedSubCategory)?.name
-                  : 'Categories'}
+                  : (t('categories') || 'Categories')}
               </Button>
             </DropdownMenuTrigger>
 
@@ -218,7 +218,7 @@ export default function AdminProductsPage() {
                 setSelectedSubCategory(null)
                 setPage(1)
               }}>
-                All Categories
+                {t('all_categories_filter') || 'All Categories'}
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
