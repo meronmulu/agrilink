@@ -138,10 +138,10 @@ export default function AdminUsersPage() {
       {/* HEADER */}
       <div>
         <h1 className="text-2xl font-bold">
-          {t('user_management') || 'User Management'}
+          {t('user_management')}
         </h1>
         <p className="text-sm text-gray-500">
-          {t('manage_users_desc') || 'Manage users, roles, and status'}
+          {t('manage_users_desc')}
         </p>
       </div>
 
@@ -168,26 +168,26 @@ export default function AdminUsersPage() {
             {/* ROLE */}
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder={t('role') || "Role"} />
+                <SelectValue placeholder={t('role')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">{t('all_roles') || 'All Roles'}</SelectItem>
-                <SelectItem value="ADMIN">{t('admin') || 'Admin'}</SelectItem>
-                <SelectItem value="AGENT">{t('role_agent') || 'Agent'}</SelectItem>
-                <SelectItem value="BUYER">{t('buyer') || 'Buyer'}</SelectItem>
-                <SelectItem value="FARMER">{t('role_farmer_opt') || 'Farmer'}</SelectItem>
+                <SelectItem value="ALL">{t('all_roles')}</SelectItem>
+                <SelectItem value="ADMIN">{t('admin')}</SelectItem>
+                <SelectItem value="AGENT">{t('role_agent')}</SelectItem>
+                <SelectItem value="BUYER">{t('buyer')}</SelectItem>
+                <SelectItem value="FARMER">{t('role_farmer_opt')}</SelectItem>
               </SelectContent>
             </Select>
 
             {/* STATUS */}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder={t('status') || "Status"} />
+                <SelectValue placeholder={t('status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">{t('all_status') || 'All Status'}</SelectItem>
-                <SelectItem value="ACTIVE">{t('active') || 'Active'}</SelectItem>
-                <SelectItem value="PENDING">{t('pending') || 'Pending'}</SelectItem>
+                <SelectItem value="ALL">{t('all_status')}</SelectItem>
+                <SelectItem value="ACTIVE">{t('active')}</SelectItem>
+                <SelectItem value="PENDING">{t('pending')}</SelectItem>
               </SelectContent>
             </Select>
 

@@ -213,11 +213,10 @@ export default function MyCropsPage() {
             return (
               <div
                 key={crop.id}
-                className="bg-white rounded-2xl border overflow-hidden shadow-sm"
+                className="bg-white rounded-2xl border overflow-hidden shadow-sm relative"
               >
-
-                <Link href={`/farmer/crops/${crop.id}`} className="flex-1">
-
+                {/* Details Link */}
+                <Link href={`/farmer/crops/${crop.id}`} className="block h-full group">
                   {/* Image */}
                   <div className="relative aspect-4/3 bg-gray-100">
                     {crop.image ? (
@@ -232,38 +231,13 @@ export default function MyCropsPage() {
                         <Sprout size={40} />
                       </div>
                     )}
-
-                    {/* Buttons */}
-                    <div className="absolute top-3 right-3 flex gap-2">
-
-                      <Link href={`/farmer/crops/${crop.id}/edit`}>
-                        <button
-                          onClick={(e) => e.stopPropagation()}
-                          className="p-2 bg-white rounded-full shadow"
-                          title={t('edit_crop')}
-                        >
-                          <Pencil size={16} />
-                        </button>
-                      </Link>
-
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          setDeleteId(crop.id)
-                        }}
-                        className="p-2 bg-white rounded-full text-red-600 shadow"
-                        title={t('delete_crop')}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-
-                    </div>
                   </div>
 
-                  {/* Details */}
+                  {/* Info */}
                   <div className="p-5">
-                    <h3 className="font-semibold">{crop.name}</h3>
+                    <h3 className="font-semibold group-hover:text-emerald-600 transition-colors">
+                      {crop.name}
+                    </h3>
 
                     <p className="text-xs text-gray-500">
                       {sub?.name}
@@ -280,8 +254,30 @@ export default function MyCropsPage() {
                       </span>
                     </div>
                   </div>
-
                 </Link>
+
+                {/* Floating Action Buttons (Outside the Link to avoid nesting) */}
+                <div className="absolute top-3 right-3 flex gap-2 z-10">
+                  <Link href={`/farmer/crops/${crop.id}/edit`}>
+                    <button
+                      className="p-2 bg-white rounded-full shadow hover:bg-gray-50 transition"
+                      title={t('edit_crop')}
+                    >
+                      <Pencil size={16} />
+                    </button>
+                  </Link>
+
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setDeleteId(crop.id)
+                    }}
+                    className="p-2 bg-white rounded-full text-red-600 shadow hover:bg-gray-50 transition"
+                    title={t('delete_crop')}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             )
           })}

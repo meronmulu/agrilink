@@ -95,7 +95,7 @@ export default function MarketPricePage() {
     try {
       await rejectMarketPrice(id)
 
-      toast.success("Price rejected")
+      toast.success(t('toast_price_rejected') || "Price rejected")
 
       setData(prev =>
         prev.map(item =>
@@ -105,7 +105,7 @@ export default function MarketPricePage() {
         )
       )
     } catch (err) {
-      toast.error("Rejection failed")
+      toast.error(t('toast_rejection_failed') || "Rejection failed")
       console.log(err)
     }
   }
@@ -177,7 +177,7 @@ export default function MarketPricePage() {
             <SelectContent>
 
               <SelectItem value="all">
-                All Locations
+                {t('all_locations') || 'All Locations'}
               </SelectItem>
 
               {[...new Set(data.map(i => i.woreda?.name))]
@@ -201,10 +201,10 @@ export default function MarketPricePage() {
 
           <TableHeader>
             <TableRow>
-              <TableHead>Product</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+              <TableHead>{t('product') || 'Product'}</TableHead>
+              <TableHead>{t('price') || 'Price'}</TableHead>
+              <TableHead>{t('location') || 'Location'}</TableHead>
+              <TableHead className="text-right">{t('actions') || 'Action'}</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -260,7 +260,7 @@ export default function MarketPricePage() {
                     onClick={() => handleReject(item.id)}
                     disabled={item.status !== "PENDING"}
                   >
-                    Reject
+                    {t('reject') || 'Reject'}
                   </Button>
 
                 </TableCell>

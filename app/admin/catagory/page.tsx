@@ -48,6 +48,7 @@ import {
   Trash,
   Loader2,
   PlusCircle,
+  Plus,
   Package,
   MoreVertical,
   Search,
@@ -296,24 +297,27 @@ export default function CategoriesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t('categories') || 'Categories'}</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
+                {t('categories')}
+              </h1>
               <p className="text-sm text-gray-500 mt-1">
-                {t('categories_desc') || 'Organize your products with categories and subcategories'}
+                {t('categories_desc')}
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {/* ADD CATEGORY */}
               <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    {t('add_category') || 'Add Category'}
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-5 px-6 shadow-sm">
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t('add_category')}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-106.25">
+                <DialogContent className="rounded-2xl">
                   <DialogHeader>
-                    <DialogTitle>{t('create_new_category') || 'Create New Category'}</DialogTitle>
+                    <DialogTitle>{t('create_new_category')}</DialogTitle>
                     <DialogDescription>
-                      {t('create_category_desc') || 'Add a new category to organize your products'}
+                      {t('create_category_desc')}
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleCreateCategory} className="space-y-4">

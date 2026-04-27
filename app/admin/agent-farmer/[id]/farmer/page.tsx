@@ -16,6 +16,8 @@ import { User } from '@/types/auth'
 import { Loader2, Users } from 'lucide-react'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
+import { useLanguage } from '@/context/LanguageContext'
+
 import {
   Pagination,
   PaginationContent,
@@ -26,6 +28,7 @@ import {
 } from '@/components/ui/pagination'
 export default function AgentFarmersPage() {
   const { id } = useParams()
+  const { t } = useLanguage()
 
   const [farmers, setFarmers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -81,16 +84,16 @@ export default function AgentFarmersPage() {
       {/* HEADER */}
       <div>
         <h1 className="text-2xl font-semibold flex items-center gap-2">
-          Farmers under Agent
+          {t('farmers_under_agent') || 'Farmers under Agent'}
         </h1>
         <p className="text-sm text-muted-foreground">
-          All farmers assigned to this agent
+          {t('all_farmers_assigned_to_agent') || 'All farmers assigned to this agent'}
         </p>
       </div>
 
       <Card className="p-4">
         <Input
-          placeholder="Search farmer by name..."
+          placeholder={t('search_farmer_placeholder') || "Search farmer by name..."}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value)
@@ -107,9 +110,9 @@ export default function AgentFarmersPage() {
 
             <TableHeader>
               <TableRow>
-                <TableHead>Farmer</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Location</TableHead>
+                <TableHead>{t('farmer')}</TableHead>
+                <TableHead>{t('contact')}</TableHead>
+                <TableHead>{t('location')}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -120,7 +123,7 @@ export default function AgentFarmersPage() {
                   <TableCell colSpan={3} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
                       <Users className="w-6 h-6" />
-                      No farmers found
+                      {t('no_farmers_found')}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -142,7 +145,7 @@ export default function AgentFarmersPage() {
                         </div>
 
                         <span className="font-semibold">
-                          {farmer?.profile?.fullName || "Unknown Farmer"}
+                          {farmer?.profile?.fullName || t('unknown_farmer')}
                         </span>
                       </div>
                     </TableCell>
@@ -159,25 +162,8 @@ export default function AgentFarmersPage() {
 
                     {/* LOCATION */}
                     <TableCell>
-                      <div className="flex flex-wrap gap-2">
-                        {/* {farmer.profile?.kebele?.woreda?.zone?.region?.name && (
-                          <Badge variant="secondary">
-                            {farmer.profile.kebele.woreda.zone.region.name}
-                          </Badge>
-                        )}
-                        {farmer.profile?.kebele?.woreda?.zone?.name && (
-                          <Badge variant="secondary">
-                            {farmer.profile.kebele.woreda.zone.name}
-                          </Badge>
-                        )}
-                        {farmer.profile?.kebele?.woreda?.name && (
-                          <Badge variant="secondary">
-                            {farmer.profile.kebele.woreda.name}
-                          </Badge>
-                        )}
-                        {farmer.profile?.kebele?.name && (
-                          <Badge>{farmer.profile.kebele.name}</Badge>
-                        )} */}
+                      <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                        {farmer.profile?.kebele?.name}
                       </div>
                     </TableCell>
 

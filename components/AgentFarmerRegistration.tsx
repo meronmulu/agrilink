@@ -86,7 +86,7 @@ export default function AgentFarmerRegistration() {
       {/* ROLE */}
       <div className="space-y-2">
         <label className="text-sm font-medium">
-          {t('role') || 'Role'}
+          {t('role')}
         </label>
         <div className="h-11 flex items-center px-3 rounded-xl border bg-gray-50">
           {t('farmer')}
@@ -99,7 +99,7 @@ export default function AgentFarmerRegistration() {
         <Input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="example@email.com"
+          placeholder={t('email_placeholder') || "example@email.com"}
           className={`h-11 rounded-xl ${errors.email ? "border-red-500" : ""}`}
         />
         {errors.email && (
@@ -128,7 +128,7 @@ export default function AgentFarmerRegistration() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••"
+          placeholder={t('password_placeholder') || "••••••"}
           className={`h-11 rounded-xl ${errors.password ? "border-red-500" : ""}`}
         />
         {errors.password && (
@@ -143,7 +143,7 @@ export default function AgentFarmerRegistration() {
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="••••••"
+          placeholder={t('password_placeholder') || "••••••"}
           className={`h-11 rounded-xl ${errors.confirmPassword ? "border-red-500" : ""}`}
         />
         {errors.confirmPassword && (
@@ -159,7 +159,7 @@ export default function AgentFarmerRegistration() {
         disabled={isLoading}
         className="w-full h-11 rounded-xl bg-emerald-600 text-white"
       >
-        {isLoading ? t('loading') || "Loading..." : t('create_farmer_account')}
+        {isLoading ? t('loading') : t('create_farmer_account')}
       </button>
 
     </form>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card"
 import { forgotPassword } from "@/services/authService"
 import { useLanguage } from "@/context/LanguageContext"
+import { toast } from "sonner"
 
 export default function ForgotPassword() {
   const { t } = useLanguage()
@@ -15,7 +16,7 @@ export default function ForgotPassword() {
   const router = useRouter()
 
   const handleSendOtp = async () => {
-    if (!emailOrPhone) return alert("Enter email or phone")
+    if (!emailOrPhone) return toast.error(t("toast_enter_email_phone"))
 
     try {
       setLoading(true)
@@ -23,9 +24,8 @@ export default function ForgotPassword() {
       console.log("Forgot Password Result:", res)
     //   alert(res.message)
       router.push(`/verify-otp?identifier=${encodeURIComponent(emailOrPhone)}&purpose=RESET`)
-    } catch (error) {
       console.log(error)
-    //   alert(error?.response?.data?.message || "Failed to send OTP")
+      toast.error(t("toast_otp_resend_failed"))
     } finally {
       setLoading(false)
     }

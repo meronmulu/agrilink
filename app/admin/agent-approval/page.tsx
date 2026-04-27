@@ -143,11 +143,11 @@ export default function RoleRequestTable() {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case "PENDING":
-        return { color: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock, label: t('pending') || "Pending" }
+        return { color: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock, label: t('pending') }
       case "APPROVED":
-        return { color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle, label: t('approved') || "Approved" }
+        return { color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle, label: t('approved') }
       case "REJECTED":
-        return { color: "bg-rose-50 text-rose-700 border-rose-200", icon: XCircle, label: t('rejected') || "Rejected" }
+        return { color: "bg-rose-50 text-rose-700 border-rose-200", icon: XCircle, label: t('rejected') }
       default:
         return { color: "bg-gray-50 text-gray-700 border-gray-200", icon: AlertCircle, label: status }
     }
@@ -166,8 +166,8 @@ export default function RoleRequestTable() {
 
       {/* HEADER */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">{t('role_requests') || 'Role Requests'}</h1>
-        <p className="text-gray-500">{t('manage_role_requests') || 'Manage all role change requests'}</p>
+        <h1 className="text-2xl font-bold">{t('role_requests')}</h1>
+        <p className="text-gray-500">{t('manage_role_requests')}</p>
       </div>
 
       {/* FILTER */}
@@ -196,10 +196,10 @@ export default function RoleRequestTable() {
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="ALL">{t('all') || 'All'}</SelectItem>
-              <SelectItem value="PENDING">{t('pending') || 'Pending'}</SelectItem>
-              <SelectItem value="APPROVED">{t('approved') || 'Approved'}</SelectItem>
-              <SelectItem value="REJECTED">{t('rejected') || 'Rejected'}</SelectItem>
+              <SelectItem value="ALL">{t('all')}</SelectItem>
+              <SelectItem value="PENDING">{t('pending')}</SelectItem>
+              <SelectItem value="APPROVED">{t('approved')}</SelectItem>
+              <SelectItem value="REJECTED">{t('rejected')}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -212,12 +212,12 @@ export default function RoleRequestTable() {
 
           <TableHeader>
             <TableRow>
-              <TableHead>{t('user') || 'User'}</TableHead>
-              <TableHead>{t('role') || 'Role'}</TableHead>
-              <TableHead>{t('contact') || 'Contact'}</TableHead>
-              <TableHead>{t('date') || 'Date'}</TableHead>
-              <TableHead>{t('status') || 'Status'}</TableHead>
-              <TableHead className="text-right">{t('actions') || 'Actions'}</TableHead>
+              <TableHead>{t('user')}</TableHead>
+              <TableHead>{t('role')}</TableHead>
+              <TableHead>{t('contact')}</TableHead>
+              <TableHead>{t('date')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
+              <TableHead className="text-right">{t('actions')}</TableHead>
             </TableRow>
           </TableHeader>
 

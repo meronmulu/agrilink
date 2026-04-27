@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext"
 import { useLanguage } from "@/context/LanguageContext"
 import Cookies from 'js-cookie'
 import { listenForegroundNotification, requestNotificationPermission } from "@/services/notificationService"
+import { toast } from "sonner"
 
 
 export default function VerifyOTP() {
@@ -44,8 +45,8 @@ export default function VerifyOTP() {
 
   const handleVerify = async () => {
     console.log("handleVerify called, otp:", otp, "length:", otp.length)
-    if (!identifier) return alert("Identifier missing")
-    if (otp.length < 6) return alert("Enter 6-digit OTP")
+    if (!identifier) return toast.error(t("toast_identifier_missing"))
+    if (otp.length < 6) return toast.error(t("toast_enter_otp"))
 
     try {
       setLoading(true)
@@ -96,23 +97,23 @@ listenForegroundNotification()
 
     } catch (error) {
       console.log(error)
-      alert("OTP verification failed")
+      toast.error(t("toast_otp_verif_failed"))
     } finally {
       setLoading(false)
     }
   }
 
   const handleResend = async () => {
-    if (!identifier) return alert("Identifier missing")
+    if (!identifier) return toast.error(t("toast_identifier_missing"))
 
     try {
       setResendLoading(true)
       await resendOtp(identifier, purpose)
       setCountdown(60)
-      alert("OTP resent successfully")
+      toast.success(t("toast_otp_resent"))
     } catch (error) {
       console.log("Resend failed:", error)
-      alert("Failed to resend OTP. Please try again.")
+      toast.error(t("toast_otp_resend_failed"))
     } finally {
       setResendLoading(false)
     }

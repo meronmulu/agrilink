@@ -107,10 +107,10 @@ export default function FarmerManagementPage() {
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-900 leading-tight">
             {t('farmer_management')}
           </h1>
-          <p className="text-gray-500">
+          <p className="text-sm text-gray-500 mt-1 max-w-2xl">
             {t('manage_farmers_statuses')}
           </p>
         </div>
@@ -127,38 +127,29 @@ export default function FarmerManagementPage() {
       {/* DASHBOARD CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-        <Card className="shadow-sm rounded-xl ">
-          <CardContent className="p-5 flex justify-between items-center">
-            <div>
-              <p className="text-gray-500 text-sm">{t('total_farmers_label')}</p>
-              <h2 className="text-3xl font-bold">{totalFarmers}</h2>
-            </div>
-            <div className="p-3 rounded-full bg-emerald-100">
-              <Users className="text-emerald-600" />
+        <Card className="shadow-sm rounded-xl">
+          <CardContent className="p-6">
+            <p className="text-sm text-gray-500 font-medium">{t('total_farmers_label')}</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-3xl font-bold text-gray-900">{totalFarmers}</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm rounded-xl ">
-          <CardContent className="p-5 flex justify-between items-center">
-            <div>
-              <p className="text-gray-500 text-sm">{t('active_farmers_label')}</p>
-              <h2 className="text-3xl font-bold">{activeFarmers}</h2>
-            </div>
-            <div className="p-3 rounded-full bg-green-100">
-              <CheckCircle className="text-green-600" />
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <p className="text-sm text-emerald-600 font-medium">{t('active_farmers_label')}</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-3xl font-bold text-emerald-600">{activeFarmers}</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm rounded-xl ">
-          <CardContent className="p-5 flex justify-between items-center">
-            <div>
-              <p className="text-gray-500 text-sm">{t('pending_farmers_label')}</p>
-              <h2 className="text-3xl font-bold">{pendingFarmers}</h2>
-            </div>
-            <div className="p-3 rounded-full bg-yellow-100">
-              <Clock3 className="text-yellow-600" />
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <p className="text-sm text-amber-600 font-medium">{t('pending_farmers_label')}</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-3xl font-bold text-amber-600">{pendingFarmers}</span>
             </div>
           </CardContent>
         </Card>

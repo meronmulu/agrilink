@@ -6,9 +6,14 @@ const aiInstance = axios.create({
 
 export const sendMessageToAI = async (message: string) => {
   try {
-    const res = await aiInstance.post("/chat", {
+    const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
+    const res = await aiInstance.post("/api/v1/chat", {
       message,
       location: "Central Ethiopia",
+    }, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : undefined
+      }
     })
 
     console.log("AI RESPONSE:", res.data)
@@ -19,8 +24,8 @@ export const sendMessageToAI = async (message: string) => {
 
     throw new Error(
       error.response?.data?.message ||
-        error.message ||
-        "Failed to get response from AI service"
+      error.message ||
+      "Failed to get response from AI service"
     )
   }
 }

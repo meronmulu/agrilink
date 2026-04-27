@@ -19,7 +19,7 @@ import Image from "next/image"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export default function BuyerOrdersPage() {
+export default function AgentOrdersPage() {
   const { t } = useLanguage()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -93,7 +93,7 @@ export default function BuyerOrdersPage() {
 
           {/* SEARCH */}
           <Input
-            placeholder="Search product..."
+            placeholder={t('search_product_placeholder') || "Search product..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full md:w-96"
@@ -102,12 +102,12 @@ export default function BuyerOrdersPage() {
           {/* STATUS */}
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full md:w-44">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('status_label_orders') || t('status') || "Status"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">All Status</SelectItem>
-              <SelectItem value="PAID">Paid</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="ALL">{t('all_status_label') || t('all_status') || "All Status"}</SelectItem>
+              <SelectItem value="PAID">{t('paid') || "Paid"}</SelectItem>
+              <SelectItem value="PENDING">{t('pending') || "Pending"}</SelectItem>
             </SelectContent>
           </Select>
 
