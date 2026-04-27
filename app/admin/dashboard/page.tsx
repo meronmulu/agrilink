@@ -1,19 +1,24 @@
 'use client'
 
-import { useEffect, useState } from "react"
-import { getProducts, addAllProducts } from "@/services/productService"
-import { getUsers } from "@/services/authService"
-import { Product } from "@/types/product"
-import { User } from "@/types/auth"
-import { useLanguage } from "@/context/LanguageContext"
-
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import {
+  getProducts,
+  addAllProducts,
+  getAllProducts,
+  deleteAllProduct,
+  updateAllProduct,
+} from '@/services/productService'
+import { getUsers } from '@/services/authService'
+import { Product } from '@/types/product'
+import { User } from '@/types/auth'
+import { useLanguage } from '@/context/LanguageContext'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-
+} from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -21,19 +26,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-
+} from '@/components/ui/table'
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   LineChart,
   Line,
@@ -42,11 +45,10 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts"
-
-import { Loader2 } from "lucide-react"
-import Image from "next/image"
-import { toast } from "sonner"
+} from 'recharts'
+import { Loader2, Pencil, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 
 interface ChartData {
   month: string
@@ -54,12 +56,20 @@ interface ChartData {
   products: number
 }
 
+type AllProductItem = {
+  id: string
+  name: string
+}
+
 export default function AdminDashboardPage() {
   const { t } = useLanguage()
 
   const [products, setProducts] = useState<Product[]>([])
   const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
+  const [allProducts, setAllProducts] = useState<AllProductItem[]>([])
+
+  const [pageLoading, setPageLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
 
   const [chartData, setChartData] = useState<ChartData[]>([])
   const [totalProducts, setTotalProducts] = useState(0)
@@ -67,17 +77,23 @@ export default function AdminDashboardPage() {
   const [totalOrders, setTotalOrders] = useState(0)
   const [totalRevenue, setTotalRevenue] = useState(0)
 
-  // dialog state
-  const [open, setOpen] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
-  // ONLY NAME (Swagger compliant)
+  const [selectedProduct, setSelectedProduct] = useState<AllProductItem | null>(null)
+
   const [form, setForm] = useState({
-    name: "",
+    name: '',
   })
 
+  const [currentPage, setCurrentPage] = useState(1)
+const pageSize = 5
+
+  const [editName, setEditName] = useState('')
+
   function groupDataByMonth(products: Product[], users: User[]): ChartData[] {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
     const monthlyData: ChartData[] = months.map((m) => ({
       month: m,
@@ -98,41 +114,64 @@ export default function AdminDashboardPage() {
     return monthlyData
   }
 
+  const loadAllproducts = async () => {
+    try {
+      const data = await getAllProducts()
+      console.log("ALL PRODUCTS RESPONSE:", data)
+
+      setAllProducts(data.product || [])
+    } catch (err) {
+      console.error("LOAD ALL PRODUCTS ERROR:", err)
+      setAllProducts([])
+    }
+  }
+
   const loadData = async () => {
-    const [productsData, usersData] = await Promise.all([
-      getProducts(),
-      getUsers()
-    ])
+    try {
+      const [productsData, usersData] = await Promise.all([
+        getProducts(),
+        getUsers(),
+      ])
 
-    const safeProducts = productsData || []
-    const safeUsers = usersData || []
+      const safeProducts = productsData || []
+      const safeUsers = usersData || []
 
-    setProducts(safeProducts)
-    setUsers(safeUsers)
+      setProducts(safeProducts)
+      setUsers(safeUsers)
 
-    setTotalProducts(safeProducts.length)
-    setTotalUsers(safeUsers.length)
+      setTotalProducts(safeProducts.length)
+      setTotalUsers(safeUsers.length)
 
-    setTotalOrders(
-      safeProducts.reduce((acc, p) => acc + (p.amount || 0), 0)
-    )
-
-    setTotalRevenue(
-      safeProducts.reduce(
-        (acc, p) =>
-          acc + (p.amountSold && p.price ? p.amount * Number(p.price) : 0),
-        0
+      setTotalOrders(
+        safeProducts.reduce((acc, p) => acc + (p.amount || 0), 0)
       )
-    )
 
-    setChartData(groupDataByMonth(safeProducts, safeUsers))
+      setTotalRevenue(
+        safeProducts.reduce(
+          (acc, p) => acc + ((p.amountSold || 0) * Number(p.price || 0)),
+          0
+        )
+      )
+
+      setChartData(groupDataByMonth(safeProducts, safeUsers))
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   useEffect(() => {
-    loadData().finally(() => setLoading(false))
+    const init = async () => {
+      setPageLoading(true)
+      await Promise.all([loadData(), loadAllproducts()])
+      setPageLoading(false)
+    }
+
+    init()
   }, [])
 
   const handleCreateProduct = async () => {
+    if (!form.name.trim()) return toast.error('Enter product name')
+
     try {
       setSubmitting(true)
 
@@ -140,22 +179,78 @@ export default function AdminDashboardPage() {
         name: form.name.trim(),
       })
 
-      setOpen(false)
-      setForm({ name: "" })
-
-      await loadData()
-      toast.success("Product created successfully")
+      toast.success('Product created successfully')
+      setForm({ name: '' })
+      setAddOpen(false)
+      await loadAllproducts()
     } catch (err) {
-      console.error("Create product failed:", err)
+      console.error(err)
+      toast.error('Failed to create product')
     } finally {
       setSubmitting(false)
     }
   }
 
-  const recentProducts = products.slice(0, 5)
-  const recentUsers = users.slice(0, 5)
+  const handleEditClick = (product: AllProductItem) => {
+    setSelectedProduct(product)
+    setEditName(product.name)
+    setEditOpen(true)
+  }
 
-  if (loading) {
+  const handleDeleteClick = (product: AllProductItem) => {
+    setSelectedProduct(product)
+    setDeleteOpen(true)
+  }
+
+  const handleUpdateProduct = async () => {
+    if (!selectedProduct) return
+
+    try {
+      setSubmitting(true)
+
+      await updateAllProduct(selectedProduct.id, {
+        name: editName,
+      })
+
+      toast.success('Product updated')
+      setEditOpen(false)
+      await loadAllproducts()
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to update product')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleDeleteProduct = async () => {
+    if (!selectedProduct) return
+
+    try {
+      setSubmitting(true)
+
+      await deleteAllProduct(selectedProduct.id)
+
+      toast.success('Product deleted')
+      setDeleteOpen(false)
+      await loadAllproducts()
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to delete product')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const recentUsers = users.slice(0, 5)
+  const totalPages = Math.ceil(allProducts.length / pageSize)
+
+const paginatedProducts = allProducts.slice(
+  (currentPage - 1) * pageSize,
+  currentPage * pageSize
+)
+
+  if (pageLoading) {
     return (
       <div className="h-[70vh] flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-500" size={32} />
@@ -165,21 +260,17 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="p-4 space-y-8 bg-gray-50 min-h-screen">
-
-      {/* HEADER */}
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-bold">{t('dashboard')}</h1>
-          <p className="text-gray-500">
-            {t('overview_of_products_and_users')}
-          </p>
+          <p className="text-gray-500">{t('overview_of_products_and_users')}</p>
         </div>
 
-        {/* ADD PRODUCT */}
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
-            <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '>
-              Add Product</Button>
+            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 text-white">
+              Add Product
+            </Button>
           </DialogTrigger>
 
           <DialogContent>
@@ -191,63 +282,30 @@ export default function AdminDashboardPage() {
               <Input
                 placeholder="Product name"
                 value={form.name}
-                onChange={(e) =>
-                  setForm({ name: e.target.value })
-                }
+                onChange={(e) => setForm({ name: e.target.value })}
               />
 
-              <Button className='bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white '
-
-                onClick={handleCreateProduct}
-                disabled={submitting}
-              >
-                {submitting ? "Creating..." : "Create"}
+            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 text-white"
+              onClick={handleCreateProduct} disabled={submitting}>
+                {submitting ? 'Creating...' : 'Create'}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* STATS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_products')}</CardTitle></CardHeader>
-          <CardContent className="text-3xl font-bold text-blue-600">
-            {totalProducts}
-          </CardContent>
-        </Card>
-
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_users')}</CardTitle></CardHeader>
-          <CardContent className="text-3xl font-bold text-green-600">
-            {totalUsers}
-          </CardContent>
-        </Card>
-
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_orders')}</CardTitle></CardHeader>
-          <CardContent className="text-3xl font-bold text-purple-600">
-            {totalOrders}
-          </CardContent>
-        </Card>
-
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_revenue')}</CardTitle></CardHeader>
-          <CardContent className="text-3xl font-bold text-orange-600">
-            ${totalRevenue.toLocaleString()}
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card className='py-4'><CardHeader><CardTitle>{t('total_products')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalProducts}</CardContent></Card>
+        <Card className='py-4'><CardHeader><CardTitle>{t('total_users')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalUsers}</CardContent></Card>
+        <Card className='py-4'><CardHeader><CardTitle>{t('total_orders')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalOrders}</CardContent></Card>
       </div>
 
-      {/* CHART */}
-      <Card className="py-4">
-        <CardHeader>
-          <CardTitle>{t('monthly_overview')}</CardTitle>
-        </CardHeader>
-        <CardContent className="h-75">
+      <Card className="py-2">
+        <CardHeader><CardTitle>{t('monthly_overview')}</CardTitle></CardHeader>
+        <CardContent className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
@@ -258,52 +316,77 @@ export default function AdminDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* TABLES (UNCHANGED) */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* recent products */}
-        <Card className="py-4">
-          <CardHeader><CardTitle>{t('recent_products')}</CardTitle></CardHeader>
+        <Card className="py-2">
+          <CardHeader><CardTitle>Products</CardTitle></CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('product')}</TableHead>
-                  <TableHead>{t('category')}</TableHead>
-                  <TableHead>{t('price')}</TableHead>
-                  <TableHead>{t('sold')}</TableHead>
+                  <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentProducts.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell className='flex items-center gap-3'>
-                      <div className="relative w-12 h-12 rounded-md overflow-hidden border">
-                        <Image
-                          src={p.image || "/placeholder.png"}
-                          alt={p.name}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
-                      </div>
-                      {p.name}
-                    </TableCell>
-                    <TableCell>
-                      {typeof p.subCategory === 'string'
-                        ? p.subCategory
-                        : p.subCategory?.name || "N/A"}
-                    </TableCell>
-                    <TableCell>${p.price}</TableCell>
-                    <TableCell>{p.amountSold || 0}</TableCell>
-                  </TableRow>
+                {paginatedProducts.map((p) => (<TableRow key={p.id}>
+                  <TableCell>{p.name}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleEditClick(p)}><Pencil className="w-4 h-4 text-emerald-600" /></button>
+                      <button onClick={() => handleDeleteClick(p)}><Trash2 className="w-4 h-4 text-red-400" /></button>
+                    </div>
+                  </TableCell>
+                </TableRow>
                 ))}
               </TableBody>
             </Table>
           </CardContent>
+
+          <div className="mt-4 flex justify-end">
+        <Pagination>
+          <PaginationContent>
+
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() =>
+                  setCurrentPage((p) => Math.max(p - 1, 1))
+                }
+                className={
+                  currentPage === 1 ? 'pointer-events-none opacity-50' : ''
+                }
+              />
+            </PaginationItem>
+
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  isActive={currentPage === i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+                className={
+                  currentPage === totalPages
+                    ? 'pointer-events-none opacity-50'
+                    : ''
+                }
+              />
+            </PaginationItem>
+
+          </PaginationContent>
+        </Pagination>
+      </div>
         </Card>
 
-        {/* recent users */}
-        <Card className="py-4">
+        <Card className="py-2">
           <CardHeader><CardTitle>{t('recent_users')}</CardTitle></CardHeader>
           <CardContent>
             <Table>
@@ -317,17 +400,11 @@ export default function AdminDashboardPage() {
               <TableBody>
                 {recentUsers.map((u) => (
                   <TableRow key={u.id}>
-                    <TableCell className='flex items-center gap-3'>
+                    <TableCell className="flex items-center gap-3">
                       <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
-                        <Image
-                          src={u.profile?.imageUrl || "/placeholder.png"}
-                          alt="User"
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
+                        <Image src={u.profile?.imageUrl || '/placeholder.png'} alt="User" fill unoptimized className="object-cover" />
                       </div>
-                      {u.profile?.fullName || t('unknown_farmer')}
+                      {u.profile?.fullName || 'Unknown'}
                     </TableCell>
                     <TableCell>{u.email}</TableCell>
                     <TableCell>{u.role}</TableCell>
@@ -339,6 +416,35 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
+      {/* EDIT DIALOG */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Edit Product</DialogTitle></DialogHeader>
+          <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+          <DialogFooter>
+            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 text-white"
+            onClick={handleUpdateProduct}>{submitting ? 'Updating...' : 'Update'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DELETE DIALOG */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Delete Product</DialogTitle></DialogHeader>
+          <p>Are you sure you want to delete this product?</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteProduct}>
+              {submitting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      
     </div>
+
+
   )
 }

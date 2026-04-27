@@ -139,6 +139,7 @@ export const addAllProducts = async (data: CreateAllProductsPayload) => {
 // GET all products
 export const getAllProducts = async () => {
   const res = await instance.get("/all-product")
+  console.log(res)
   return res.data
 }
 
@@ -149,7 +150,7 @@ export const deleteAllProduct = async (id: string) => {
 }
 
 // UPDATE product (basic example)
-// export const updateAllProduct = async (id: string, data: any) => {
-//   const res = await instance.put(`/all-product/${id}`, data)
-//   return res.data
-// }
+export const updateAllProduct = async (id: string, data: CreateAllProductsPayload) => {
+  const res = await instance.patch(`/all-product/${id}`, data)
+  return res.data
+}

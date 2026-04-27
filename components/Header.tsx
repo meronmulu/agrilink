@@ -51,7 +51,7 @@ export default function Header() {
   const [notifications, setNotifications] = useState<Notification[]>([])
 
 
-  
+
 
 
 
@@ -105,7 +105,7 @@ export default function Header() {
       { name: t('my_orders') || 'My Orders', href: '/farmer/orders', icon: ListOrdered },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('messages') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
     ],
     AGENT: [
       { name: t('farmers') || 'Farmers', href: '/agent/farmer', icon: Users },
@@ -113,7 +113,7 @@ export default function Header() {
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
       { name: 'Market Place', href: '/MarketInsight', icon: Store },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
 
     ],
     ADMIN: [
@@ -124,7 +124,7 @@ export default function Header() {
       { name: t('market_place'), href: '/MarketPlace', icon: Store },
       { name: t('cart') || 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
       { name: t('nav_message') || 'Messages', href: '/message', icon: MessageSquare, badge: unreadCount },
-      { name:  'Market Price', href: '/farmer/insights', icon: BrainCircuit },
+      { name: 'Market Price', href: '/farmer/insights', icon: BrainCircuit },
 
 
     ],
@@ -232,34 +232,18 @@ export default function Header() {
 
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100">
-                  <Bell />
+            <div
+              onClick={() => router.push("/notification")}
+              className="relative cursor-pointer p-2 rounded-xl hover:bg-emerald-50 transition"
+            >
+              <Bell className="w-5 h-5 text-gray-700" />
 
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                      {unreadCount}
-                    </span>
-                  )}
-                </div>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
-
-                {notifications.length === 0 ? (
-                  <p className="p-3 text-sm text-gray-500">No notifications</p>
-                ) : (
-                  notifications.map((n) => (
-                    <div key={n.id} className="p-3 border-b hover:bg-gray-50">
-                      <p className="font-medium">{n.title}</p>
-                      <p className="text-sm text-gray-500">{n.message}</p>
-                    </div>
-                  ))
-                )}
-
-              </DropdownMenuContent>
-            </DropdownMenu>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] min-w-4.5 h-4.5 px-1 flex items-center justify-center rounded-full font-medium shadow">
+                  {unreadCount}
+                </span>
+              )}
+            </div>
 
             <LanguageDropdown />
 

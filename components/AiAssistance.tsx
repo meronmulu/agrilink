@@ -86,9 +86,51 @@ export default function AiAssistant() {
       window.speechSynthesis.cancel()
       const utterance = new SpeechSynthesisUtterance(text)
 
-      if (lang === 'am') utterance.lang = 'am-ET'
-      else if (lang === 'om') utterance.lang = 'om-ET'
-      else utterance.lang = 'en-US'
+      // Enhanced voice settings for better language support
+      if (lang === 'am') {
+        utterance.lang = 'am-ET'
+        // Try to find Amharic voice if available
+        const voices = window.speechSynthesis.getVoices()
+        const amharicVoice = voices.find(voice => 
+          voice.lang.includes('am') || voice.lang.includes('ET')
+        )
+        if (amharicVoice) utterance.voice = amharicVoice
+        utterance.rate = 0.9 // Slightly slower for better comprehension
+      } else if (lang === 'om') {
+        utterance.lang = 'om-ET'
+        // Oromo voices might not be available, try similar languages
+        const voices = window.speechSynthesis.getVoices()
+        const oromoVoice = voices.find(voice => 
+          voice.lang.includes('om') || voice.lang.includes('ET')
+        )
+        if (oromoVoice) utterance.voice = oromoVoice
+        else utterance.lang = 'en-US' // Fallback
+        utterance.rate = 0.9
+      } else {
+        utterance.lang = 'en-US'
+        const voices = window.speechSynthesis.getVoices()
+        const englishVoice = voices.find(voice => 
+          voice.lang.includes('en-US') || voice.lang.includes('en')
+        )
+        if (englishVoice) utterance.voice = englishVoice
+        utterance.rate = 1.0
+      }
+
+      utterance.pitch = 1.0
+      utterance.volume = 1.0
+
+      // Add event listeners for better feedback
+      utterance.onstart = () => {
+        console.log(`Speaking in ${lang}`)
+      }
+      
+      utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event)
+      }
+
+      utterance.onend = () => {
+        console.log('Speech synthesis ended')
+      }
 
       window.speechSynthesis.speak(utterance)
     }
@@ -102,7 +144,7 @@ export default function AiAssistant() {
       (window as any).webkitSpeechRecognition
 
     if (!SpeechRecognition) {
-      alert('Browser does not support voice recognition')
+      alert('Browser does not support voice recognition. Please use Chrome, Edge, or Safari.')
       return
     }
 
@@ -114,33 +156,84 @@ export default function AiAssistant() {
     const recognition = new SpeechRecognition()
     recognitionRef.current = recognition
 
-    if (lang === 'am') recognition.lang = 'am-ET'
-    else if (lang === 'om') recognition.lang = 'om-ET'
-    else recognition.lang = 'en-US'
+    if (lang === 'am') {
+      recognition.lang = 'am-ET'
+      recognition.serviceURI = 'wss://www.google.com/speech-api/full-duplex/v1/down'
+    } else if (lang === 'om') {
+      recognition.lang = 'om-ET'
+      recognition.lang = 'en-US' // Fallback
+    } else {
+      recognition.lang = 'en-US'
+    }
 
     recognition.interimResults = true
     recognition.continuous = false
+    recognition.maxAlternatives = 1
 
-    recognition.onstart = () => setIsListening(true)
-
-    recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
-        .join('')
-
-      setInput(transcript)
-      setWasVoiceInput(true)
+    recognition.onstart = () => {
+      setIsListening(true)
+      console.log(`Voice recognition started in ${lang}`)
     }
 
-    recognition.onerror = () => {
+    recognition.onresult = (event: any) => {
+      let finalTranscript = ''
+      let interimTranscript = ''
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i]
+        const transcript = result[0].transcript
+        
+        if (result.isFinal) {
+          finalTranscript += transcript
+        } else {
+          interimTranscript += transcript
+        }
+      }
+
+      if (finalTranscript) {
+        setInput(finalTranscript.trim())
+        setWasVoiceInput(true)
+        console.log('Final transcript:', finalTranscript)
+      } else if (interimTranscript) {
+        setInput(interimTranscript.trim())
+      }
+    }
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error)
       setIsListening(false)
+      
+      let errorMessage = 'Voice recognition error'
+      if (event.error === 'no-speech') {
+        errorMessage = 'No speech detected. Please try again.'
+      } else if (event.error === 'audio-capture') {
+        errorMessage = 'Microphone not available. Please check permissions.'
+      } else if (event.error === 'not-allowed') {
+        errorMessage = 'Microphone permission denied. Please allow microphone access.'
+      } else if (event.error === 'network') {
+        errorMessage = 'Network error. Please check your connection.'
+      }
+      
+      const errorMsg: ChatMessage = {
+        role: 'ai',
+        text: errorMessage,
+        timestamp: new Date(),
+        isError: true,
+      }
+      setMessages(prev => [...prev, errorMsg])
     }
 
     recognition.onend = () => {
       setIsListening(false)
+      console.log('Voice recognition ended')
     }
 
-    recognition.start()
+    try {
+      recognition.start()
+    } catch (error) {
+      console.error('Failed to start recognition:', error)
+      setIsListening(false)
+    }
   }
 
   const handleSend = async () => {
@@ -161,10 +254,15 @@ export default function AiAssistant() {
     setLoading(true)
 
     try {
-      let langNote = ''
-      if (lang === 'am') langNote = ' Respond only in Amharic.'
-      if (lang === 'om') langNote = ' Respond only in Oromo.'
-      if (lang === 'en') langNote = ' Respond only in English.'
+      // Strong language instruction to ensure response in correct language
+      let languageInstruction = ''
+      if (lang === 'am') {
+        languageInstruction = ' IMPORTANT: You must respond ONLY in Amharic language. Do not use any English words in your response. All your answers must be completely in Amharic.'
+      } else if (lang === 'om') {
+        languageInstruction = ' IMPORTANT: You must respond ONLY in Oromo language. Do not use any English words in your response. All your answers must be completely in Oromo.'
+      } else {
+        languageInstruction = ' IMPORTANT: You must respond ONLY in English language.'
+      }
 
       let agentPrompt = ''
       if (selectedAgent === 'agronomist') {
@@ -177,7 +275,7 @@ export default function AiAssistant() {
         agentPrompt = ' You are an agricultural weather expert. Give rain, frost, irrigation and forecast advice.'
       }
 
-      const finalPrompt = currentInput + agentPrompt + langNote
+      const finalPrompt = `${currentInput}${agentPrompt}${languageInstruction}`
 
       const res = await sendMessageToAI(finalPrompt)
 
@@ -238,9 +336,22 @@ export default function AiAssistant() {
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <Bot className="w-5 h-5 text-white" />
               </div>
-              <DialogTitle className="text-white text-lg font-semibold">
-                {t('ai_assistant') || 'AI Assistant'}
-              </DialogTitle>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold">
+                  {t('ai_assistant') || 'AI Assistant'}
+                </DialogTitle>
+                <div className="flex items-center gap-2 text-white/80 text-xs">
+                  <span>Language:</span>
+                  <span className="bg-white/20 px-2 py-1 rounded-full">
+                    {lang === 'am' ? '🇪🇹 Amharic' : lang === 'om' ? '🇪🇹 Oromo' : '🇬🇧 English'}
+                  </span>
+                  {isListening && (
+                    <span className="bg-red-500 text-white px-2 py-1 rounded-full animate-pulse">
+                      🎤 Listening...
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 

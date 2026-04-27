@@ -34,8 +34,7 @@ export default function LayoutContent({
       </CartProvider>
 
       <Toaster position="top-center" richColors />
-
-=      {user && !hideAi && <AiAssistant />}
+    {user && !hideAi && <AiAssistant />}
     </>
   );
 }

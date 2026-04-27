@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { deleteProducts, getProducts } from '@/services/productService'
-import { Product } from '@/types/product'
+import { deleteProducts, getAllProducts, getProducts } from '@/services/productService'
+import { CreateAllProductsPayload, Product } from '@/types/product'
 import { useLanguage } from '@/context/LanguageContext'
 
 import {
@@ -63,7 +63,7 @@ export default function AdminProductsPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<SubCategory[]>([])
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null)
- 
+
   // PAGINATION
   const [page, setPage] = useState(1)
   const pageSize = 7
@@ -100,6 +100,10 @@ export default function AdminProductsPage() {
       toast.error("Failed to delete product")
     }
   }
+
+  
+
+
 
   // ================= FILTER =================
   const filteredProducts = useMemo(() => {

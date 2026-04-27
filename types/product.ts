@@ -40,6 +40,11 @@ export type UpdateProductPayload = {
 }
 
 
+export type AllProductsPayload = {
+  id: string
+  name: string
+}
+
 export type CreateAllProductsPayload = {
   name: string
 }
