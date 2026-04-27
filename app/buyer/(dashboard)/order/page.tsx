@@ -137,7 +137,7 @@ export default function BuyerOrdersPage() {
 
           {/* SEARCH */}
           <Input
-            placeholder="Search product..."
+            placeholder={t('search_product_placeholder') || 'Search product...'}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full md:w-96"
@@ -146,12 +146,12 @@ export default function BuyerOrdersPage() {
           {/* STATUS */}
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full md:w-44">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('status') || 'Status'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">All Status</SelectItem>
-              <SelectItem value="PAID">Paid</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="ALL">{t('all_status_option') || 'All Status'}</SelectItem>
+              <SelectItem value="PAID">{t('sales_status_paid') || 'Paid'}</SelectItem>
+              <SelectItem value="PENDING">{t('sales_status_pending') || 'Pending'}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -167,12 +167,12 @@ export default function BuyerOrdersPage() {
 
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>{t('product') || 'Product'}</TableHead>
+                <TableHead>{t('quantity') || 'Quantity'}</TableHead>
+                <TableHead>{t('price') || 'Price'}</TableHead>
+                <TableHead>{t('total') || 'Total'}</TableHead>
+                <TableHead>{t('status') || 'Status'}</TableHead>
+                <TableHead>{t('date') || 'Date'}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -204,7 +204,7 @@ export default function BuyerOrdersPage() {
 
                   <TableCell>
                     <span className={`px-3 py-1 rounded-full text-xs ${getStatusStyle(order.status)}`}>
-                      {order.status}
+                      {order.status === 'PAID' ? t('sales_status_paid') : order.status === 'PENDING' ? t('sales_status_pending') : order.status === 'CANCELLED' ? t('sales_status_cancelled') : order.status}
                     </span>
                   </TableCell>
 

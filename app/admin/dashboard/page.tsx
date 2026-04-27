@@ -91,6 +91,50 @@ export default function AdminDashboardPage() {
 const pageSize = 5
 
   const [editName, setEditName] = useState('')
+  const recentProducts = products.slice(0, 5)
+
+  const handleEdit = (product: AllProductItem) => {
+    setSelectedProduct(product)
+    setEditName(product.name)
+    setEditOpen(true)
+  }
+
+  const handleDelete = (product: AllProductItem) => {
+    setSelectedProduct(product)
+    setDeleteOpen(true)
+  }
+
+  const handleUpdateProduct = async () => {
+    if (!selectedProduct || !editName.trim()) return
+    try {
+      setSubmitting(true)
+      await updateAllProduct(selectedProduct.id, { name: editName.trim() })
+      setEditOpen(false)
+      await loadAllproducts()
+      toast.success("Product updated successfully")
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update product")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleDeleteProduct = async () => {
+    if (!selectedProduct) return
+    try {
+      setSubmitting(true)
+      await deleteAllProduct(selectedProduct.id)
+      setDeleteOpen(false)
+      await loadAllproducts()
+      toast.success("Product deleted successfully")
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to delete product")
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   function groupDataByMonth(products: Product[], users: User[]): ChartData[] {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -323,8 +367,9 @@ const paginatedProducts = allProducts.slice(
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>ID</TableHead>
                   <TableHead>{t('product')}</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

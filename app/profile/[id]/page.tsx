@@ -432,7 +432,7 @@ export default function Page() {
                     ) : (
                       <>
                         <Save className="mr-2 h-4 w-4" />
-                        {t('update_profile_button') || 'Update Profile'}
+                        {t('update_profile_btn') || 'Update Profile'}
                       </>
                     )}
                   </Button>
