@@ -6,8 +6,11 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { resetPassword } from "@/services/authService"
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card"
+import { useLanguage } from "@/context/LanguageContext"
+import { toast } from "sonner"
 
 export default function ResetPassword() {
+  const { t } = useLanguage()
   const router = useRouter()
   const [identifier, setIdentifier] = useState("")
 
@@ -22,18 +25,19 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false)
 
   const handleReset = async () => {
-    if (!password || !confirmPassword) return alert("Fill both fields")
-    if (password !== confirmPassword) return alert("Passwords do not match")
-    if (!identifier) return alert("Invalid reset request")
+    if (!password || !confirmPassword) return toast.error(t("toast_fill_all_fields"))
+    if (password !== confirmPassword) return toast.error(t("toast_pass_mismatch"))
+    if (!identifier) return toast.error(t("toast_invalid_request"))
 
     try {
       setLoading(true)
       const res = await resetPassword({ emailOrPhone: identifier, password, confirmPassword })
       console.log("Reset Password Response:", res)
-     
+      toast.success(t("toast_reset_success"))
       router.push("/login")
     } catch (error) {
-         console.log(error)
+      console.log(error)
+      toast.error(t("toast_reset_failed"))
     } finally {
       setLoading(false)
     }
@@ -43,17 +47,17 @@ export default function ResetPassword() {
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
       <Card className="w-full max-w-md p-6 shadow-lg rounded-2xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t('reset_password_title')}</CardTitle>
           <CardDescription>
-            Enter your new password to reset your account for <span className="font-medium">{identifier}</span>.
+            {t('reset_password_desc_with_id')} <span className="font-medium">{identifier}</span>.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <div className="flex flex-col space-y-3">
-            <label className="text-sm font-medium text-gray-700">New Password</label>
+            <label className="text-sm font-medium text-gray-700">{t('new_password_label')}</label>
             <Input
-              placeholder="New Password"
+              placeholder={t('new_password_placeholder')}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -62,9 +66,9 @@ export default function ResetPassword() {
           </div>
 
           <div className="flex flex-col space-y-3">
-            <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+            <label className="text-sm font-medium text-gray-700">{t('confirm_password_label')}</label>
             <Input
-              placeholder="Confirm Password"
+              placeholder={t('confirm_password_placeholder')}
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -77,10 +81,10 @@ export default function ResetPassword() {
             onClick={handleReset}
             disabled={loading}
           >
-            {loading ? "Resetting..." : "Reset Password"}
+            {loading ? t('resetting_btn') : t('reset_password_btn')}
           </Button>
         </CardContent>
       </Card>
     </div>
   )
-}
+}

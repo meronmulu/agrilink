@@ -64,7 +64,7 @@ const user = await login(payload)
         return
       }
 
-      toast.success('Login successful')
+      toast.success(t('toast_login_success'))
 
       const roleRoutes: Record<string, string> = {
         ADMIN: '/admin/dashboard',
@@ -139,7 +139,7 @@ const user = await login(payload)
       localStorage.setItem('token', res.token)
       localStorage.setItem('user', JSON.stringify(res.user))
 
-      toast.success('Google login successful')
+      toast.success(t('toast_google_login_success'))
 
       const roleRoutes: Record<string, string> = {
         ADMIN: '/admin/dashboard',

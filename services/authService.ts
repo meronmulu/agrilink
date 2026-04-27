@@ -53,12 +53,7 @@ export const login = async (credentials: {
     throw new Error('Invalid credentials')
   } catch (error) {
     console.log('LOGIN ERROR RESPONSE:', error)
-    toast.error(
-        'Login failed. Please check your credentials and try again.'
-    )
-    
-
-      throw error
+    throw error
   }
 }
 export const verifyOtp = async (data: VerifyOtpRequest) => {
