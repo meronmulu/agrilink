@@ -41,9 +41,8 @@ import {
   approveMarketPrice,
   rejectMarketPrice,
 } from "@/services/marketPrice"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useLanguage } from "@/context/LanguageContext"
+
 
 export default function MarketPricePage() {
   const { t } = useLanguage()

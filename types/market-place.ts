@@ -1,5 +1,6 @@
 export interface MarketPrice {
   id: string
+  date: string
   productId: string
   woredaId: string
   price: number

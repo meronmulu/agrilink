@@ -129,7 +129,7 @@ export default function MarketPriceCheckPage() {
 
           {/* Enhanced Quick Selection */}
           <div className="flex flex-wrap justify-center gap-3 mb-10">
-            {popularProducts.map(({ name, icon }) => (
+            {popularProducts.map(({ name}) => (
               <Button
                 key={name}
                 variant="outline"
@@ -140,7 +140,6 @@ export default function MarketPriceCheckPage() {
                     : 'hover:border-emerald-300 hover:bg-emerald-50'
                 }`}
               >
-                <span className="mr-2 text-lg">{icon}</span>
                 {name}
               </Button>
             ))}
@@ -212,7 +211,7 @@ export default function MarketPriceCheckPage() {
                   No weekly data found
                 </h2>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  No approved market records found for "{productQuery}" in the last 7 days. 
+                  No approved market records found for `{productQuery}` in the last 7 days. 
                   Try searching for a different product or check back later.
                 </p>
               </CardContent>
@@ -299,7 +298,7 @@ export default function MarketPriceCheckPage() {
                 </div>
 
                 <div className="grid gap-4">
-                  {weeklyResults.map((item, idx) => (
+                  {weeklyResults.map((item) => (
                     <Card 
                       key={item.id} 
                       className="rounded-2xl bg-white border border-gray-100 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"

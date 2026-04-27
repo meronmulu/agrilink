@@ -38,6 +38,7 @@ import { useCart } from "@/context/CartContext"
 import { useMessage } from "@/context/MessageContext"
 import Image from "next/image"
 import { getNotifications } from "@/services/notificationService"
+import { Notification } from "@/types/notification"
 
 export default function Header() {
   const { user, logout, loading } = useAuth()
@@ -47,7 +48,7 @@ export default function Header() {
   const pathname = usePathname()
   const { cartCount } = useCart()
   const { unreadCount } = useMessage()
-  const [notifications, setNotifications] = useState([])
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
 
   
