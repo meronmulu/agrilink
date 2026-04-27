@@ -23,21 +23,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const restoreUser = async () => {
+      // We still use localStorage for the UI state, 
+      // but Middleware will rely on the Cookie we set in login()
       const userString = localStorage.getItem('user')
-      const token = localStorage.getItem('token')
-
-      if (userString && token) {
+      if (userString) {
         try {
           const basicUser: User = JSON.parse(userString)
           const fullUser = await AuthService.getUserById(basicUser.id)
           setUser(fullUser)
         } catch (error) {
           console.error('Failed to restore user:', error)
-          logout()
+          Cookies.remove('token')
+          Cookies.remove('user-role')
+          setUser(null)
         }
-      } else if (userString || token) {
-        // partial session data, clean it up
-        logout()
       }
       setLoading(false)
     }
