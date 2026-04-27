@@ -13,12 +13,14 @@ import { getUsers } from '@/services/authService'
 import { Product } from '@/types/product'
 import { User } from '@/types/auth'
 import { useLanguage } from '@/context/LanguageContext'
+
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+
 import {
   Table,
   TableBody,
@@ -27,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+
 import {
   Dialog,
   DialogContent,
@@ -35,8 +38,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+
 import {
   LineChart,
   Line,
@@ -46,9 +51,18 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+
 import { Loader2, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
 
 interface ChartData {
   month: string
@@ -75,66 +89,30 @@ export default function AdminDashboardPage() {
   const [totalProducts, setTotalProducts] = useState(0)
   const [totalUsers, setTotalUsers] = useState(0)
   const [totalOrders, setTotalOrders] = useState(0)
-  const [totalRevenue, setTotalRevenue] = useState(0)
 
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const [selectedProduct, setSelectedProduct] = useState<AllProductItem | null>(null)
+  const [editName, setEditName] = useState('')
 
   const [form, setForm] = useState({
+    id: '',
     name: '',
   })
 
   const [currentPage, setCurrentPage] = useState(1)
-const pageSize = 5
+  const pageSize = 5
 
-  const [editName, setEditName] = useState('')
-  const recentProducts = products.slice(0, 5)
+  const recentUsers = users.slice(0, 5)
 
-  const handleEdit = (product: AllProductItem) => {
-    setSelectedProduct(product)
-    setEditName(product.name)
-    setEditOpen(true)
-  }
+  const totalPages = Math.ceil(allProducts.length / pageSize)
 
-  const handleDelete = (product: AllProductItem) => {
-    setSelectedProduct(product)
-    setDeleteOpen(true)
-  }
-
-  const handleUpdateProduct = async () => {
-    if (!selectedProduct || !editName.trim()) return
-    try {
-      setSubmitting(true)
-      await updateAllProduct(selectedProduct.id, { name: editName.trim() })
-      setEditOpen(false)
-      await loadAllproducts()
-      toast.success("Product updated successfully")
-    } catch (err) {
-      console.error(err)
-      toast.error("Failed to update product")
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const handleDeleteProduct = async () => {
-    if (!selectedProduct) return
-    try {
-      setSubmitting(true)
-      await deleteAllProduct(selectedProduct.id)
-      setDeleteOpen(false)
-      await loadAllproducts()
-      toast.success("Product deleted successfully")
-    } catch (err) {
-      console.error(err)
-      toast.error("Failed to delete product")
-    } finally {
-      setSubmitting(false)
-    }
-  }
+  const paginatedProducts = allProducts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  )
 
   function groupDataByMonth(products: Product[], users: User[]): ChartData[] {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -161,11 +139,11 @@ const pageSize = 5
   const loadAllproducts = async () => {
     try {
       const data = await getAllProducts()
-      console.log("ALL PRODUCTS RESPONSE:", data)
+      console.log('ALL PRODUCTS RESPONSE:', data)
 
-      setAllProducts(data.product || [])
+      setAllProducts(data?.product || data?.products || data || [])
     } catch (err) {
-      console.error("LOAD ALL PRODUCTS ERROR:", err)
+      console.error('LOAD ALL PRODUCTS ERROR:', err)
       setAllProducts([])
     }
   }
@@ -188,13 +166,6 @@ const pageSize = 5
 
       setTotalOrders(
         safeProducts.reduce((acc, p) => acc + (p.amount || 0), 0)
-      )
-
-      setTotalRevenue(
-        safeProducts.reduce(
-          (acc, p) => acc + ((p.amountSold || 0) * Number(p.price || 0)),
-          0
-        )
       )
 
       setChartData(groupDataByMonth(safeProducts, safeUsers))
@@ -224,7 +195,7 @@ const pageSize = 5
       })
 
       toast.success('Product created successfully')
-      setForm({ name: '' })
+      setForm({ id: '', name: '' })
       setAddOpen(false)
       await loadAllproducts()
     } catch (err) {
@@ -247,16 +218,16 @@ const pageSize = 5
   }
 
   const handleUpdateProduct = async () => {
-    if (!selectedProduct) return
+    if (!selectedProduct || !editName.trim()) return
 
     try {
       setSubmitting(true)
 
       await updateAllProduct(selectedProduct.id, {
-        name: editName,
+        name: editName.trim(),
       })
 
-      toast.success('Product updated')
+      toast.success('Product updated successfully')
       setEditOpen(false)
       await loadAllproducts()
     } catch (err) {
@@ -275,7 +246,7 @@ const pageSize = 5
 
       await deleteAllProduct(selectedProduct.id)
 
-      toast.success('Product deleted')
+      toast.success('Product deleted successfully')
       setDeleteOpen(false)
       await loadAllproducts()
     } catch (err) {
@@ -285,14 +256,6 @@ const pageSize = 5
       setSubmitting(false)
     }
   }
-
-  const recentUsers = users.slice(0, 5)
-  const totalPages = Math.ceil(allProducts.length / pageSize)
-
-const paginatedProducts = allProducts.slice(
-  (currentPage - 1) * pageSize,
-  currentPage * pageSize
-)
 
   if (pageLoading) {
     return (
@@ -326,11 +289,16 @@ const paginatedProducts = allProducts.slice(
               <Input
                 placeholder="Product name"
                 value={form.name}
-                onChange={(e) => setForm({ name: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })
+                }
               />
 
-            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 text-white"
-              onClick={handleCreateProduct} disabled={submitting}>
+              <Button
+                className="bg-linear-to-r from-emerald-600 to-teal-600 text-white"
+                onClick={handleCreateProduct}
+                disabled={submitting}
+              >
                 {submitting ? 'Creating...' : 'Create'}
               </Button>
             </div>
@@ -338,10 +306,21 @@ const paginatedProducts = allProducts.slice(
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className='py-4'><CardHeader><CardTitle>{t('total_products')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalProducts}</CardContent></Card>
-        <Card className='py-4'><CardHeader><CardTitle>{t('total_users')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalUsers}</CardContent></Card>
-        <Card className='py-4'><CardHeader><CardTitle>{t('total_orders')}</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{totalOrders}</CardContent></Card>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <Card className="py-4">
+          <CardHeader><CardTitle>{t('total_products')}</CardTitle></CardHeader>
+          <CardContent className="text-3xl font-bold">{totalProducts}</CardContent>
+        </Card>
+
+        <Card className="py-4">
+          <CardHeader><CardTitle>{t('total_users')}</CardTitle></CardHeader>
+          <CardContent className="text-3xl font-bold">{totalUsers}</CardContent>
+        </Card>
+
+        <Card className="py-4">
+          <CardHeader><CardTitle>{t('total_orders')}</CardTitle></CardHeader>
+          <CardContent className="text-3xl font-bold">{totalOrders}</CardContent>
+        </Card>
       </div>
 
       <Card className="py-2">
@@ -362,73 +341,69 @@ const paginatedProducts = allProducts.slice(
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <Card className="py-2">
-          <CardHeader><CardTitle>Products</CardTitle></CardHeader>
+          <CardHeader><CardTitle>All Products</CardTitle></CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>{t('product')}</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                {paginatedProducts.map((p) => (<TableRow key={p.id}>
-                  <TableCell>{p.name}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <button onClick={() => handleEditClick(p)}><Pencil className="w-4 h-4 text-emerald-600" /></button>
-                      <button onClick={() => handleDeleteClick(p)}><Trash2 className="w-4 h-4 text-red-400" /></button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                {paginatedProducts.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell>{p.name}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-3">
+                        <button onClick={() => handleEditClick(p)}>
+                          <Pencil className="w-4 h-4 text-emerald-600" />
+                        </button>
+
+                        <button onClick={() => handleDeleteClick(p)}>
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
+
+            <div className="mt-4 flex justify-end">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                    />
+                  </PaginationItem>
+
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <PaginationItem key={i}>
+                      <PaginationLink
+                        isActive={currentPage === i + 1}
+                        onClick={() => setCurrentPage(i + 1)}
+                      >
+                        {i + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(p + 1, totalPages))
+                      }
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
           </CardContent>
-
-          <div className="mt-4 flex justify-end">
-        <Pagination>
-          <PaginationContent>
-
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() =>
-                  setCurrentPage((p) => Math.max(p - 1, 1))
-                }
-                className={
-                  currentPage === 1 ? 'pointer-events-none opacity-50' : ''
-                }
-              />
-            </PaginationItem>
-
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  isActive={currentPage === i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-
-            <PaginationItem>
-              <PaginationNext
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(p + 1, totalPages))
-                }
-                className={
-                  currentPage === totalPages
-                    ? 'pointer-events-none opacity-50'
-                    : ''
-                }
-              />
-            </PaginationItem>
-
-          </PaginationContent>
-        </Pagination>
-      </div>
         </Card>
 
         <Card className="py-2">
@@ -442,12 +417,19 @@ const paginatedProducts = allProducts.slice(
                   <TableHead>{t('role')}</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
                 {recentUsers.map((u) => (
                   <TableRow key={u.id}>
                     <TableCell className="flex items-center gap-3">
                       <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-200">
-                        <Image src={u.profile?.imageUrl || '/placeholder.png'} alt="User" fill unoptimized className="object-cover" />
+                        <Image
+                          src={u.profile?.imageUrl || '/placeholder.png'}
+                          alt="User"
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
                       </div>
                       {u.profile?.fullName || 'Unknown'}
                     </TableCell>
@@ -464,11 +446,23 @@ const paginatedProducts = allProducts.slice(
       {/* EDIT DIALOG */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Edit Product</DialogTitle></DialogHeader>
-          <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+          <DialogHeader>
+            <DialogTitle>Edit Product</DialogTitle>
+          </DialogHeader>
+
+          <Input
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+          />
+
           <DialogFooter>
-            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 text-white"
-            onClick={handleUpdateProduct}>{submitting ? 'Updating...' : 'Update'}</Button>
+            <Button
+              className="bg-linear-to-r from-emerald-600 to-teal-600 text-white"
+              onClick={handleUpdateProduct}
+              disabled={submitting}
+            >
+              {submitting ? 'Updating...' : 'Update'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -476,20 +470,27 @@ const paginatedProducts = allProducts.slice(
       {/* DELETE DIALOG */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Delete Product</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Delete Product</DialogTitle>
+          </DialogHeader>
+
           <p>Are you sure you want to delete this product?</p>
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteProduct}>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+              Cancel
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={handleDeleteProduct}
+              disabled={submitting}
+            >
               {submitting ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      
     </div>
-
-
   )
 }
