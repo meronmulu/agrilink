@@ -246,9 +246,12 @@ export default function Header() {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
+                <div className="p-3 border-b bg-gray-50/50">
+                  <p className="font-bold text-sm text-gray-800">{t('notifications_label') || "Notifications"}</p>
+                </div>
 
                 {notifications.length === 0 ? (
-                  <p className="p-3 text-sm text-gray-500">No notifications</p>
+                  <p className="p-3 text-sm text-gray-500">{t('no_notifications') || "No notifications"}</p>
                 ) : (
                   notifications.map((n) => (
                     <div key={n.id} className="p-3 border-b hover:bg-gray-50">

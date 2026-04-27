@@ -26,8 +26,10 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { MarketPrice } from '@/types/market-place'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MarketPriceCheckPage() {
+  const { t } = useLanguage()
   const [data, setData] = useState<MarketPrice[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -36,12 +38,12 @@ export default function MarketPriceCheckPage() {
   const [notFound, setNotFound] = useState(false)
 
   const popularProducts = [
-    { name: 'Banana',  },
-    { name: 'Tomato',  },
-    { name: 'Onion', },
-    { name: 'Coffee', },
-    { name: 'Maize',  },
-    { name: 'Avocado',}
+    { name: t('banana') || 'Banana', key: 'Banana' },
+    { name: t('tomato') || 'Tomato', key: 'Tomato' },
+    { name: t('onion') || 'Onion', key: 'Onion' },
+    { name: t('coffee') || 'Coffee', key: 'Coffee' },
+    { name: t('maize') || 'Maize', key: 'Maize' },
+    { name: t('avocado') || 'Avocado', key: 'Avocado' }
   ]
 
   useEffect(() => {
@@ -116,26 +118,25 @@ export default function MarketPriceCheckPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
-              Real-time Market Data
+              {t('real_time_data') || "Real-time Market Data"}
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-linear-to-br from-emerald-700 to-teal-600 bg-clip-text text-transparent">
-              Market Price Checker
+              {t('market_price_title') || "Market Price Checker"}
             </h1>
             <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-              Search approved agricultural prices across Ethiopian markets — 
-              transparent, verified, and up-to-date.
+              {t('market_price_desc') || "Search approved agricultural prices across Ethiopian markets — transparent, verified, and up-to-date."}
             </p>
           </div>
 
           {/* Enhanced Quick Selection */}
           <div className="flex flex-wrap justify-center gap-3 mb-10">
-            {popularProducts.map(({ name}) => (
+            {popularProducts.map(({ name, key }) => (
               <Button
-                key={name}
+                key={key}
                 variant="outline"
-                onClick={() => handleQuickSelect(name)}
+                onClick={() => handleQuickSelect(key)}
                 className={`rounded-full px-5 py-2 h-auto transition-all duration-200 ${
-                  productQuery === name 
+                  productQuery === key 
                     ? 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700' 
                     : 'hover:border-emerald-300 hover:bg-emerald-50'
                 }`}
@@ -151,7 +152,7 @@ export default function MarketPriceCheckPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
-                  placeholder="Search any agricultural product... e.g., Banana, Teff, Potato"
+                  placeholder={t('search_product_placeholder') || "Search any agricultural product... e.g., Banana, Teff, Potato"}
                   value={productQuery}
                   onChange={e => {
                     setProductQuery(e.target.value)
@@ -169,7 +170,7 @@ export default function MarketPriceCheckPage() {
                 className="h-14 rounded-2xl bg-linear-to-br from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md hover:shadow-lg transition-all duration-200 px-8"
               >
                 <Search className="w-5 h-5 mr-2" />
-                Check Price
+                {t('check_price') || "Check Price"}
               </Button>
             </div>
           </div>
@@ -208,11 +209,10 @@ export default function MarketPriceCheckPage() {
                   <PackageSearch className="w-10 h-10 text-amber-500" />
                 </div>
                 <h2 className="text-2xl font-semibold mb-2 text-gray-800">
-                  No weekly data found
+                  {t('no_weekly_data') || "No weekly data found"}
                 </h2>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  No approved market records found for `{productQuery}` in the last 7 days. 
-                  Try searching for a different product or check back later.
+                  {t('no_weekly_data_desc') || "No approved market records found in the last 7 days. Try searching for a different product or check back later."}
                 </p>
               </CardContent>
             </Card>
@@ -228,12 +228,12 @@ export default function MarketPriceCheckPage() {
                     <div>
                       <div className="flex items-center gap-2 text-emerald-600 mb-2">
                         <BarChart3 className="w-5 h-5" />
-                        <span className="text-sm font-medium">7-Day Analysis</span>
+                        <span className="text-sm font-medium">{t('7_day_analysis') || "7-Day Analysis"}</span>
                       </div>
                       <h2 className="text-4xl font-bold capitalize text-gray-800">
                         {productQuery}
                       </h2>
-                      <p className="text-gray-500 mt-1">Weekly market summary</p>
+                      <p className="text-gray-500 mt-1">{t('weekly_summary') || "Weekly market summary"}</p>
                     </div>
                     <div className="mt-4 md:mt-0">
                       <Badge className={`px-4 py-2 rounded-full text-sm font-medium ${
@@ -244,8 +244,8 @@ export default function MarketPriceCheckPage() {
                         {weeklyStats.trend === 'up' && <TrendingUp className="w-4 h-4 mr-1" />}
                         {weeklyStats.trend === 'down' && <TrendingDown className="w-4 h-4 mr-1" />}
                         {weeklyStats.trend === 'stable' && <Minus className="w-4 h-4 mr-1" />}
-                        {weeklyStats.trend === 'up' ? 'Price Rising' : 
-                         weeklyStats.trend === 'down' ? 'Price Falling' : 'Stable'}
+                        {weeklyStats.trend === 'up' ? (t('price_rising') || 'Price Rising') : 
+                         weeklyStats.trend === 'down' ? (t('price_falling') || 'Price Falling') : (t('stable') || 'Stable')}
                       </Badge>
                     </div>
                   </div>
@@ -253,7 +253,7 @@ export default function MarketPriceCheckPage() {
                   <div className="grid md:grid-cols-4 gap-6">
                     <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 text-center">
                       <DollarSign className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500 mb-1">Average Price</p>
+                      <p className="text-sm text-gray-500 mb-1">{t('average_price') || "Average Price"}</p>
                       <h3 className="text-3xl font-bold text-emerald-700">
                         {weeklyStats.avg} ETB
                       </h3>
@@ -261,7 +261,7 @@ export default function MarketPriceCheckPage() {
 
                     <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-5 text-center">
                       <TrendingUp className="w-6 h-6 text-red-500 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500 mb-1">Highest</p>
+                      <p className="text-sm text-gray-500 mb-1">{t('highest') || "Highest"}</p>
                       <h3 className="text-3xl font-bold text-red-600">
                         {weeklyStats.max} ETB
                       </h3>
@@ -269,7 +269,7 @@ export default function MarketPriceCheckPage() {
 
                     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 text-center">
                       <TrendingDown className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500 mb-1">Lowest</p>
+                      <p className="text-sm text-gray-500 mb-1">{t('lowest') || "Lowest"}</p>
                       <h3 className="text-3xl font-bold text-green-600">
                         {weeklyStats.min} ETB
                       </h3>
@@ -277,7 +277,7 @@ export default function MarketPriceCheckPage() {
 
                     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 text-center">
                       <Store className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500 mb-1">Market Reports</p>
+                      <p className="text-sm text-gray-500 mb-1">{t('market_reports') || "Market Reports"}</p>
                       <h3 className="text-3xl font-bold text-blue-600">
                         {weeklyStats.count}
                       </h3>
@@ -290,10 +290,10 @@ export default function MarketPriceCheckPage() {
               <div className="mb-14">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-2xl font-semibold text-gray-800">
-                    Weekly Approved Records
+                    {t('weekly_approved_records') || "Weekly Approved Records"}
                   </h3>
                   <p className="text-sm text-gray-400">
-                    Last 7 days
+                    {t('last_7_days') || "Last 7 days"}
                   </p>
                 </div>
 
@@ -307,7 +307,7 @@ export default function MarketPriceCheckPage() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="font-bold text-xl text-gray-800 capitalize">
-                              {item.product?.name}
+                              {item.product?.name ? (t(item.product.name.toLowerCase()) || item.product.name) : ""}
                             </h4>
                             <Badge className="bg-emerald-50 text-emerald-700 border-0 text-xs">
                               {item.status}
@@ -333,7 +333,7 @@ export default function MarketPriceCheckPage() {
                         <div className="text-right sm:text-left">
                           <div className="flex items-center gap-2 sm:justify-end">
                             <BadgeCheck className="w-4 h-4 text-emerald-500" />
-                            <span className="text-xs text-gray-400">Verified</span>
+                            <span className="text-xs text-gray-400">{t('verified') || "Verified"}</span>
                           </div>
                           <h2 className="text-2xl font-bold text-emerald-700 mt-1">
                             {item.price} <span className="text-sm font-normal text-gray-400">ETB</span>
@@ -353,14 +353,14 @@ export default function MarketPriceCheckPage() {
               <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                 <div>
                   <h2 className="text-3xl font-bold text-gray-800">
-                    Latest Approved Prices
+                    {t('latest_approved_prices') || "Latest Approved Prices"}
                   </h2>
                   <p className="text-gray-500 mt-1">
-                    Most recent market reports from across Ethiopia
+                    {t('latest_prices_desc') || "Most recent market reports from across Ethiopia"}
                   </p>
                 </div>
                 <Button variant="ghost" className="text-emerald-600 group">
-                  View all
+                  {t('view_all') || "View all"}
                   <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition" />
                 </Button>
               </div>
@@ -375,7 +375,7 @@ export default function MarketPriceCheckPage() {
                     <CardContent className="p-5">
                       <div className="flex justify-between items-start mb-3">
                         <h3 className="font-bold text-lg capitalize text-gray-800">
-                          {item.product?.name}
+                          {item.product?.name ? (t(item.product.name.toLowerCase()) || item.product.name) : ""}
                         </h3>
                         <BadgeCheck className="w-4 h-4 text-emerald-500" />
                       </div>
@@ -388,7 +388,7 @@ export default function MarketPriceCheckPage() {
                       </p>
                       <div className="border-t border-gray-100 pt-3">
                         <div className="flex items-baseline justify-between">
-                          <span className="text-xs text-gray-400">Price</span>
+                          <span className="text-xs text-gray-400">{t('price') || "Price"}</span>
                           <span className="text-xl font-bold text-emerald-700">
                             {item.price} ETB
                           </span>
@@ -408,10 +408,10 @@ export default function MarketPriceCheckPage() {
                 <Store className="w-12 h-12 text-gray-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                No market data available
+                {t('no_market_data') || "No market data available"}
               </h3>
               <p className="text-gray-400">
-                Check back later for updated price information.
+                {t('check_back_later') || "Check back later for updated price information."}
               </p>
             </div>
           )}
