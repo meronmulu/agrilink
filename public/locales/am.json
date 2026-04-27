@@ -702,5 +702,6 @@
   "register_farmer_desc": "አዲስ የአርሶ አደር አካውንት ለመፍጠር እባክዎን ዝርዝሩን ከዚህ በታች ይሙሉ",
   "email_placeholder": "example@email.com",
   "password_placeholder": "••••••",
-  "register_farmer": "አርሶ አደር ይመዝገቡ"
+  "register_farmer": "አርሶ አደር ይመዝገቡ",
+  "update_profile_button": "መለያ ያዘምኑ"
 }

@@ -135,7 +135,7 @@ export default function FarmerOrdersPage() {
           {t('farmer_orders') || 'Farmer Orders'}
         </h1>
         <p className="text-gray-500 text-sm">
-          Track all your orders and revenue
+          {t('orders_track_desc') || 'Track all your orders and revenue'}
         </p>
       </div>
 
@@ -145,7 +145,7 @@ export default function FarmerOrdersPage() {
         <Card className='py-4'>
           <CardHeader>
             <CardTitle className="text-sm text-gray-500">
-              Total Orders
+              {t('total_orders') || 'Total Orders'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -158,7 +158,7 @@ export default function FarmerOrdersPage() {
         <Card className='py-4'>
           <CardHeader>
             <CardTitle className="text-sm text-gray-500">
-              Paid Orders
+              {t('paid_orders') || 'Paid Orders'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -171,7 +171,7 @@ export default function FarmerOrdersPage() {
         <Card className='py-4'>
           <CardHeader>
             <CardTitle className="text-sm text-gray-500">
-              Total Revenue
+              {t('total_revenue') || 'Total Revenue'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -189,7 +189,7 @@ export default function FarmerOrdersPage() {
 
           {/* SEARCH */}
           <Input
-            placeholder="Search buyer..."
+            placeholder={t('search_buyer_placeholder') || 'Search buyer...'}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full md:w-96"
@@ -200,12 +200,12 @@ export default function FarmerOrdersPage() {
             {/* STATUS */}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t('status') || 'Status'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Status</SelectItem>
-                <SelectItem value="PAID">Paid</SelectItem>
-                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="ALL">{t('all_status_option') || 'All Status'}</SelectItem>
+                <SelectItem value="PAID">{t('sales_status_paid') || 'Paid'}</SelectItem>
+                <SelectItem value="PENDING">{t('sales_status_pending') || 'Pending'}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -223,14 +223,14 @@ export default function FarmerOrdersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Buyer</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Qty</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>{t('col_buyer') || 'Buyer'}</TableHead>
+                <TableHead>{t('col_contact') || 'Contact'}</TableHead>
+                <TableHead>{t('product') || 'Product'}</TableHead>
+                <TableHead>{t('col_qty') || 'Qty'}</TableHead>
+                <TableHead>{t('price') || 'Price'}</TableHead>
+                <TableHead>{t('col_total') || 'Total'}</TableHead>
+                <TableHead>{t('status') || 'Status'}</TableHead>
+                <TableHead>{t('date') || 'Date'}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -239,7 +239,7 @@ export default function FarmerOrdersPage() {
               {paginatedRows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-6 text-gray-500">
-                    No orders found
+                    {t('no_orders_found') || 'No orders found'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -258,14 +258,14 @@ export default function FarmerOrdersPage() {
                             className="object-cover"
                           />
                         </div>
-                        {order.buyer?.profile?.fullName || "Unknown"}
+                        {order.buyer?.profile?.fullName || t('unknown_buyer') || 'Unknown'}
                       </div>
                     </TableCell>
 
                     <TableCell>
-                      <div>{order.buyer?.phone || "No phone"}</div>
+                      <div>{order.buyer?.phone || t('no_phone') || 'No phone'}</div>
                       <div className="text-xs text-gray-500">
-                        {order.buyer?.email || "No email"}
+                        {order.buyer?.email || t('no_email') || 'No email'}
                       </div>
                     </TableCell>
 
@@ -291,7 +291,7 @@ export default function FarmerOrdersPage() {
                             ? 'bg-yellow-100 text-yellow-700'
                             : 'bg-gray-100 text-gray-700'
                         }`}>
-                        {order.status}
+                        {order.status === 'PAID' ? t('sales_status_paid') : order.status === 'PENDING' ? t('sales_status_pending') : order.status}
                       </span>
                     </TableCell>
 

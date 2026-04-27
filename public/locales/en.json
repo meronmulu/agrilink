@@ -298,7 +298,7 @@
   "kebele": "Kebele",
   "select_kebele": "Select kebele",
   "updating": "Updating",
-  "update_profile_btn": "Update Profile",
+  "update_profile_btn": "Update profile btn",
   "verify_otp": "Verify otp",
   "enter_6_digit_code": "Enter 6 digit code",
   "verifying": "Verifying",
@@ -704,5 +704,6 @@
   "register_farmer_desc": "Please fill in the details below to create a new farmer account.",
   "email_placeholder": "example@email.com",
   "password_placeholder": "••••••",
-  "register_farmer": "Register Farmer"
+  "register_farmer": "Register Farmer",
+  "update_profile_button": "Update Profile"
 }

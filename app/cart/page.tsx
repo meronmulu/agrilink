@@ -122,9 +122,9 @@ export default function CartPage() {
       await clearCart()
       setCart([])
       setSelectedCartItemId(null)
-      toast.success('Cart cleared')
+      toast.success(t('toast_cart_cleared') || 'Cart cleared')
     } catch {
-      toast.error('Failed')
+      toast.error(t('toast_failed') || 'Failed')
     }
   }
 
@@ -160,7 +160,7 @@ export default function CartPage() {
     }
   }
 
-  
+
 
   if (loading) {
     return (
@@ -305,7 +305,7 @@ export default function CartPage() {
                         .map(item => (
                           <div key={item.id} className="space-y-2">
 
-                           
+
 
                             <div className="flex justify-between">
                               <span>{t('price') || 'Price'}</span>
@@ -314,7 +314,7 @@ export default function CartPage() {
                               </span>
                             </div>
 
-                            
+
 
                             <div className="flex justify-between font-bold text-lg">
                               <span>{t('total') || 'Total'}</span>
@@ -346,7 +346,7 @@ export default function CartPage() {
                     className="w-full"
                     onClick={handleClear}
                   >
-                    Clear Cart
+                    {t('clear_cart') || 'Clear Cart'}
                   </Button>
 
                 </CardContent>

@@ -702,5 +702,6 @@
   "register_farmer_desc": "Ira deebi'ii bal'inaan odeeffannoo armaan gadii guutuun akaakuu qonnaan bulaa haaraa uumi.",
   "email_placeholder": "example@email.com",
   "password_placeholder": "••••••",
-  "register_farmer": "Qonnaan Bulaa Galmeessi"
+  "register_farmer": "Qonnaan Bulaa Galmeessi",
+  "update_profile_button": "Uumi"
 }
