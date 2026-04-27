@@ -91,6 +91,50 @@ export default function AdminDashboardPage() {
 const pageSize = 5
 
   const [editName, setEditName] = useState('')
+  const recentProducts = products.slice(0, 5)
+
+  const handleEdit = (product: AllProductItem) => {
+    setSelectedProduct(product)
+    setEditName(product.name)
+    setEditOpen(true)
+  }
+
+  const handleDelete = (product: AllProductItem) => {
+    setSelectedProduct(product)
+    setDeleteOpen(true)
+  }
+
+  const handleUpdateProduct = async () => {
+    if (!selectedProduct || !editName.trim()) return
+    try {
+      setSubmitting(true)
+      await updateAllProduct(selectedProduct.id, { name: editName.trim() })
+      setEditOpen(false)
+      await loadAllproducts()
+      toast.success("Product updated successfully")
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update product")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleDeleteProduct = async () => {
+    if (!selectedProduct) return
+    try {
+      setSubmitting(true)
+      await deleteAllProduct(selectedProduct.id)
+      setDeleteOpen(false)
+      await loadAllproducts()
+      toast.success("Product deleted successfully")
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to delete product")
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   function groupDataByMonth(products: Product[], users: User[]): ChartData[] {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -179,7 +223,7 @@ const pageSize = 5
         name: form.name.trim(),
       })
 
-      setOpen(false)
+      setAddOpen(false)
       setForm({ name: "" })
 
       await loadData()
@@ -300,32 +344,40 @@ const paginatedProducts = allProducts.slice(
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>ID</TableHead>
                   <TableHead>{t('product')}</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentProducts.map((p) => (
+                {paginatedProducts.map((p) => (
                   <TableRow key={p.id}>
-                    <TableCell className='flex items-center gap-3'>
-                      <div className="relative w-12 h-12 rounded-md overflow-hidden border">
-                        <Image
-                          src={p.image || "/placeholder.png"}
-                          alt={p.name}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
-                      </div>
+                    <TableCell className="font-mono text-xs text-gray-500">
+                      {p.id.slice(-6)}
+                    </TableCell>
+                    <TableCell className="font-medium">
                       {p.name}
                     </TableCell>
-                    <TableCell>
-                      {typeof p.subCategory === 'string'
-                        ? p.subCategory
-                        : p.subCategory?.name || "N/A"}
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(p)}
+                          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Pencil size={16} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(p)}
+                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
                     </TableCell>
-                    <TableCell>${p.price}</TableCell>
-                    <TableCell>{p.amountSold || 0}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
