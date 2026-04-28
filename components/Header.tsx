@@ -43,6 +43,7 @@ import {
 } from "@/services/notificationService"
 
 import { NotificationPayload } from "@/types/notification"
+import { Button } from "./ui/button"
 
 export default function Header() {
   const { user, logout, loading } = useAuth()
@@ -195,6 +196,35 @@ export default function Header() {
             <h1 className="text-lg font-semibold">AgriLink</h1>
           </div>
         </div>
+
+       {!user && (
+  <ul className="hidden md:flex items-center gap-6 text-sm text-gray-600">
+    
+    <li
+      onClick={() => document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" })}
+      className="hover:text-green-600 cursor-pointer"
+    >
+      {t('footer_link_home')}
+    </li>
+
+    <li
+      onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
+      className="hover:text-green-600 cursor-pointer"
+    >
+      {t('footer_link_about')}
+    </li>
+
+    <li
+      onClick={() => document.getElementById("market")?.scrollIntoView({ behavior: "smooth" })}
+      className="hover:text-green-600 cursor-pointer"
+    >
+      {t('footer_link_market')}
+    </li>
+
+   
+
+  </ul>
+)}
 
         {/* RIGHT */}
         {user && (
