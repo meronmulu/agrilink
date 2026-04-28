@@ -7,13 +7,16 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { getNotifications } from '@/services/notificationService'
+import {
+  getNotifications,
+  markNotificationRead,
+} from '@/services/notificationService'
 
 type NotificationType = {
   id: string
   title: string
   message: string
-  createdAt: string
+  createdAt?: string
   isRead?: boolean
 }
 
@@ -29,11 +32,28 @@ export default function NotificationsPage() {
   const loadNotifications = async () => {
     try {
       const res = await getNotifications()
-      setNotifications(res)
+      console.log("notification api result:", res)
+
+      setNotifications(Array.isArray(res) ? res : [])
     } catch (err) {
-      console.error(err)
+      console.error("notification load error:", err)
+      setNotifications([])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleClick = async (id: string) => {
+    try {
+      await markNotificationRead(id)
+
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === id ? { ...n, isRead: true } : n
+        )
+      )
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -77,19 +97,27 @@ export default function NotificationsPage() {
               {notifications.map((n) => (
                 <Card
                   key={n.id}
-                  className="rounded-2xl border border-gray-100 hover:shadow-md transition"
+                  onClick={() => handleClick(n.id)}
+                  className={`rounded-2xl border cursor-pointer transition hover:shadow-md ${
+                    n.isRead
+                      ? "border-gray-100 bg-white"
+                      : "border-emerald-300 bg-emerald-50"
+                  }`}
                 >
-                  <CardContent className="px-5 py-1">
+                  <CardContent className="px-5 py-4">
                     <h3 className="font-semibold text-lg text-gray-800">
                       {n.title}
                     </h3>
+
                     <p className="text-sm text-gray-500 mt-1">
                       {n.message}
                     </p>
 
                     <div className="flex items-center gap-2 mt-3 text-xs text-gray-400">
                       <Calendar className="w-3.5 h-3.5" />
-                      {new Date(n.createdAt).toLocaleString()}
+                      {n.createdAt
+                        ? new Date(n.createdAt).toLocaleString()
+                        : "Just now"}
                     </div>
                   </CardContent>
                 </Card>

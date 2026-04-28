@@ -135,7 +135,14 @@ export default function AiAssistant() {
       window.speechSynthesis.speak(utterance)
     }
   }
+  const handleCloseDialog = () => {
+  setOpen(false)
+  setExpanded(false)
+  setIsListening(false)
 
+  recognitionRef.current?.stop()
+  window.speechSynthesis?.cancel()
+}
   const handleVoiceInput = () => {
     if (typeof window === 'undefined') return
 
@@ -323,8 +330,16 @@ export default function AiAssistant() {
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent
+<Dialog
+  open={open}
+  onOpenChange={(value) => {
+    if (!value) {
+      handleCloseDialog()
+    } else {
+      setOpen(true)
+    }
+  }}
+>        <DialogContent
           className={`flex flex-col transition-all duration-300 ${
             expanded
               ? 'w-[95vw] max-w-[95vw] h-screen max-h-screen'
@@ -332,28 +347,31 @@ export default function AiAssistant() {
           } p-0 gap-0 rounded-xl overflow-hidden`}
         >
           <div className="flex items-center justify-between px-6 py-4 border-b bg-linear-to-r from-emerald-500 to-teal-500">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <DialogTitle className="text-white text-lg font-semibold">
-                  {t('ai_assistant') || 'AI Assistant'}
-                </DialogTitle>
-                <div className="flex items-center gap-2 text-white/80 text-xs">
-                  <span>Language:</span>
-                  <span className="bg-white/20 px-2 py-1 rounded-full">
-                    {lang === 'am' ? '🇪🇹 Amharic' : lang === 'om' ? '🇪🇹 Oromo' : '🇬🇧 English'}
-                  </span>
-                  {isListening && (
-                    <span className="bg-red-500 text-white px-2 py-1 rounded-full animate-pulse">
-                      🎤 Listening...
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+  <div className="flex items-center gap-3">
+    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+      <Bot className="w-5 h-5 text-white" />
+    </div>
+    <div>
+      <DialogTitle className="text-white text-lg font-semibold">
+        {t('ai_assistant') || 'AI Assistant'}
+      </DialogTitle>
+    </div>
+  </div>
+
+  {/* CUSTOM CLOSE BUTTON */}
+  {/* <button
+    onClick={() => {
+      setOpen(false)
+      setExpanded(false)
+      setIsListening(false)
+      recognitionRef.current?.stop()
+      window.speechSynthesis?.cancel()
+    }}
+    className="text-white hover:bg-white/20 rounded-full p-2 transition"
+  >
+    <X className="w-5 h-5" />
+  </button> */}
+</div>
 
           <div className="flex-1 overflow-y-auto p-4 bg-linear-to-b from-gray-50 to-gray-100">
             {messages.length === 0 ? (
