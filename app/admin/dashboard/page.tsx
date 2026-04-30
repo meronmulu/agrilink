@@ -318,7 +318,7 @@ export default function AdminDashboardPage() {
         </Card>
 
         <Card className="py-4">
-          <CardHeader><CardTitle>{t('total_orders')}</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Total Product amount </CardTitle></CardHeader>
           <CardContent className="text-3xl font-bold">{totalOrders}</CardContent>
         </Card>
       </div>

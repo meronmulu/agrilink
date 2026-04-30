@@ -31,19 +31,20 @@ type ChatMessage = {
 
 const getSuggestedQuestions = (t: (key: string) => string) => ({
   agronomist: [
-    t('ai_q_plant_maize') || 'How do I plant maize properly?',
-    t('ai_q_fertilizer_clay') || 'Best fertilizer for clay soil?',
-    t('ai_q_wheat_rust') || 'How to treat wheat rust disease?',
+   'How can i sow wheat?',
+'What is the recommended seed rate for barley per hectare?',
+'What is the optimal planting depth for maize?'
   ],
   market: [
-    t('ai_q_tomato_price') || 'Current tomato market price?',
-    t('ai_q_sell_onions') || 'Where can I sell onions fast?',
-    t('ai_q_highest_demand') || 'Which crop has highest demand now?',
+     'What is the price of Coffee in Jimma??',
+     'What is the price of bananas?',
+     'How much is onion??',
+    
+
   ],
   weather: [
-    t('ai_q_rain_amhara') || 'Will it rain in Amhara this week?',
-    t('ai_q_frost_risk') || 'Is there frost risk tonight?',
-    t('ai_q_irrigation') || 'Should I irrigate tomorrow?',
+     'Should I plant today based on the weather?',
+    'What is the weather like in my area today?',
   ],
 })
 
