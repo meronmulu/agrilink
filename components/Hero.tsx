@@ -18,7 +18,7 @@ export default function Hero() {
       if (user.role === "FARMER") router.push("/farmer");
       else if (user.role === "BUYER") router.push("/buyer");
       else if (user.role === "ADMIN") router.push("/admin/dashboard");
-      else if (user.role === "AGENT") router.push("/agent/dashboard");
+      else if (user.role === "AGENT") router.push("agent/farmer");
     } else {
       router.push("/login");
     }

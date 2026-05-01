@@ -14,7 +14,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginInput } from '@/lib/validation/auth.schema'
 import Cookies from 'js-cookie'
 import { Button } from './ui/button'
-import { listenForegroundNotification, requestNotificationPermission } from '@/services/notificationService'
 
 export default function LoginPage() {
   const { t } = useLanguage()
